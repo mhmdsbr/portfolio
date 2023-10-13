@@ -1,0 +1,64 @@
+/* General
+========================================================================== */
+@import "../variables/all-variables";
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 175px;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+    font-family: $font-primary;
+    font-size: var(--text-font-size);
+    line-height: var(--text-lineheight);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    --font-body: $font-primary;
+
+    --color-primary: var(--color-black-pearl);
+    --color-secondary: var(--color-blue);
+
+    --bg-primary: var(--color-black-pearl);
+    --bg-secondary: var(--color-secondary);
+
+
+    --color-success: var(--color-green);
+    --color-danger: var(--color-red);
+    --color-warning: var(--color-yellow);
+
+    --text-color: var(--color-white);
+    --text-font-size: map-get($text-sizes, base);
+    --text-lineheight: 1.2;
+
+}
+
+// TODO: change to a utility class
+.bg-primary {
+    background-color: var(--bg-primary) !important;
+}
+
+
+// Order
+@for $i from 1 through 3 {
+    .order-#{$i} {
+        @include media-breakpoint-up(md) {
+            order: #{$i};
+        }
+    }
+
+    .mobile-order-#{$i} {
+        @include media-breakpoint-down(md) {
+            order: #{$i};
+        }
+    }
+}

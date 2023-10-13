@@ -1,0 +1,48 @@
+/* Generate font-size classes for lg down and lg up
+** This can be altered by adding on to or removing items from the $text-sizes variable
+========================================================================== */
+@import "../variables/all-variables";
+@import "../vendor/bootstrap";
+
+@each $name, $size in $text-sizes {
+    .text-#{$name} {
+        font-size: $size;
+    }
+
+    @each $breakpoint-name, $breakpoint-size in $container-max-widths {
+        .text-#{$breakpoint-name}-#{$name} {
+            @include media-breakpoint-up(#{$breakpoint-name}) {
+                font-size: $size;
+            }
+        }
+    }
+}
+
+/* Generate css variables.
+** All colors added in the $exp-colors array will be generated as: --color-name: #000000;
+========================================================================== */
+body {
+    @each $name, $hex in $exp-colors {
+        --color-#{$name}: #{$hex};
+    }
+}
+
+/* Container, Row, and Column Gutter
+** This generates special gutter classes for container, row, and column
+========================================================================== */
+@include media-breakpoint-up(lg) {
+    .container,
+    .row {
+        &:not([class*="g-"]):not([class*="gx-"]) {
+            --bs-gutter-x: 2.5rem;
+        }
+    }
+}
+
+/* Max Width
+** This generates a max-width class that can be used to set a max-width on any element
+========================================================================== */
+.max-width {
+    max-width: 1920px;
+    margin: 0 auto;
+}
