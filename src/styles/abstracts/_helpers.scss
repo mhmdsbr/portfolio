@@ -34,7 +34,7 @@ body {
     .container,
     .row {
         &:not([class*="g-"]):not([class*="gx-"]) {
-            --bs-gutter-x: 2.5rem;
+            --bs-gutter-x: 4rem;
         }
     }
 }
@@ -43,6 +43,6 @@ body {
 ** This generates a max-width class that can be used to set a max-width on any element
 ========================================================================== */
 .max-width {
-    max-width: 1920px;
+    max-width: 1440px;
     margin: 0 auto;
 }

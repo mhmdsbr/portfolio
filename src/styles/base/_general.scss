@@ -8,8 +8,12 @@
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 175px;
+    scrollbar-width: none;
     overflow-x: hidden;
     height: 100%;
+}
+::-webkit-scrollbar {
+    display: none; /* For Chrome and Safari */
 }
 
 body {
@@ -26,7 +30,7 @@ body {
     --font-body: $font-primary;
 
     --color-primary: var(--color-black-pearl);
-    --color-secondary: var(--color-blue);
+    --color-secondary: var(--color-gray);
 
     --bg-primary: var(--color-black-pearl);
     --bg-secondary: var(--color-secondary);

@@ -5,16 +5,16 @@ import classes from "./About.module.scss";
 const About = () => {
     return (
         <section id="about" className={`${classes.about} bg-dark`}>
-            <div className="container px-lg-5">
+            <div className="container">
                 <div className="position-relative d-flex text-center mb-5">
-                    <h2 className="text-24  text-uppercase fw-600 w-100 mb-0 text-muted opacity-1">About Me</h2>
-                    <p className="text-9 text-dark fw-600 position-absolute w-100 align-self-center lh-base mb-0 text-white">Know Me More
-                        <span className="heading-separator-line border-bottom border-3 border-primary d-block mx-auto"></span>
+                    <h2 className={`${classes['about__title-muted']} w-100 mb-0 opacity-25`}>About Me</h2>
+                    <p className={`${classes['about__title']} fw-600 position-absolute w-100 align-self-center lh-base mb-0 text-white`}>Know Me More
+                        <span className={`${classes['about__title-separator']} border-bottom border-5 border-primary d-block mx-auto`}></span>
                     </p>
                 </div>
-                <div className="row gy-5">
+                <div className="row">
                     <div className="col-lg-7 col-xl-8 text-center text-lg-start">
-                        <h2 className="text-7 fw-600 mb-3 text-white">
+                        <h2 className="fw-600 mb-3 text-white">
                             I'm <span className="text-primary">Simone Olivia,</span>
                             a Web Developer
                         </h2>

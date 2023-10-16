@@ -1,4 +1,24 @@
 @import "../../styles/variables/all-variables";
 
 .about {
+  overflow: hidden;
+  padding: 6rem 0;
+  position: relative;
+
+  &__title {
+    font-size: map-get($text-sizes, 3xl);
+    font-weight: 600;
+  }
+
+  &__title-muted {
+    color: var(--color-secondary);
+    font-size: map-get($text-sizes, 8xl);
+    font-weight: 600;
+    letter-spacing: 5px;
+  }
+
+  &__title-separator {
+    width: 80px;
+  }
+
 }
