@@ -3,10 +3,11 @@ import React from 'react';
 
 import classes from "./MainContainer.module.scss";
 
-const MainContent = (props) => {
+
+const MainContent = ({children}) => {
     return (
         <main className={`col-10 offset-2 h-100  ${classes.main}`}>
-            <h1>Main Content</h1>
+            {children}
         </main>
     );
 };

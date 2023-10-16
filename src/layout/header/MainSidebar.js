@@ -2,8 +2,8 @@
 import React from 'react';
 
 import classes from "./MainSidebar.module.scss";
-import Profile from "../UI/Profile";
-import HeaderNav from "../UI/HeaderNav";
+import Profile from "../../components/UI/Profile";
+import HeaderNav from "../nav/HeaderNav";
 
 
 const MainSidebar = (props) => {

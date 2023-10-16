@@ -1,13 +1,16 @@
 import React from 'react';
 
 import MainContainer from "./MainContainer";
-import MainSidebar from "./MainSidebar";
+import MainSidebar from "./header/MainSidebar";
+import Intro from "../sections/intro/Intro";
 
-const AppLayout = (props) => {
+const AppLayout = () => {
     return (
         <div className="row justify-content-center">
             <MainSidebar />
-            <MainContainer />
+            <MainContainer>
+                <Intro />
+            </MainContainer>
         </div>
     );
 };

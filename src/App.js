@@ -1,7 +1,7 @@
 // App.js
 import React from 'react';
 
-import AppLayout from "./components/Layout/AppLayout";
+import AppLayout from "./layout/AppLayout";
 
 function App() {
   return (
