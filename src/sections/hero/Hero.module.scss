@@ -1,0 +1,27 @@
+@import "src/styles/base/placeholders";
+
+.hero {
+
+  &__wrap {
+    position: relative;
+    z-index: 2;
+  }
+
+  &__mask {
+    @extend %bg-absolute;
+    z-index: 1;
+  }
+
+  &__bg {
+    @extend %bg-image;
+    @extend %bg-absolute;
+    background-image: url("../../assets/laptop.jpg");
+    z-index: 0;
+  }
+
+  &__content {
+    position: relative;
+    z-index: 2;
+  }
+
+}

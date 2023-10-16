@@ -1,0 +1,12 @@
+@import "src/styles/base/placeholders";
+@import "src/styles/variables/font-variables";
+@import "src/styles/variables/variables";
+
+.button {
+  @extend %btn;
+  padding: 12px 32px;
+  font-weight: 500;
+  font-family: $font-primary;
+  letter-spacing: 4px;
+  font-size: map-get($text-sizes, lg);
+}

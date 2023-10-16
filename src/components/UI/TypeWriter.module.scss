@@ -1,0 +1,27 @@
+@import "../../styles/variables/variables";
+
+.typeWriter {
+
+  &__text {
+    font-size: map-get($text-sizes, 6xl);
+    font-weight: 500;
+  }
+
+  &__cursor {
+    font-size: 1em;
+    animation: blink 700ms step-end infinite;
+  }
+
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

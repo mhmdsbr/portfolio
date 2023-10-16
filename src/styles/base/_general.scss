@@ -40,6 +40,8 @@ body {
     --text-font-size: map-get($text-sizes, base);
     --text-lineheight: 1.2;
 
+    --bs-link-color-rgb: red;
+
 }
 
 // TODO: change to a utility class

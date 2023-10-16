@@ -1,0 +1,26 @@
+@import "src/styles/variables/font-variables";
+@import "src/styles/variables/variables";
+
+.introText {
+  position: relative;
+
+  &__title, &__name, &__subtitle {
+    font-family: $font-primary;
+    color: var(--color-white);
+  }
+
+  &__title {
+    font-size: map-get($text-sizes, 4xl);
+    font-weight: 500;
+  }
+
+  &__name {
+    font-size: map-get($text-sizes, 6xl);
+    font-weight: 500;
+  }
+
+  &__subtitle {
+    font-size: map-get($text-sizes, lg);
+  }
+
+}

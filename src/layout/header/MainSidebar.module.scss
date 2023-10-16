@@ -1,7 +1,7 @@
 @import "../../styles/base/placeholders";
 .msHeader {
     @extend %flexbox-h-center;
-    justify-content: center;
     flex-direction: column;
     background-color: var(--color-primary);
+    gap: 32px;
 }
