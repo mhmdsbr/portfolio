@@ -43,6 +43,8 @@ body {
 ** This generates a max-width class that can be used to set a max-width on any element
 ========================================================================== */
 .max-width {
-    max-width: 1440px;
+    max-width: 1320px !important;
     margin: 0 auto;
 }
+
+

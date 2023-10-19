@@ -10,7 +10,7 @@ const MainSidebar = (props) => {
     return (
         <header className={`${classes.msHeader} col-2 p-lg-4 text-center fixed-top px-0`}>
             <Profile />
-            <HeaderNav />
+            <HeaderNav onClick = {props.onClick} />
         </header>
     );
 };

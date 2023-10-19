@@ -8,10 +8,20 @@ const HeaderNav = (props) => {
             <div id="navbarSupportedContent" className="collapse justify-content-center navbar-collapse" >
                 <ul className="nav flex-column text-lg-center my-lg-auto py-lg-3">
                     <li className="nav-item">
-                        <a href="#" className={`${classes['navbar__link']} nav-link`}>Home</a>
+                        <a
+                            href="#"
+                            onClick={() => props.scrollToSection(props.homeRef)}
+                            className={`${classes['navbar__link']} nav-link`}>
+                            Home
+                        </a>
                     </li>
                     <li className="nav-item">
-                        <a href="#" className={`${classes['navbar__link']} nav-link `}>About Me</a>
+                        <a
+                            onClick={() => props.scrollToSection(props.aboutRef)}
+                            href="#"
+                            className={`${classes['navbar__link']} nav-link `}>
+                            About Me
+                        </a>
                     </li>
                     <li className="nav-item">
                         <a href="#" className={`${classes['navbar__link']} nav-link `}>What I Do</a>

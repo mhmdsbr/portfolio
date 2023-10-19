@@ -30,7 +30,7 @@ body {
     --font-body: $font-primary;
 
     --color-primary: var(--color-black-pearl);
-    --color-secondary: var(--color-gray);
+    --color-secondary: var(--color-darkblue);
 
     --bg-primary: var(--color-black-pearl);
     --bg-secondary: var(--color-secondary);
@@ -53,6 +53,9 @@ body {
     background-color: var(--bg-primary) !important;
 }
 
+.bg-dark-2 {
+    background-color: var(--bg-secondary) !important;
+}
 
 // Order
 @for $i from 1 through 3 {

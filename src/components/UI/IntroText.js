@@ -15,7 +15,7 @@ const IntroText = () => {
                     delay={1200}
                 />
             </h2>
-            <p className={`${classes['introText__subtitle']} text-5 text-light mb-4`}>based in Los Angeles, California.</p>
+            <p className={`${classes['introText__subtitle']} text-5 text-light mb-4`}>based in Iran, Gilan, Rasht</p>
         </div>
     );
 };

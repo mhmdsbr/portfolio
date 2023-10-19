@@ -1,7 +1,7 @@
 @import "../../styles/variables/all-variables";
 @import "../../styles/abstracts/helpers";
 
-.about {
+.summary {
   overflow: hidden;
   padding: 6rem 0;
   position: relative;
@@ -13,7 +13,7 @@
   }
 
   &__title-muted {
-    color: var(--color-secondary);
+    color: var(--color-gray);
     font-size: map-get($text-sizes, 9xl);
     font-weight: 500;
     text-transform: uppercase;
@@ -24,31 +24,9 @@
     width: 80px;
   }
 
-  &__my-info {
-    display: flex;
-    flex-direction: column;
-    ul {
-      li {
-        border-bottom: 1px solid hsla(0,0%,98%,.12);
-        padding-bottom: 12px;
-        padding-top: 12px;
-      }
-    }
-  }
-
-  &__info {
-    margin-right: 8px;
-  }
-
-  &__brands-grid {
-
-  }
-
-  &__brands-grid-item {
-    h4 {
-      font-size: map-get($text-sizes, 5xl);
-    }
-
+  &__featured-box {
+      display: flex;
+      gap: 32px;
   }
 
 }
