@@ -1,4 +1,5 @@
 import React from 'react';
+import TitleSection from "../../components/UI/TitleSection";
 import classes from '../services/Services.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -48,13 +49,10 @@ const Services = () => {
     return (
         <section id="services" className={`${classes.services} bg-dark-2`}>
             <div className="container max-width">
-                <div className="position-relative d-flex text-center mb-5">
-                    <h2 className={`${classes['services__title-muted']} w-100 mb-0 opacity-25`}>services</h2>
-                    <p className={`${classes['services__title']} fw-600 position-absolute w-100 align-self-center lh-base mb-0 text-white`}>
-                        What I do?
-                        <span className={`${classes['services__title-separator']} border-bottom border-5 border-primary d-block mx-auto`}></span>
-                    </p>
-                </div>
+                <TitleSection
+                    title="What I do?"
+                    subtitle="Services"
+                />
                 <div className="row">
                     <div className="col-lg-11 mx-auto">
                         <div className="row">

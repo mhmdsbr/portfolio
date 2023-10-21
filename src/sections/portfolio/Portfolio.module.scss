@@ -1,33 +1,13 @@
 @import "../../styles/variables/all-variables";
 @import "../../styles/abstracts/helpers";
+@import "../../styles/base/all-base";
 
 .portfolio {
-  overflow: hidden;
-  padding: 6rem 0;
-  position: relative;
-
-
-  &__title {
-    font-size: map-get($text-sizes, 3xl);
-    font-weight: 600;
-  }
-
-  &__title-muted {
-    color: var(--color-gray);
-    font-size: map-get($text-sizes, 9xl);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 5px;
-  }
-
-  &__title-separator {
-    width: 80px;
-  }
+  @extend %section-layout;
 
   &__featured-box {
       display: flex;
       gap: 32px;
   }
-
 
 }

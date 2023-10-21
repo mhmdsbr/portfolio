@@ -8,6 +8,7 @@ import Services from "../sections/services/Services";
 import Summary from "../sections/summary/Summary";
 import Portfolio from "../sections/portfolio/Portfolio";
 import Testimonial from "../sections/testimonial/Testimonial";
+import Contact from "../sections/contact/Contact";
 
 const AppLayout = () => {
 
@@ -21,6 +22,7 @@ const AppLayout = () => {
                 <Summary/>
                 <Portfolio/>
                 <Testimonial/>
+                <Contact/>
             </MainContainer>
         </div>
     );

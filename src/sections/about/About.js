@@ -1,18 +1,17 @@
 import React from 'react';
 
 import classes from "./About.module.scss";
+import TitleSection from "../../components/UI/TitleSection";
 
 const About = (props) => {
 
     return (
         <section id="about" className={`${classes.about} bg-dark`}>
             <div className="container max-width">
-                <div className="position-relative d-flex text-center mb-5">
-                    <h2 className={`${classes['about__title-muted']} w-100 mb-0 opacity-25`}>About Me</h2>
-                    <p className={`${classes['about__title']} fw-600 position-absolute w-100 align-self-center lh-base mb-0 text-white`}>Know Me More
-                        <span className={`${classes['about__title-separator']} border-bottom border-5 border-primary d-block mx-auto`}></span>
-                    </p>
-                </div>
+                <TitleSection
+                    subtitle="About Me"
+                    title="Know me more"
+                />
                 <div className="row">
                     <div className="col-lg-7 col-xl-8 text-center text-lg-start">
                         <h2 className="fw-600 mb-3 text-white">
