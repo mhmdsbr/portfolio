@@ -1,14 +1,16 @@
 import React from 'react';
 import classes from "./Portfolio.module.scss";
 import TitleSection from "../../components/UI/TitleSection";
+import PortfolioGallery from "../../components/UI/PortfolioGallery";
 
 const Portfolio = () => {
     return (
-        <section id="summary" className={`${classes.portfolio} bg-dark-2`}>
+        <section id="portfolio" className={`${classes.portfolio} bg-dark-2`}>
             <TitleSection
                 subtitle="Portfolio"
                 title="My Work"
             />
+            <PortfolioGallery />
         </section>
     );
 };

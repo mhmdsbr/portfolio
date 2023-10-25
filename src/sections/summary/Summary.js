@@ -1,6 +1,7 @@
 import React from 'react';
 import classes from './Summary.module.scss';
 import TitleSection from '../../components/UI/TitleSection';
+import ProgressBar from "../../components/UI/ProgressBar";
 
 const experienceData = [
     {
@@ -71,6 +72,9 @@ const Summary = () => {
                             </div>
                         ))}
                     </div>
+                </div>
+                <div className="row">
+                    <ProgressBar />
                 </div>
             </div>
         </section>
