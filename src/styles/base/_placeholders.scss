@@ -13,6 +13,27 @@
     text-align: center;
 }
 
+%btn-secondary {
+    justify-content: center;
+    align-items: center;
+    font-size: map-get($text-sizes, lg);
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    color: var(--color-white);
+    box-shadow: 0 5px 15px rgba(0,0,0,.15);
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    text-align: center;
+    transition: all .3s ease-in-out;
+    z-index: 1030;
+
+    &:hover {
+        background-color: var(--bs-primary);
+        font-size: map-get($text-sizes, 2xl);
+    }
+}
+
 /* Background image
 ========================================================================== */
 

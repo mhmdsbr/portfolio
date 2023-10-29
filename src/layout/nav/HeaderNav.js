@@ -9,34 +9,52 @@ const HeaderNav = (props) => {
                 <ul className="nav flex-column text-lg-center my-lg-auto py-lg-3">
                     <li className="nav-item">
                         <a
-                            href="#"
-                            onClick={() => props.scrollToSection(props.homeRef)}
+                            href="#home"
                             className={`${classes['navbar__link']} nav-link`}>
                             Home
                         </a>
                     </li>
                     <li className="nav-item">
                         <a
-                            onClick={() => props.scrollToSection(props.aboutRef)}
-                            href="#"
+                            href="#about"
                             className={`${classes['navbar__link']} nav-link `}>
                             About Me
                         </a>
                     </li>
                     <li className="nav-item">
-                        <a href="#" className={`${classes['navbar__link']} nav-link `}>What I Do</a>
+                        <a
+                            href="#services"
+                            className={`${classes['navbar__link']} nav-link `}>
+                            What I Do
+                        </a>
                     </li>
                     <li className="nav-item">
-                        <a href="#" className={`${classes['navbar__link']} nav-link `}>Resume</a>
+                        <a
+                            href="#summary"
+                            className={`${classes['navbar__link']} nav-link `}>
+                            Resume
+                        </a>
                     </li>
                     <li className="nav-item">
-                        <a href="#" className={`${classes['navbar__link']} nav-link `}>Portfolio</a>
+                        <a
+                            href="#portfolio"
+                            className={`${classes['navbar__link']} nav-link `}>
+                            Portfolio
+                        </a>
                     </li>
                     <li className="nav-item">
-                        <a href="#" className={`${classes['navbar__link']} nav-link `}>Testimonial</a>
+                        <a
+                            href="#testimonial"
+                            className={`${classes['navbar__link']} nav-link `}>
+                            Testimonial
+                        </a>
                     </li>
                     <li className="nav-item">
-                        <a href="#" className={`${classes['navbar__link']} nav-link `}>Contact</a>
+                        <a
+                            href="#contact"
+                            className={`${classes['navbar__link']} nav-link `}>
+                            Contact
+                        </a>
                     </li>
                 </ul>
             </div>

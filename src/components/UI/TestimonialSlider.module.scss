@@ -1,0 +1,41 @@
+@import "src/styles/base/placeholders";
+@import "src/styles/variables/font-variables";
+@import "src/styles/variables/variables";
+
+
+.testimonialSlider {
+  width: 100%;
+  cursor: default;
+  height: 280px;
+
+  &__item-head {
+
+    img {
+      width: 15%;
+    }
+    p {
+      span {
+        color: var(--color-shades-gray-400);
+      }
+    }
+  }
+
+  &__item-content {
+    font-family: $font-primary;
+    font-size: map-get($text-sizes, sm);
+    line-height: 1.3;
+    letter-spacing: 2px;
+  }
+
+  &__item-stars {
+    display: flex;
+    gap: 4px;
+    svg {
+      path {
+        color: var(--color-warning);
+      }
+    }
+  }
+
+
+}

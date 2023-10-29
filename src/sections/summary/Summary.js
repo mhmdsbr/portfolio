@@ -2,6 +2,7 @@ import React from 'react';
 import classes from './Summary.module.scss';
 import TitleSection from '../../components/UI/TitleSection';
 import ProgressBar from "../../components/UI/ProgressBar";
+import Button from "../../components/UI/Button";
 
 const experienceData = [
     {
@@ -46,6 +47,7 @@ const experienceData = [
 const Summary = () => {
     const firstThreeItems = experienceData.slice(0, 3);
     const lastThreeItems = experienceData.slice(3);
+    const buttonContent = "Download CV";
 
     return (
         <section id="summary" className={`${classes.summary} bg-dark`}>
@@ -73,8 +75,11 @@ const Summary = () => {
                         ))}
                     </div>
                 </div>
-                <div className="row">
+                <div className="row justify-content-center">
                     <ProgressBar />
+                    <div className="col-6 mt-5 text-center">
+                        <Button className="btn-secondary text-white border-secondary" content={buttonContent} />
+                    </div>
                 </div>
             </div>
         </section>

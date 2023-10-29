@@ -9,6 +9,7 @@ import Summary from "../sections/summary/Summary";
 import Portfolio from "../sections/portfolio/Portfolio";
 import Testimonial from "../sections/testimonial/Testimonial";
 import Contact from "../sections/contact/Contact";
+import Footer from "./footer/Footer";
 
 const AppLayout = () => {
 
@@ -24,6 +25,7 @@ const AppLayout = () => {
                 <Testimonial/>
                 <Contact/>
             </MainContainer>
+            <Footer />
         </div>
     );
 };
