@@ -3,6 +3,9 @@ import classes from './Summary.module.scss';
 import TitleSection from '../../components/UI/section/TitleSection';
 import ProgressBar from "./ProgressBar";
 import Button from "../../components/UI/button/Button";
+import Section from "../../components/UI/section/Section";
+import SectionContainer from "../../components/UI/section/SectionContainer";
+import ExperienceList from "./ExperienceList";
 
 const experienceData = [
     {
@@ -45,44 +48,22 @@ const experienceData = [
 ];
 
 const Summary = () => {
-    const firstThreeItems = experienceData.slice(0, 3);
-    const lastThreeItems = experienceData.slice(3);
+
     const buttonContent = "Download CV";
 
     return (
-        <section id="summary" className={`${classes.summary} bg-dark`}>
+        <Section id="summary" className={`${classes.summary} bg-dark`}>
             <TitleSection subtitle="Summary" title="Resume" />
-            <div className="container max-width">
-                <div className="row gx-5">
-                    <div className="col-md-6">
-                        {firstThreeItems.map((experience, index) => (
-                            <div key={index} className={` ${classes['summary__featured-box']} rounded p-4 mb-4 bg-dark-2`}>
-                                <p className="badge p-2 bg-primary text-2 fw-400">{experience.year}</p>
-                                <h4 className="text-white">{experience.title}</h4>
-                                <p className="text-primary">{experience.company}</p>
-                                <p className="mb-0 text-white-50">{experience.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="col-md-6">
-                        {lastThreeItems.map((experience, index) => (
-                            <div key={index} className={` ${classes['summary__featured-box']} rounded p-4 mb-4 bg-dark-2`}>
-                                <p className="badge p-2 bg-primary text-2 fw-400">{experience.year}</p>
-                                <h4 className="text-white">{experience.title}</h4>
-                                <p className="text-primary">{experience.company}</p>
-                                <p className="mb-0 text-white-50">{experience.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+            <SectionContainer>
+                <ExperienceList experience={experienceData} />
                 <div className="row justify-content-center">
                     <ProgressBar />
                     <div className="col-6 mt-5 text-center">
                         <Button className="btn-secondary text-white border-secondary" content={buttonContent} />
                     </div>
                 </div>
-            </div>
-        </section>
+            </SectionContainer>
+        </Section>
     );
 };
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import TitleSection from "../../components/UI/section/TitleSection";
 import classes from '../services/Services.module.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faPalette,
     faDesktop,
@@ -10,6 +9,9 @@ import {
     faChartArea,
     faBullhorn,
 } from '@fortawesome/free-solid-svg-icons';
+import Section from "../../components/UI/section/Section";
+import SectionContainer from "../../components/UI/section/SectionContainer";
+import ServicesList from "./ServicesList";
 
 const servicesData = [
     {
@@ -47,33 +49,19 @@ const servicesData = [
 
 const Services = () => {
     return (
-        <section id="services" className={`${classes.services} bg-dark-2`}>
-            <div className="container max-width">
+        <Section id="services" className={`${classes.services} bg-dark-2`}>
+            <SectionContainer>
                 <TitleSection
                     title="What I do?"
                     subtitle="Services"
                 />
                 <div className="row">
-                    <div className="col-lg-11 mx-auto">
-                        <div className="row">
-                            {servicesData.map((service, index) => (
-                                <div key={index} className="col-md-6">
-                                    <div className={`${classes['services__featured-box']} mb-5`}>
-                                        <div className={`${classes['services__featured-box-icon']} text-primary rounded bg-dark`}>
-                                            <FontAwesomeIcon icon={service.icon} size="2x" />
-                                        </div>
-                                        <div className={`${classes['services__featured-box-content']}`}>
-                                            <h3 className="text-white">{service.title}</h3>
-                                            <p className="mb-0 text-white-50">{service.content}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                    <div className="col-lg-12">
+                        <ServicesList servicesData={servicesData} />
                     </div>
                 </div>
-            </div>
-        </section>
+            </SectionContainer>
+        </Section>
     );
 };
 

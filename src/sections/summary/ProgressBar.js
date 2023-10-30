@@ -12,7 +12,7 @@ function ProgressBarComponent() {
     ];
 
     return (
-        <div className="row mt-4">
+        <div className="row p-0 mt-4">
             {progressBarData.map((item, index) => (
                 <div key={index} className="col-md-6">
                     <p className="fw-500 text-start mb-2 text-light">
