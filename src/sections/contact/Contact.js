@@ -1,6 +1,6 @@
 import React from 'react';
 import classes from "./Contact.module.scss";
-import TitleSection from "../../components/UI/TitleSection";
+import TitleSection from "../../components/UI/section/TitleSection";
 import {
     faEnvelope,
     faPhone,

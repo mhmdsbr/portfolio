@@ -2,7 +2,7 @@
 import React from 'react';
 
 import classes from "./MainSidebar.module.scss";
-import Profile from "../../components/UI/Profile";
+import Profile from "./Profile";
 import HeaderNav from "../nav/HeaderNav";
 import FollowUs from "../../components/UI/FollowUs";
 

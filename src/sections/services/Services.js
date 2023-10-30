@@ -1,5 +1,5 @@
 import React from 'react';
-import TitleSection from "../../components/UI/TitleSection";
+import TitleSection from "../../components/UI/section/TitleSection";
 import classes from '../services/Services.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {

@@ -1,0 +1,6 @@
+@import "../../../styles/variables/all-variables";
+@import "../../../styles/base/placeholders";
+
+.section {
+  @extend %section-layout;
+}

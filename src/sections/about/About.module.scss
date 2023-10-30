@@ -1,9 +1,7 @@
 @import "../../styles/variables/all-variables";
 @import "../../styles/abstracts/helpers";
-@import "../../styles/base/all-base";
 
 .about {
-  @extend %section-layout;
 
   &__my-info {
     display: flex;

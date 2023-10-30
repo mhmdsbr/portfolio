@@ -1,6 +1,6 @@
-@import "src/styles/base/placeholders";
-@import "src/styles/variables/font-variables";
-@import "src/styles/variables/variables";
+@import "../../../styles/base/placeholders";
+@import "../../../styles/variables/font-variables";
+@import "../../../styles/variables/variables";
 
 .button {
   @extend %btn;

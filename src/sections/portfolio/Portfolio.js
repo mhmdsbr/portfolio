@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from "./Portfolio.module.scss";
-import TitleSection from "../../components/UI/TitleSection";
-import PortfolioGallery from "../../components/UI/PortfolioGallery";
+import TitleSection from "../../components/UI/section/TitleSection";
+import PortfolioGallery from "./PortfolioGallery";
 
 const Portfolio = () => {
     return (

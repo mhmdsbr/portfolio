@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from "./Testimonial.module.scss";
-import TitleSection from "../../components/UI/TitleSection";
-import TestimonialSlider from "../../components/UI/TestimonialSlider";
+import TitleSection from "../../components/UI/section/TitleSection";
+import TestimonialSlider from "./TestimonialSlider";
 
 
 const Testimonial = () => {

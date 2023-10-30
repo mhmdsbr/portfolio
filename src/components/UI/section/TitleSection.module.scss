@@ -1,0 +1,6 @@
+@import "../../../styles/variables/all-variables";
+@import "../../../styles/abstracts/helpers";
+
+.titleSection {
+  @include section-title;
+}

@@ -1,8 +1,8 @@
 import React from 'react';
 import classes from './Summary.module.scss';
-import TitleSection from '../../components/UI/TitleSection';
-import ProgressBar from "../../components/UI/ProgressBar";
-import Button from "../../components/UI/Button";
+import TitleSection from '../../components/UI/section/TitleSection';
+import ProgressBar from "./ProgressBar";
+import Button from "../../components/UI/button/Button";
 
 const experienceData = [
     {

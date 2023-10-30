@@ -1,29 +1,31 @@
 import React from 'react';
 
 import classes from "./Hero.module.scss";
-import Button from "../../components/UI/Button";
-import IntroText from "../../components/UI/IntroText";
+import Button from "../../components/UI/button/Button";
+import IntroText from "./IntroText";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
+import SectionContainer from "../../components/UI/section/SectionContainer";
+import Section from "../../components/UI/section/Section";
 
 const Hero= ((props) => {
 
     return (
-        <section id="home" className={`${classes.hero} position-relative`}>
+        <Section id="home" className={`${classes.hero} p-0`}>
             <div className={classes['hero__wrap']}>
                 <div className={`${classes['hero__mask']} opacity-75 bg-dark`}></div>
                 <div className={`${classes['hero__bg']} parallax`}></div>
                 <div className={`${classes['hero__content']} d-flex min-vh-100`}>
-                    <div className="container my-auto">
+                    <SectionContainer className="my-auto" >
                         <div className="row">
                             <div className="col-12 text-center">
                                 <IntroText />
                                 <Button content="hire me" />
                             </div>
                         </div>
-                    </div>
+                    </SectionContainer>
                     <div
                         className={classes['hero__scrollBtn']}
                         onClick={() => {
@@ -39,11 +41,9 @@ const Hero= ((props) => {
                     >
                         <FontAwesomeIcon icon={faChevronDown} size="1x" className={classes['hero__btn-bounce']} />
                     </div>
-
                 </div>
             </div>
-
-        </section>
+        </Section>
     );
 });
 
