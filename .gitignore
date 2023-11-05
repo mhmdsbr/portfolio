@@ -1,10 +1,29 @@
-# Don't check auto-generated stuff into git
-coverage
-build
-node_modules
-stats.json
-
-# Cruft
-.DS_Store
-npm-debug.log
+# IDE
 .idea
+.vscode
+
+# React
+/client/node_modules/
+
+# Dotenv
+.env
+.env.*
+!.env.example
+!.env.j2
+!.env.vars.*
+
+docker-compose.yaml
+
+# WP-CLI
+wp-cli.yml
+
+# Cache
+.php_cs.cache
+
+#react
+
+# WordPress & Theme
+/server/public/*
+/server/public/
+
+!/server/public/wp-content/*
