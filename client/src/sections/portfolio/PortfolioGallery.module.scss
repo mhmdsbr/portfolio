@@ -1,0 +1,68 @@
+@import "../../styles/base/placeholders";
+@import "../../styles/variables/font-variables";
+@import "../../styles/variables/variables";
+
+.portfolioGallery {
+
+  &__nav-link {
+    cursor: pointer;
+    &:hover {
+      color: var(--bs-primary) !important;
+    }
+  }
+
+  &__items {
+    height: 880px;
+    display: flex;
+    justify-content: flex-start;
+    position: relative;
+    gap: 16px;
+    flex-wrap: wrap;
+    //grid-template-columns: [first] 1fr [line2] 1fr [line3] 1fr [end];
+    //grid-template-rows: [start] 1fr [line2] 1fr [line3] 1fr [end];
+
+  }
+
+  &__grid-item {
+    //display: grid;
+    //width: 33%;
+    position: relative;
+    padding: 4px;
+    border-radius: 8px;
+    background-color: var(--color-white);
+    text-align: center;
+    width: 32%;
+    height: auto;
+  }
+
+  &__booking {
+    //height: 700px;
+    //grid-column-start: first;
+    //grid-column-end: line2;
+    //grid-row-start: start;
+    //grid-row-end: fill;
+  }
+  &__blog {
+    //height: 340px;
+    //grid-column-start: line2;
+    //grid-column-end: line3;
+    //grid-row-start: start;
+    //grid-row-end: line2;
+  }
+  &__b2b {
+    //height: 670px;
+    //grid-column-start: line3;
+    //grid-column-end: end;
+    //grid-row-start: start;
+    //grid-row-end: fill;
+  }
+  &__gallery {
+    //height: 300px;
+    //grid-column-start: line2;
+    //grid-column-end: line3;
+    //grid-row-start: line2;
+    //grid-row-end: fill;
+  }
+
+}
+
