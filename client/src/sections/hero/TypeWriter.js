@@ -7,42 +7,46 @@ const Typewriter = ({ texts, typingSpeed, erasingSpeed, delay }) => {
     const [isTyping, setIsTyping] = useState(true);
 
     useEffect(() => {
-        const currentText = texts[currentTextIndex];
-        const speed = isTyping ? typingSpeed : erasingSpeed;
-        let timeout;
+        if (texts && texts.length > 0) {
+            const currentText = texts && texts[currentTextIndex];
 
-        if (isTyping) {
-            timeout = setTimeout(() => {
-                setIsTyping(false);
-            }, delay);
-        } else {
-            timeout = setTimeout(() => {
-                setIsTyping(true);
-                setCurrentIndex(0);
+            if (currentText) {
+                const speed = isTyping ? typingSpeed : erasingSpeed;
+                let timeout;
 
-                // Move to the next text in the array
-                setCurrentTextIndex((currentTextIndex + 1) % texts.length);
-            }, delay);
-        }
-
-        const interval = setInterval(() => {
-            if (isTyping) {
-                if (currentIndex <= currentText.length) {
-                    setDisplayText(currentText.slice(0, currentIndex));
-                    setCurrentIndex(currentIndex + 1);
+                if (isTyping) {
+                    timeout = setTimeout(() => {
+                        setIsTyping(false);
+                    }, delay);
+                } else {
+                    timeout = setTimeout(() => {
+                        setIsTyping(true);
+                        setCurrentIndex(0);
+                        // Move to the next text in the array
+                        setCurrentTextIndex((currentTextIndex + 1) % texts.length);
+                    }, delay);
                 }
-            } else {
-                if (currentIndex >= 0) {
-                    setDisplayText(currentText.slice(0, currentIndex));
-                    setCurrentIndex(currentIndex - 1);
-                }
+
+                const interval = setInterval(() => {
+                    if (isTyping) {
+                        if (currentIndex <= currentText.length) {
+                            setDisplayText(currentText.slice(0, currentIndex));
+                            setCurrentIndex(currentIndex + 1);
+                        }
+                    } else {
+                        if (currentIndex >= 0) {
+                            setDisplayText(currentText.slice(0, currentIndex));
+                            setCurrentIndex(currentIndex - 1);
+                        }
+                    }
+                }, speed);
+
+                return () => {
+                    clearTimeout(timeout);
+                    clearInterval(interval);
+                };
             }
-        }, speed);
-
-        return () => {
-            clearTimeout(timeout);
-            clearInterval(interval);
-        };
+        }
     }, [texts, typingSpeed, erasingSpeed, delay, currentTextIndex, currentIndex, isTyping]);
 
     return (

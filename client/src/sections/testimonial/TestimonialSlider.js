@@ -43,7 +43,7 @@ const TestimonialSlider = () => {
                 dynamicBullets: true,
             }}
             onSlideChange={() => console.log('slide change')}
-            onSwiper={(swiper) => console.log(swiper)}
+            onSwiper={(swiper) => {}}
             className={classes.testimonialSlider}
         >
             {testimonials.map((testimonial, index) => (

@@ -1,4 +1,4 @@
-@import "src/styles/base/placeholders";
+@import "../../styles/base/placeholders";
 
 .hero {
 
@@ -15,7 +15,6 @@
   &__bg {
     @extend %bg-image;
     @extend %bg-absolute;
-    background-image: url("../../assets/laptop.jpg");
     z-index: 0;
   }
 

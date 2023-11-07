@@ -10,14 +10,20 @@ import Portfolio from "../sections/portfolio/Portfolio";
 import Testimonial from "../sections/testimonial/Testimonial";
 import Contact from "../sections/contact/Contact";
 import Footer from "./footer/Footer";
+import { HeroFieldsProvider } from "../store/HeroFieldsContext";
+import {GeneralFieldsProvider} from "../store/GeneralFieldsContext";
 
-const AppLayout = () => {
+const AppLayout = (props) => {
 
     return (
         <div className="row justify-content-center">
-            <MainSidebar/>
+            <GeneralFieldsProvider>
+                <MainSidebar />
+            </GeneralFieldsProvider>
             <MainContainer>
-                <Hero/>
+                <HeroFieldsProvider>
+                    <Hero/>
+                </HeroFieldsProvider>
                 <About/>
                 <Services/>
                 <Summary/>
