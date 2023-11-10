@@ -4,7 +4,7 @@ import axios from 'axios';
 const GeneralFieldsContext = createContext();
 
 const GeneralFieldsProvider = ({ children }) => {
-    const [generalFields, setGeneralFields] = useState([]);
+    const [generalFields, setGeneralFields] = useState(null); // Set initial state to null
 
     useEffect(() => {
         const fetchGeneralFields = async () => {
@@ -19,6 +19,10 @@ const GeneralFieldsProvider = ({ children }) => {
 
         fetchGeneralFields();
     }, []);
+
+    if (generalFields === null) {
+        return <p>Loading...</p>;
+    }
 
     return (
         <GeneralFieldsContext.Provider value={generalFields}>

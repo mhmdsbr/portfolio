@@ -1,5 +1,5 @@
 import React from 'react';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const FollowUs = ({title, socialMediaLinks}) => {
     const linksArray = Object.entries(socialMediaLinks).map(([icon, url]) => ({ icon, url }));

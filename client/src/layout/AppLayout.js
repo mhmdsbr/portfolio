@@ -19,7 +19,6 @@ const AppLayout = (props) => {
         <div className="row justify-content-center">
             <GeneralFieldsProvider>
                 <MainSidebar />
-            </GeneralFieldsProvider>
             <MainContainer>
                 <HeroFieldsProvider>
                     <Hero/>
@@ -31,6 +30,7 @@ const AppLayout = (props) => {
                 <Testimonial/>
                 <Contact/>
             </MainContainer>
+            </GeneralFieldsProvider>
             <Footer />
         </div>
     );
