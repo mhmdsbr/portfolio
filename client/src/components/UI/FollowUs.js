@@ -1,7 +1,16 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {GeneralFieldsContext} from "../../store/GeneralFieldsContext";
 
-const FollowUs = ({title, socialMediaLinks}) => {
+const FollowUs = ({title}) => {
+    const { linkedin, github, twitter, google } = useContext(GeneralFieldsContext);
+
+    const socialMediaLinks = {
+        linkedin,
+        github,
+        twitter,
+        google,
+    };
     const linksArray = Object.entries(socialMediaLinks).map(([icon, url]) => ({ icon, url }));
 
     return (

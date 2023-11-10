@@ -36,8 +36,13 @@ const Hero= (() => {
                     <SectionContainer className="my-auto" >
                         <div className="row">
                             <div className="col-12 text-center">
-                                <IntroText data={heroIntroText} />
-                                <Button url={heroButton.url} content={heroButton.title} />
+                                <IntroText
+                                    data={heroIntroText}
+                                />
+                                <Button
+                                    url={heroButton.url}
+                                    content={heroButton.title}
+                                />
                             </div>
                         </div>
                     </SectionContainer>

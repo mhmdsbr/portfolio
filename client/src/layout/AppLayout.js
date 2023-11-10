@@ -12,6 +12,7 @@ import Contact from "../sections/contact/Contact";
 import Footer from "./footer/Footer";
 import { HeroFieldsProvider } from "../store/HeroFieldsContext";
 import {GeneralFieldsProvider} from "../store/GeneralFieldsContext";
+import {AboutFieldsProvider} from "../store/AboutFieldsContext";
 
 const AppLayout = (props) => {
 
@@ -23,7 +24,9 @@ const AppLayout = (props) => {
                 <HeroFieldsProvider>
                     <Hero/>
                 </HeroFieldsProvider>
-                <About/>
+                <AboutFieldsProvider>
+                    <About/>
+                </AboutFieldsProvider>
                 <Services/>
                 <Summary/>
                 <Portfolio/>

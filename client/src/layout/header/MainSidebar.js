@@ -22,7 +22,7 @@ const MainSidebar = (props) => {
             <MenuItemsProvider>
                 <HeaderNav onClick = {props.onClick} />
             </MenuItemsProvider>
-                <FollowUs title="" socialMediaLinks={generalSettings} />
+                <FollowUs title="" />
         </header>
     );
 };

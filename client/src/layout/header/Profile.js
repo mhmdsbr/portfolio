@@ -13,7 +13,7 @@ const Profile = (props) => {
     const profileName = profileContent['profile_title'];
     const profileImage = profileContent['profile_image'];
     const imageUrl = profileImage['url'];
-    console.log(imageUrl);
+
     return (
         <div className={`${classes.msProfile} mt-lg-4`}>
             <ProfileImage

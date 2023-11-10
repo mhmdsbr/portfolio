@@ -9,9 +9,9 @@ const AboutDetails = ({ detailsData }) => {
                     <div className="col-6 col-md-3" key={index}>
                         <div className={`${classes['about__brands-grid-item']} text-center`}>
                             <h4 className="mb-0 text-white-50">
-                                <span>{item.value}</span>+
+                                <span>{item.content}</span>+
                             </h4>
-                            <p className="mb-0 text-light">{item.label}</p>
+                            <p className="mb-0 text-light">{item.title}</p>
                         </div>
                     </div>
                 ))}
