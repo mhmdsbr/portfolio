@@ -13,6 +13,8 @@ import Footer from "./footer/Footer";
 import { HeroFieldsProvider } from "../store/HeroFieldsContext";
 import {GeneralFieldsProvider} from "../store/GeneralFieldsContext";
 import {AboutFieldsProvider} from "../store/AboutFieldsContext";
+import {ServicesFieldsProvider} from "../store/ServicesFieldsContext";
+import {SummaryFieldsProvider} from "../store/SummaryFieldsContext";
 
 const AppLayout = (props) => {
 
@@ -27,8 +29,12 @@ const AppLayout = (props) => {
                 <AboutFieldsProvider>
                     <About/>
                 </AboutFieldsProvider>
-                <Services/>
-                <Summary/>
+                <ServicesFieldsProvider>
+                    <Services/>
+                </ServicesFieldsProvider>
+                <SummaryFieldsProvider>
+                    <Summary/>
+                </SummaryFieldsProvider>
                 <Portfolio/>
                 <Testimonial/>
                 <Contact/>
