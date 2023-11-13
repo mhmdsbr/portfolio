@@ -15,19 +15,6 @@ class General
         /** Custom Admin footer */
         add_filter('admin_footer_text', [&$this, 'customAdminFooterText']);
 
-        /** Custom excerpt length */
-        add_filter('excerpt_length', [&$this, 'customExcerptLength']);
-
-        /** New excerpt more */
-        add_filter('excerpt_more', [&$this, 'newExcerptMore']);
-
-        /** Load ACF options global */
-        add_filter('timber_context', [&$this, 'loadACFOptions']);
-
-        /** Add classes to the body element */
-        add_filter( 'body_class',[&$this, 'addBodyClasses'] );
-
-
         /** Helper to delete the adminbar when developing */
         if (isset($_GET['nobar'])) {
             add_filter('show_admin_bar', '__return_false');

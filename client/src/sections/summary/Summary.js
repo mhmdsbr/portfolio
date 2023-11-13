@@ -16,7 +16,6 @@ const Summary = () => {
     const jobs = summariesData.summaries;
     const experiences = summariesData.experiences;
     const buttonContent = summariesData.summary_button;
-    console.log(buttonContent);
 
     return (
         <Section id="summary" className={`${classes.summary} bg-dark`}>

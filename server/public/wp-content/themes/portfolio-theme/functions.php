@@ -23,6 +23,7 @@ new EXP\Core\Hero("portfolio/v2");
 new EXP\Core\About("portfolio/v2");
 new EXP\Core\Services("portfolio/v2");
 new EXP\Core\Summary("portfolio/v2");
+new EXP\Core\Projects("portfolio/v2");
 
 // Instantiate and initialize ThirdParty class
 new EXP\ThirdParty\ACF();
