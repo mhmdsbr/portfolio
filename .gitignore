@@ -24,6 +24,5 @@ wp-cli.yml
 
 # WordPress & Theme
 /server/public/*
-/server/public/
 
 !/server/public/wp-content/*
