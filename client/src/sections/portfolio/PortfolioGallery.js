@@ -36,15 +36,11 @@ function PortfolioGallery() {
                     imageSrc: project.featured_image,
                 };
                 tempPortfolioList.push(portfolioItem);
-                // console.log(portfolioItem);
             });
             setPortfolioList(tempPortfolioList);
             setFilteredItems(tempPortfolioList);
         }
     }, [projects]);
-
-    console.log(portfolioList['name']);
-
 
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("all");
@@ -115,5 +111,4 @@ function PortfolioGallery() {
         )
     }
 }
-
 export default PortfolioGallery;
