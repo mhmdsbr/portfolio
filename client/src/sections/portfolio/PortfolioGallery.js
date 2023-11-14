@@ -3,30 +3,6 @@ import PortfolioItem from "./PortfolioItem";
 import classes from "./PortfolioGallery.module.scss";
 import { ProjectsFieldsContext } from "../../store/ProjectsFieldsContext";
 
-const portfoliolist = [
-    {
-        id: 1,
-        name: "holigo",
-        category: "booking",
-    },
-    {
-        id: 2,
-        name: "freedomstock",
-        category: "blog",
-    },
-    {
-        id: 3,
-        name: "milimol",
-        category: "b2b",
-    },
-    {
-        id: 4,
-        name: "tarzan",
-        category: "gallery",
-    },
-];
-
-
 function PortfolioGallery() {
     const projects = useContext(ProjectsFieldsContext);
 
@@ -46,11 +22,35 @@ function PortfolioGallery() {
     };
     projectTax.unshift(allCategory);
 
+    const [portfolioList, setPortfolioList] = useState([]);
+
+    useEffect(() => {
+        if (projects && projects.length > 0) {
+            let tempPortfolioList = [];
+            projects.forEach((project) => {
+                const category = project.project_types.length > 0 ? project.project_types[0].slug : 'uncategorized';
+                let portfolioItem = {
+                    id: project.post_id,
+                    name: project.title,
+                    category,
+                    imageSrc: project.featured_image,
+                };
+                tempPortfolioList.push(portfolioItem);
+                // console.log(portfolioItem);
+            });
+            setPortfolioList(tempPortfolioList);
+            setFilteredItems(tempPortfolioList);
+        }
+    }, [projects]);
+
+    console.log(portfolioList['name']);
+
+
+    const [isLoading, setIsLoading] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("all");
-    const [filteredItems, setFilteredItems] = useState(portfoliolist);
+    const [filteredItems, setFilteredItems] = useState([]);
     const [animate, setAnimate] = useState(false);
 
-    // Move the useEffect hook to the top-level
     useEffect(() => {
         if (animate) {
             const animationTimeout = setTimeout(() => {
@@ -62,46 +62,58 @@ function PortfolioGallery() {
 
     const handleCategorySelection = (selectedCategory) => {
         if (selectedCategory === "all") {
-            setFilteredItems(portfoliolist);
+            setFilteredItems(portfolioList);
         } else {
-            const filtered = portfoliolist.filter((item) => item.category === selectedCategory);
+            const filtered = portfolioList.filter((item) => item.category === selectedCategory);
             setFilteredItems(filtered);
         }
 
         setSelectedCategory(selectedCategory);
         setAnimate(true);
+        setIsLoading(false);
     };
 
-    return (
-        <div className={`${classes.portfolioGallery} container max-width`}>
-            <div className="row justify-content-center">
-                <div className="col-12">
-                    <ul className="nav pointer-event border-bottom-0 justify-content-center mb-5">
-                        {projectTax.map((category) => (
-                            <li className="nav-item gx-2" key={category.term_id}>
-                                <a
-                                    className={`${classes["portfolioGallery__nav-link"]} nav-link text-capitalize text-white m-2`}
-                                    onClick={() => handleCategorySelection(category.slug)}
-                                    style={category.name === selectedCategory ? { fontWeight: "bold" } : {}}
-                                >
-                                    {category.name}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
+    if(!isLoading) {
+        return (
+            <div className={`${classes.portfolioGallery} container max-width`}>
+                <div className="row justify-content-center">
+                    <div className="col-12">
+                        <ul className="nav pointer-event border-bottom-0 justify-content-center mb-5">
+                            {projectTax.map((category) => (
+                                <li className="nav-item gx-2" key={category.term_id}>
+                                    <a
+                                        className={`${classes["portfolioGallery__nav-link"]} nav-link text-capitalize text-white m-2`}
+                                        onClick={() => handleCategorySelection(category.slug)}
+                                        style={category.name === selectedCategory ? {fontWeight: "bold"} : {}}
+                                    >
+                                        {category.name}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+                <div className={`${classes["portfolioGallery__items"]}`}>
+                    {filteredItems.map((item) => (
+                        <div
+                            className={`${classes["portfolioGallery__grid-item"]} ${classes[`portfolioGallery__${item.category}`]} ${
+                                animate ? "fade-in show" : ""
+                            }`} key={item.id}>
+                            <PortfolioItem item={item}/>
+                        </div>
+                    ))}
                 </div>
             </div>
-            <div className={`${classes["portfolioGallery__items"]}`}>
-                {filteredItems.map((item) => (
-                    <div className={`${classes["portfolioGallery__grid-item"]} ${classes[`portfolioGallery__${item.category}`]} ${
-                        animate ? "fade-in show" : ""
-                    }`} key={item.id}>
-                        <PortfolioItem item={item} />
-                    </div>
-                ))}
+        );
+    } else {
+        return (
+            <div>
+                <p>
+                    loading...
+                </p>
             </div>
-        </div>
-    );
+        )
+    }
 }
 
 export default PortfolioGallery;
