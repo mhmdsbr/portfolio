@@ -1,27 +1,38 @@
-import React, { createContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { createContext, useEffect, useState, useCallback } from 'react';
+import axios from "axios";
 
 const TestimonialFieldsContext = createContext();
 
 const TestimonialFieldsProvider = ({ children }) => {
-    const [testimonialFields, setTestimonialFields] = useState({});
+    const [testimonialFields, setTestimonialFields] = useState(null);
 
-    useEffect(() => {
-        const fetchTestimonialFields = async () => {
-            try {
-                const res = await axios.get('http://portfolio.test/wp-json/portfolio/v2/testimonial-portfolio');
-                const { data } = res;
-                setTestimonialFields(data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchTestimonialFields();
+    const fetchTestimonialFields = useCallback(async () => {
+        try {
+            const res = await axios.get('http://portfolio.test/wp-json/portfolio/v2/testimonial-portfolio');
+            const { data } = res;
+            setTestimonialFields(data);
+        } catch (error) {
+            console.error(error);
+        }
     }, []);
 
+    useEffect(() => {
+        fetchTestimonialFields().then(r => {});
+    }, [fetchTestimonialFields]);
+
+    if (testimonialFields === null) {
+        return null;
+    }
+
+    let content = {
+        title: testimonialFields.testimonial_title,
+        title_overlay: testimonialFields.testimonial_title_overlay,
+        items: testimonialFields.testimonial,
+    };
+
+
     return (
-        <TestimonialFieldsContext.Provider value={testimonialFields}>
+        <TestimonialFieldsContext.Provider value={content}>
             {children}
         </TestimonialFieldsContext.Provider>
     );
