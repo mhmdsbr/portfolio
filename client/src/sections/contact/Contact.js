@@ -1,39 +1,52 @@
-import React, {useContext} from 'react';
-import classes from "./Contact.module.scss";
-import TitleSection from "../../components/UI/section/TitleSection";
-
-import FollowUs from "../../components/UI/FollowUs";
-import ContactForm from "./ContactForm";
-import ContactContent from "./ContactContent";
-import Section from "../../components/UI/section/Section";
-import {GeneralFieldsContext} from "../../store/GeneralFieldsContext";
-
-const contactInfo = {
-    address: '123 Main Street',
-    phone: '(123) 456-7890',
-    email: 'example@example.com',
-};
+import React, { useContext } from 'react';
+import classes from './Contact.module.scss';
+import TitleSection from '../../components/UI/section/TitleSection';
+import FollowUs from '../../components/UI/FollowUs';
+import ContactForm from './ContactForm';
+import ContactContent from './ContactContent';
+import Section from '../../components/UI/section/Section';
+import {ContactFieldsContext} from "../../store/ContactFieldsContext";
 
 const Contact = () => {
-    const generalSettings = useContext(GeneralFieldsContext);
-    if (!generalSettings) {
+    const contactSettings = useContext(ContactFieldsContext);
+    if (!contactSettings) {
         return <p>Loading...</p>;
     }
+
+    const contactTitle = {
+        title: contactSettings.title,
+        overlay: contactSettings.title_overlay
+    }
+    const contactInfo = {
+        title: contactSettings.contact_info_title,
+        address: contactSettings.contact_info_address,
+        phone: contactSettings.contact_info_phone,
+        email: contactSettings.contact_info_email,
+    };
+    const contactForm = {
+        title: contactSettings.contact_form_title,
+        buttonTitle: contactSettings.contact_button.title,
+        buttonUrl: contactSettings.contact_button.url
+    }
+    console.log(contactForm.buttonUrl);
 
     return (
         <Section id="contact" className={`${classes.contact} bg-dark-2`}>
             <div className="container max-width">
                 <TitleSection
-                    subtitle="contact"
-                    title="Be in touch"
-                />
+                    subtitle={contactTitle.title}
+                    title={contactTitle.overlay} />
                 <div className="row">
                     <div className="col-md-4 col-xl-3 gx-1 order-1 order-md-0 text-center text-md-start">
                         <ContactContent contactInfo={contactInfo} />
-                        <FollowUs title="Follow Us" />
+                        <FollowUs title="Follow Me" />
                     </div>
                     <div className="col-md-8 col-xl-9 order-0 order-md-1">
-                        <ContactForm />
+                        <ContactForm
+                            title={contactForm.title}
+                            buttonUrl={contactForm.buttonUrl}
+                            buttonTitle = {contactForm.buttonTitle}
+                        />
                     </div>
                 </div>
             </div>

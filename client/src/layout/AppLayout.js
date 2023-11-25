@@ -17,6 +17,7 @@ import {ServicesFieldsProvider} from "../store/ServicesFieldsContext";
 import {SummaryFieldsProvider} from "../store/SummaryFieldsContext";
 import {ProjectsFieldsProvider} from "../store/ProjectsFieldsContext";
 import {TestimonialFieldsProvider} from "../store/TestimonialFieldsContext";
+import {ContactFieldsProvider} from "../store/ContactFieldsContext";
 
 const AppLayout = (props) => {
 
@@ -43,7 +44,9 @@ const AppLayout = (props) => {
                 <TestimonialFieldsProvider>
                     <Testimonial/>
                 </TestimonialFieldsProvider>
-                <Contact/>
+                <ContactFieldsProvider>
+                    <Contact/>
+                </ContactFieldsProvider>
             </MainContainer>
             </GeneralFieldsProvider>
             <Footer />

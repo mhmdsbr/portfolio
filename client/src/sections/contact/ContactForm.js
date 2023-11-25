@@ -3,12 +3,11 @@ import classes from "./ContactForm.module.scss";
 import Input from "../../components/UI/Input";
 import Button from "../../components/UI/button/Button";
 
-const ContactForm = () => {
-    const contactTitle = "Send Us A Note";
+const ContactForm = (props) => {
     return (
         <React.Fragment>
             <h2 className="mb-3 text-uppercase text-center text-md-start text-white">
-                {contactTitle}
+                {props.title}
             </h2>
             <form className={`${classes.contactForm} `} id="contact-form" action="" method="post">
                 <div className="row g-4">
@@ -42,10 +41,11 @@ const ContactForm = () => {
                     </div>
                 </div>
                 <Button
+                    url={props.buttonUrl}
                     id="submit-btn"
                     className="btn rounded-pill mt-4 mb-0 d-inline-flex"
                     type="submit"
-                    content="Message"
+                    content={props.buttonTitle}
                 >
                 </Button>
             </form>
