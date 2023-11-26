@@ -25,31 +25,31 @@ const AppLayout = (props) => {
         <div className="row justify-content-center">
             <GeneralFieldsProvider>
                 <MainSidebar />
-            <MainContainer>
-                <HeroFieldsProvider>
-                    <Hero/>
-                </HeroFieldsProvider>
-                <AboutFieldsProvider>
-                    <About/>
-                </AboutFieldsProvider>
-                <ServicesFieldsProvider>
-                    <Services/>
-                </ServicesFieldsProvider>
-                <SummaryFieldsProvider>
-                    <Summary/>
-                </SummaryFieldsProvider>
-                <ProjectsFieldsProvider>
-                    <Portfolio/>
-                </ProjectsFieldsProvider>
-                <TestimonialFieldsProvider>
-                    <Testimonial/>
-                </TestimonialFieldsProvider>
-                <ContactFieldsProvider>
-                    <Contact/>
-                </ContactFieldsProvider>
-            </MainContainer>
+                <MainContainer>
+                    <HeroFieldsProvider>
+                        <Hero/>
+                    </HeroFieldsProvider>
+                    <AboutFieldsProvider>
+                        <About/>
+                    </AboutFieldsProvider>
+                    <ServicesFieldsProvider>
+                        <Services/>
+                    </ServicesFieldsProvider>
+                    <SummaryFieldsProvider>
+                        <Summary/>
+                    </SummaryFieldsProvider>
+                    <ProjectsFieldsProvider>
+                        <Portfolio/>
+                    </ProjectsFieldsProvider>
+                    <TestimonialFieldsProvider>
+                        <Testimonial/>
+                    </TestimonialFieldsProvider>
+                    <ContactFieldsProvider>
+                        <Contact/>
+                    </ContactFieldsProvider>
+                </MainContainer>
+                <Footer />
             </GeneralFieldsProvider>
-            <Footer />
         </div>
     );
 };

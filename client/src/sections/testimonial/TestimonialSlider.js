@@ -14,6 +14,7 @@ const TestimonialSlider = (props) => {
             modules={[Pagination]}
             spaceBetween={50}
             slidesPerView={2}
+            autoHeight={true}
             pagination={{
                 dynamicBullets: true,
             }}

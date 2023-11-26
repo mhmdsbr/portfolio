@@ -4,7 +4,7 @@ import axios from 'axios';
 const GeneralFieldsContext = createContext();
 
 const GeneralFieldsProvider = ({ children }) => {
-    const [generalFields, setGeneralFields] = useState(null); // Set initial state to null
+    const [generalFields, setGeneralFields] = useState(null);
 
     useEffect(() => {
         const fetchGeneralFields = async () => {

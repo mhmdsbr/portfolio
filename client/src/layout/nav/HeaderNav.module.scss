@@ -1,13 +1,1 @@
 @import "../../styles/variables/all-variables";
-
-
-.navbar {
-
-  &__link {
-    font-family: $font-primary;
-    color: white;
-    &:hover {
-      color: var(--color-secondary);
-    }
-  }
-}

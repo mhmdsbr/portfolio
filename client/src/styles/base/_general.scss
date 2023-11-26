@@ -89,3 +89,15 @@ body {
         opacity: 1;
     }
 }
+
+.modal-body {
+    h5 {
+      color: var(--color-white);
+      font-weight: 500;
+    }
+    p {
+        font-size: map-get($text-sizes, lg);
+        font-weight: 400;
+        line-height: 1.5;
+    }
+}

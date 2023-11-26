@@ -28,7 +28,6 @@ const Contact = () => {
         buttonTitle: contactSettings.contact_button.title,
         buttonUrl: contactSettings.contact_button.url
     }
-    console.log(contactForm.buttonUrl);
 
     return (
         <Section id="contact" className={`${classes.contact} bg-dark-2`}>

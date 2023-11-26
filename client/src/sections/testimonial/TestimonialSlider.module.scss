@@ -6,7 +6,6 @@
 .testimonialSlider {
   width: 100%;
   cursor: default;
-  height: 280px;
 
   &__item-head {
 
@@ -25,6 +24,20 @@
     font-size: map-get($text-sizes, sm);
     line-height: 1.3;
     letter-spacing: 2px;
+    height: 80px;
+    overflow-y: scroll;
+    padding: 8px 0;
+
+    &::-webkit-scrollbar {
+      width: 5px;
+      display: block;
+      background-color: var(--color-white);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--color-shades-gray-500);
+      min-height: 5px;
+    }
   }
 
   &__item-stars {

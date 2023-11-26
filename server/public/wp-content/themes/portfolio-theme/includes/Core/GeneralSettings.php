@@ -19,7 +19,8 @@ class GeneralSettings extends ApiManager {
 		$global_mail = get_field('mail', 'option');
 		$profile_image = get_field('profile_image', 'option');
 		$profile_title = get_field('profile_title', 'option');
-		$footer_text = get_field('footer_text', 'option');
+		$terms_policies = get_field('terms_policies', 'option');
+		$disclaimer = get_field('disclaimer', 'option');
 
 		// Create an array with all the general settings
 		$global_settings = array(
@@ -29,7 +30,8 @@ class GeneralSettings extends ApiManager {
 			'google' => $global_mail,
 			'profile_image' => $profile_image,
 			'profile_title' => $profile_title,
-			'footer_text' => $footer_text,
+			'terms' => $terms_policies,
+			'disclaimer' => $disclaimer
 		);
 
 		return rest_ensure_response($global_settings);
