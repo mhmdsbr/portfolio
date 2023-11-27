@@ -1,14 +1,30 @@
-import React, {Fragment, useContext} from "react";
+import React, { Fragment, useContext, useState } from "react";
 import classes from "./HeaderNav.module.scss";
 import { MenuItemsContext } from "../../store/MenuItemsContext";
 
 const HeaderNav = (props) => {
     const menuItems = useContext(MenuItemsContext);
+    const [isToggled, setIsToggled] = useState(false);
+
+    const toggleHandler = () => {
+        setIsToggled(!isToggled);
+    };
 
     return (
         <Fragment>
-            <button className="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#header-nav" aria-controls="header-nav" aria-expanded="false" aria-label="Toggle navigation">
-                <span className="navbar-toggler-icon"></span>
+            <button
+                onClick={toggleHandler}
+                className={`${classes.headerNavToggler} navbar-toggler order-1 ${isToggled ? classes.toggled : ''}`}
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#header-nav"
+                aria-controls="header-nav"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
             <nav id="header-nav" className={`${classes.headerNav} collapse navbar-collapse justify-content-center`}>
                 <ul className="nav p-2 flex-column text-lg-center my-lg-auto py-lg-3">
@@ -29,4 +45,3 @@ const HeaderNav = (props) => {
 };
 
 export default HeaderNav;
-

@@ -38,3 +38,51 @@
   }
 
 }
+
+.headerNavToggler {
+  border: none;
+  cursor: pointer;
+  height: 30px;
+  margin: 8px;
+  padding: 10px;
+  position: relative;
+  transition: .5s ease-in-out;
+  width: 25px;
+  span {
+    background: #fff;
+    border-radius: 2px;
+    height: 2px;
+    left: 0;
+    opacity: 1;
+    position: absolute;
+    transition: .25s ease-in-out;
+    width: 100%;
+
+    &:first-child {
+      top: 7px;
+      transform-origin: left center;
+    }
+    &:nth-child(2) {
+      top: 14px;
+      transform-origin: left center;
+
+    }
+    &:last-child {
+      top: 21px;
+      transform-origin: left center;
+    }
+  }
+  &.toggled {
+    span:first-child {
+      transform: rotate(45deg);
+    }
+
+    span:nth-child(2) {
+      opacity: 0;
+    }
+
+    span:last-child {
+      transform: rotate(-45deg);
+    }
+  }
+}

@@ -2,15 +2,17 @@ import React, {useContext} from 'react';
 import {createPortal} from "react-dom";
 import classes from "./Footer.module.scss";
 import {GeneralFieldsContext} from "../../store/GeneralFieldsContext";
+import useMobileCheck from "../../components/MobileCheck";
 
 const Footer = () => {
+    const isMobile = useMobileCheck();
     const footerData = useContext(GeneralFieldsContext);
     const termsDisclaimer = {
         terms: footerData.terms,
         disclaimer: footerData.disclaimer
     }
     return (
-        <footer id="footer" className={`${classes.footer} bg-dark text-white col-10 offset-2 gx-0`}>
+        <footer id="footer" className={`${classes.footer} ${isMobile ? 'col-12' : 'col-10 offset-2'} bg-dark text-white gx-0`}>
             <div className="container max-width">
                 <div className="row justify-content-center">
                     <div className="col-lg-6 text-center text-lg-start">

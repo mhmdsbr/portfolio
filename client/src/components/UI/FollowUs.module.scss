@@ -6,13 +6,13 @@
   align-items: flex-end;
   justify-content: flex-end;
   flex: 1;
-  margin-bottom: 0;
 
   &__title {
     font-size: map-get($text-sizes, lg);
   }
 
   &__items {
+    margin-bottom: 0;
     svg {
       font-size: 1.2em;
     }
