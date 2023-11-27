@@ -1,6 +1,17 @@
 @import "../../../styles/variables/all-variables";
 @import "../../../styles/abstracts/helpers";
+@import "../../../styles/vendor/bootstrap";
 
 .titleSection {
   @include section-title;
+
+  &__title-muted {
+    font-size: map-get($text-sizes, 6xl);
+
+    @include media-breakpoint-up(lg) {
+      font-size: map-get($text-sizes, 8xl);
+    }
+
+  }
+
 }

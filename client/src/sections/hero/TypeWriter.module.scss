@@ -1,10 +1,15 @@
 @import "../../styles/variables/variables";
+@import "../../styles/vendor/bootstrap";
 
 .typeWriter {
 
   &__text {
-    font-size: map-get($text-sizes, 6xl);
+    font-size: map-get($text-sizes, 5xl);
     font-weight: 500;
+
+    @include media-breakpoint-up(lg) {
+      font-size: map-get($text-sizes, 6xl);
+    }
   }
 
   &__cursor {
