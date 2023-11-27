@@ -1,0 +1,14 @@
+@import "../../styles/variables/all-variables";
+
+.social-icons {
+
+  &__title {
+    font-size: map-get($text-sizes, lg);
+  }
+
+  &__items {
+    svg {
+      font-size: 1.5em;
+    }
+  }
+}
