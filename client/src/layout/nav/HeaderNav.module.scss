@@ -1,1 +1,20 @@
 @import "../../styles/variables/all-variables";
+@import "../../styles/vendor/bootstrap";
+
+.headerNav {
+  box-shadow: 0 0 15px rgba(0,0,0,.1);
+  left: 0;
+  margin-top: 0;
+  position: absolute;
+  right: 0;
+  top: 99%;
+  z-index: 1000;
+  background-color: rgba(0,0,0,.95);
+
+  @include media-breakpoint-up(lg) {
+    position: relative;
+    top: unset;
+    background-color: transparent;
+  }
+
+}

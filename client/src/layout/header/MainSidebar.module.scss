@@ -1,7 +1,14 @@
 @import "../../styles/base/placeholders";
+@import "../../styles/vendor/bootstrap";
 .msHeader {
     @extend %flexbox-h-center;
-    flex-direction: column;
+    flex-direction: row;
     background-color: var(--color-primary);
     gap: 32px;
+
+    @include media-breakpoint-up(lg) {
+        flex-direction: column;
+        height: 100%;
+    }
+
 }

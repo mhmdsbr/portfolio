@@ -10,6 +10,7 @@
   }
 
   &__items {
+    position: relative;
     margin: 0;
     padding: 0;
     display: grid;
@@ -20,7 +21,7 @@
   }
 
   &__grid-item {
-
+    position: relative;
   }
 
   &__0 {
