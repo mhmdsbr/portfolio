@@ -4,11 +4,12 @@
     @extend %flexbox-h-center;
     flex-direction: row;
     background-color: var(--color-primary);
-    gap: 32px;
+    gap: 16px;
 
     @include media-breakpoint-up(lg) {
         flex-direction: column;
         height: 100%;
+        gap: 32px;
     }
 
 }

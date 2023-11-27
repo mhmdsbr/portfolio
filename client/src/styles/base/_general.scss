@@ -21,6 +21,7 @@ body {
     margin: 0;
     padding: 0;
     cursor: default;
+    overflow-x: hidden;
 
     font-family: $font-primary;
     font-size: var(--text-font-size);

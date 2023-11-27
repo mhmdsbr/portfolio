@@ -1,4 +1,11 @@
 @import "../../styles/variables/variables";
+@import "../../styles/vendor/bootstrap";
+
 .msProfileName {
   font-size: map-get($text-sizes, lg);
+  text-align: left;
+
+  @include media-breakpoint-up(lg) {
+    text-align: center;
+  }
 }

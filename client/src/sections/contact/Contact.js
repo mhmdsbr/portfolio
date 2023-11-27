@@ -38,7 +38,10 @@ const Contact = () => {
                 <div className="row">
                     <div className="col-md-4 col-xl-3 gx-1 order-1 order-md-0 text-center text-md-start">
                         <ContactContent contactInfo={contactInfo} />
-                        <FollowUs title="Follow Me" />
+                        <FollowUs
+                            title="Follow Me"
+                            className={`${classes['contact__social']}`}
+                        />
                     </div>
                     <div className="col-md-8 col-xl-9 order-0 order-md-1">
                         <ContactForm

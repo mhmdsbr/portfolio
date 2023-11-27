@@ -1,4 +1,10 @@
 @import "../../styles/variables/variables";
+@import "../../styles/vendor/bootstrap";
 .msProfile {
   text-decoration: none;
+  flex: 4;
+
+  @include media-breakpoint-up(lg) {
+    flex: none;
+  }
 }

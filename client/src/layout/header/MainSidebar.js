@@ -12,7 +12,7 @@ import {GeneralFieldsContext} from "../../store/GeneralFieldsContext";
 
 const MainSidebar = (props) => {
     const isMobile = useMobileCheck();
-    const headerClasses = ` ${classes.msHeader} p-lg-4 navbar navbar-expand-lg text-center fixed-top px-0 ${isMobile ? 'col-12' : 'col-2' } `
+    const headerClasses = ` ${classes.msHeader} p-lg-4 pe-3 ps-3 navbar navbar-expand-lg text-center fixed-top ${isMobile ? 'col-12' : 'col-2' } `
     const generalSettings = useContext(GeneralFieldsContext);
     if (!generalSettings) {
         return <p>Loading...</p>;
