@@ -51,7 +51,7 @@ function PortfolioGallery() {
         if (animate) {
             const animationTimeout = setTimeout(() => {
                 setAnimate(false);
-            }, 500); // Adjust this timeout to match your CSS transition duration
+            }, 500);
             return () => clearTimeout(animationTimeout);
         }
     }, [animate]);
@@ -75,24 +75,28 @@ function PortfolioGallery() {
                 <div className="row justify-content-center">
                     <div className="col-12">
                         <ul className="nav pointer-event border-bottom-0 justify-content-center mb-5">
-                            {projectTax.map((category) => (
-                                <li className="nav-item gx-2" key={category.term_id}>
-                                    <a
-                                        className={`${classes["portfolioGallery__nav-link"]} nav-link text-capitalize text-white m-2`}
-                                        onClick={() => handleCategorySelection(category.slug)}
-                                        style={category.name === selectedCategory ? {fontWeight: "bold"} : {}}
-                                    >
-                                        {category.name}
-                                    </a>
-                                </li>
-                            ))}
+                            {[...new Set(projectTax.map(category => category.name))].map(uniqueCategory => {
+                                const category = projectTax.find(item => item.name === uniqueCategory);
+
+                                return (
+                                    <li className="nav-item gx-2" key={category.term_id}>
+                                        <a
+                                            className={`${classes["portfolioGallery__nav-link"]} nav-link text-capitalize m-2`}
+                                            onClick={() => handleCategorySelection(category.slug)}
+                                            style={category.name === selectedCategory ? {fontWeight: "bold"} : {}}
+                                        >
+                                            {category.name}
+                                        </a>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                 </div>
                 <div className={`${classes["portfolioGallery__items"]}`}>
-                    {filteredItems.map((item) => (
+                    {filteredItems.map((item, index) => (
                         <div
-                            className={`${classes["portfolioGallery__grid-item"]} ${classes[`portfolioGallery__${item.category}`]} ${
+                            className={`${classes["portfolioGallery__grid-item"]} ${classes[`portfolioGallery__${index}`]} ${
                                 animate ? "fade-in show" : ""
                             }`} key={item.id}>
                             <PortfolioItem item={item}/>
