@@ -80,6 +80,7 @@ function PortfolioGallery() {
 
                                 return (
                                     <li className="nav-item gx-2" key={category.term_id}>
+                                        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                                         <a
                                             className={`${classes["portfolioGallery__nav-link"]} nav-link text-capitalize m-2`}
                                             onClick={() => handleCategorySelection(category.slug)}

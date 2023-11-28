@@ -20,7 +20,7 @@
     "react-router-dom": "^6.18.0",
     "react-scripts": "^5.0.1",
     "sass": "^1.69.3",
-    "swiper": "^10.3.1"
+    "swiper": "^11.0.5"
   },
   "scripts": {
     "start": "react-scripts start",
