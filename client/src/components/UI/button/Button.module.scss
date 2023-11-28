@@ -1,6 +1,6 @@
 @import "../../../styles/base/placeholders";
-@import "../../../styles/variables/font-variables";
-@import "../../../styles/variables/variables";
+@import "../../../styles/variables/all-variables";
+@import "../../../styles/vendor/bootstrap";
 
 .button {
   @extend %btn;
@@ -8,5 +8,9 @@
   font-weight: 500;
   font-family: $font-primary;
   letter-spacing: 4px;
-  font-size: map-get($text-sizes, lg);
+  font-size: map-get($text-sizes, base);
+
+  @include media-breakpoint-up(lg) {
+    font-size: map-get($text-sizes, lg);
+  }
 }

@@ -14,6 +14,7 @@
 }
 
 %btn-secondary {
+    display: flex;
     justify-content: center;
     align-items: center;
     font-size: map-get($text-sizes, lg);

@@ -35,15 +35,6 @@ const TestimonialSlider = (props) => {
         Object.assign(swiperElRef.current, params);
         swiperElRef.current.initialize();
 
-        // listen for Swiper events using addEventListener
-        // swiperElRef.current.addEventListener('swiperprogress', (e) => {
-        //     const [swiper, progress] = e.detail;
-        //     // console.log(progress);
-        // });
-        //
-        // swiperElRef.current.addEventListener('swiperslidechange', (e) => {
-        //     // console.log('slide changed');
-        // });
     }, []);
 
     return (

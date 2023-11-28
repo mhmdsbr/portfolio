@@ -20,8 +20,14 @@ const HeroScrollButton = () => {
             className={classes['hero__scrollBtn']}
             onClick={scrollToAbout}
         >
-            <FontAwesomeIcon icon={faChevronDown} size="1x" className={classes['hero__btn-bounce']} />
+            <div
+                className={classes['hero__scrollBtn-wrapper']}
+                onClick={scrollToAbout}
+            >
+                <FontAwesomeIcon icon={faChevronDown} size="1x" className={classes['hero__btn-bounce']} />
+            </div>
         </div>
+
     );
 };
 

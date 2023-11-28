@@ -24,12 +24,16 @@
   }
 
   &__scrollBtn {
-    @extend %btn-secondary;
     display: flex;
+    justify-content: center;
     position: absolute;
     bottom: 32px;
-    right: 50%;
     animation: bounce 2s ease infinite;
+    width: 100%;
+  }
+
+  &__scrollBtn-wrapper {
+    @extend %btn-secondary;
   }
 
   &__btn-bounce {

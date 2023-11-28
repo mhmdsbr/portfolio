@@ -34,7 +34,7 @@ body {
     .container,
     .row {
         &:not([class*="g-"]):not([class*="gx-"]) {
-            --bs-gutter-x: 4rem;
+            --bs-gutter-x: 3rem;
         }
     }
 }

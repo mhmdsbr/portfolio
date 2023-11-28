@@ -24,7 +24,7 @@ const Summary = () => {
                 <ExperienceList jobs={jobs} />
                 <div className="row justify-content-center">
                     <ProgressBar progressBarData={experiences}  />
-                    <div className="col-6 mt-5 text-center">
+                    <div className="col-6 mt-5 w-100 text-center">
                         <Button url={buttonContent['url']} className="btn-secondary text-white border-secondary" content={buttonContent['title']} />
                     </div>
                 </div>
