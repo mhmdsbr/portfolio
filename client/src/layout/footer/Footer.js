@@ -1,12 +1,15 @@
 import React, {useContext} from 'react';
 import {createPortal} from "react-dom";
 import classes from "./Footer.module.scss";
-import {GeneralFieldsContext} from "../../store/GeneralFieldsContext";
 import useMobileCheck from "../../components/MobileCheck";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
-const Footer = () => {
+const Footer = (props) => {
+    const footerData = useContext(ApiDataContext);
     const isMobile = useMobileCheck();
-    const footerData = useContext(GeneralFieldsContext);
+    if (footerData === null) {
+        return null;
+    }
     const termsDisclaimer = {
         terms: footerData.terms,
         disclaimer: footerData.disclaimer
@@ -50,7 +53,6 @@ const Footer = () => {
                                     </div>,
                                     document.body
                                 )}
-
                             </li>
                             <li className="nav-item">
                                 <a
@@ -85,5 +87,4 @@ const Footer = () => {
         </footer>
     );
 };
-
 export default Footer;

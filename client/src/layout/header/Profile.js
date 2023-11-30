@@ -1,12 +1,11 @@
 import React, {useContext} from "react";
 
 import classes from "./Profile.module.scss";
-
 import ProfileImage from './ProfileImage'
 import ProfileName from "./ProfileName";
-import {GeneralFieldsContext} from "../../store/GeneralFieldsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 const Profile = (props) => {
-    const profileContent = useContext(GeneralFieldsContext)
+    const profileContent = useContext(ApiDataContext);
     if (!profileContent) {
         return <p>Loading...</p>;
     }

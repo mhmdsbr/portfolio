@@ -6,10 +6,10 @@ import Button from "../../components/UI/button/Button";
 import Section from "../../components/UI/section/Section";
 import SectionContainer from "../../components/UI/section/SectionContainer";
 import ExperienceList from "./ExperienceList";
-import {SummaryFieldsContext} from "../../store/SummaryFieldsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Summary = () => {
-    const summariesData = useContext(SummaryFieldsContext);
+    const summariesData = useContext(ApiDataContext);
     if (!summariesData) {
         return <p>Loading...</p>;
     }

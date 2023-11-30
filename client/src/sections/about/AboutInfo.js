@@ -1,10 +1,10 @@
 import React, { Fragment, useContext } from 'react';
 import classes from "./About.module.scss";
 import Button from "../../components/UI/button/Button";
-import {AboutFieldsContext} from "../../store/AboutFieldsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const AboutInfo = ({ data }) => {
-    const aboutData = useContext(AboutFieldsContext);
+    const aboutData = useContext(ApiDataContext);
     if (!aboutData) {
         return <p>Loading...</p>;
     }

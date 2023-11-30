@@ -1,10 +1,10 @@
 import React, {useContext} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {GeneralFieldsContext} from "../../store/GeneralFieldsContext";
 import classes from "./FollowUs.module.scss";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const FollowUs = ({title, className}) => {
-    const { linkedin, github, twitter, google } = useContext(GeneralFieldsContext);
+    const { linkedin, github, twitter, google } = useContext(ApiDataContext);
 
     const socialMediaLinks = {
         linkedin,

@@ -4,10 +4,10 @@ import classes from '../services/Services.module.scss';
 import Section from "../../components/UI/section/Section";
 import SectionContainer from "../../components/UI/section/SectionContainer";
 import ServicesList from "./ServicesList";
-import {ServicesFieldsContext} from "../../store/ServicesFieldsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Services = () => {
-    const servicesData = useContext(ServicesFieldsContext);
+    const servicesData = useContext(ApiDataContext);
     if (!servicesData) {
         return <p>Loading...</p>;
     }

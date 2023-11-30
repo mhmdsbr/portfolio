@@ -5,17 +5,17 @@ import FollowUs from '../../components/UI/FollowUs';
 import ContactForm from './ContactForm';
 import ContactContent from './ContactContent';
 import Section from '../../components/UI/section/Section';
-import {ContactFieldsContext} from "../../store/ContactFieldsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Contact = () => {
-    const contactSettings = useContext(ContactFieldsContext);
+    const contactSettings = useContext(ApiDataContext);
     if (!contactSettings) {
         return <p>Loading...</p>;
     }
 
     const contactTitle = {
-        title: contactSettings.title,
-        overlay: contactSettings.title_overlay
+        title: contactSettings.contact_title,
+        overlay: contactSettings.contact_title_overlay
     }
     const contactInfo = {
         title: contactSettings.contact_info_title,

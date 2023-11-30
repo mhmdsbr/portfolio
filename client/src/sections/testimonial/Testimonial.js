@@ -1,42 +1,25 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 import classes from "./Testimonial.module.scss";
 import TitleSection from "../../components/UI/section/TitleSection";
 import TestimonialSlider from "./TestimonialSlider";
-import { TestimonialFieldsContext } from "../../store/TestimonialFieldsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Testimonial = () => {
-    const testimonialsData = useContext(TestimonialFieldsContext);
-    const [testimonialTitles, setTestimonialTitles] = useState(null);
-    const [testimonialItems, setTestimonialItems] = useState(null);
-
-    useEffect(() => {
-        setTestimonialTitles({
-            title: testimonialsData.title,
-            title_overlay: testimonialsData.title_overlay,
-        })
-    }, [testimonialsData.title, testimonialsData.title_overlay]);
-
-    useEffect(() => {
-        setTestimonialItems(testimonialsData.items)
-    }, [testimonialsData.items]);
-
-    if (testimonialTitles === null || testimonialItems === null) {
+    const testimonialsData = useContext(ApiDataContext);
+    if (testimonialsData === null) {
         return null;
     }
-
-    let mainTitle = testimonialTitles.title;
-    let mainTitle_overlay = testimonialTitles.title_overlay;
-
 
     return (
         <section id="testimonial" className={`${classes.testimonial} bg-dark`}>
             <div className="container max-width">
                 <TitleSection
-                    subtitle={mainTitle}
-                    title={mainTitle_overlay}
+                    subtitle={testimonialsData.testimonial_title}
+                    title={testimonialsData.testimonial_title_overlay}
                 />
-                <TestimonialSlider testimonials={testimonialItems}/>
+                <TestimonialSlider testimonials={testimonialsData.testimonial}/>
             </div>
+            <p>Test</p>
         </section>
     );
 };

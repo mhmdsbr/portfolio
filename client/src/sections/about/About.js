@@ -1,5 +1,4 @@
 import React, {useContext} from 'react';
-
 import classes from "./About.module.scss";
 import TitleSection from "../../components/UI/section/TitleSection";
 import Section from "../../components/UI/section/Section";
@@ -7,10 +6,10 @@ import AboutContent from "./AboutContent";
 import AboutInfo from "./AboutInfo";
 import SectionContainer from "../../components/UI/section/SectionContainer";
 import AboutDetails from "./AboutDetails";
-import {AboutFieldsContext} from "../../store/AboutFieldsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const About = (props) => {
-    const aboutData = useContext(AboutFieldsContext);
+    const aboutData = useContext(ApiDataContext);
     if (!aboutData) {
         return <p>Loading...</p>;
     }

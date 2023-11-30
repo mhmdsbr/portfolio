@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import PortfolioItem from "./PortfolioItem";
 import classes from "./PortfolioGallery.module.scss";
-import { ProjectsFieldsContext } from "../../store/ProjectsFieldsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 function PortfolioGallery() {
-    const projects = useContext(ProjectsFieldsContext);
+    const projects = useContext(ApiDataContext);
 
     let projectTax = [];
     if (projects && projects.length > 0) {

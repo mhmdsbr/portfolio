@@ -6,11 +6,11 @@ import IntroText from "./IntroText";
 import SectionContainer from "../../components/UI/section/SectionContainer";
 import Section from "../../components/UI/section/Section";
 import HeroScrollButton from "./HeroScrollButton";
-import {HeroFieldsContext} from "../../store/HeroFieldsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 
 const Hero= (() => {
-    const heroData = useContext(HeroFieldsContext);
+    const heroData = useContext(ApiDataContext);
     if (!heroData) {
         return <p>Loading...</p>;
     }

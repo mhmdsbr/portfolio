@@ -10,46 +10,38 @@ import Portfolio from "../sections/portfolio/Portfolio";
 import Testimonial from "../sections/testimonial/Testimonial";
 import Contact from "../sections/contact/Contact";
 import Footer from "./footer/Footer";
-import { HeroFieldsProvider } from "../store/HeroFieldsContext";
-import {GeneralFieldsProvider} from "../store/GeneralFieldsContext";
-import {AboutFieldsProvider} from "../store/AboutFieldsContext";
-import {ServicesFieldsProvider} from "../store/ServicesFieldsContext";
-import {SummaryFieldsProvider} from "../store/SummaryFieldsContext";
-import {ProjectsFieldsProvider} from "../store/ProjectsFieldsContext";
-import {TestimonialFieldsProvider} from "../store/TestimonialFieldsContext";
-import {ContactFieldsProvider} from "../store/ContactFieldsContext";
+import {ApiDataProvider} from "../store/ApiDataProvider";
 
-const AppLayout = (props) => {
-
+const AppLayout = () => {
     return (
         <div className="row justify-content-center">
-            <GeneralFieldsProvider>
+            <ApiDataProvider endpoint="general-portfolio">
                 <MainSidebar />
                 <MainContainer>
-                    <HeroFieldsProvider>
+                    <ApiDataProvider endpoint="hero-portfolio">
                         <Hero/>
-                    </HeroFieldsProvider>
-                    <AboutFieldsProvider>
+                    </ApiDataProvider>
+                    <ApiDataProvider endpoint="about-portfolio">
                         <About/>
-                    </AboutFieldsProvider>
-                    <ServicesFieldsProvider>
+                    </ApiDataProvider>
+                    <ApiDataProvider endpoint="services-portfolio">
                         <Services/>
-                    </ServicesFieldsProvider>
-                    <SummaryFieldsProvider>
+                    </ApiDataProvider>
+                    <ApiDataProvider endpoint="summary-portfolio">
                         <Summary/>
-                    </SummaryFieldsProvider>
-                    <ProjectsFieldsProvider>
+                    </ApiDataProvider>
+                    <ApiDataProvider endpoint="projects-portfolio">
                         <Portfolio/>
-                    </ProjectsFieldsProvider>
-                    <TestimonialFieldsProvider>
+                    </ApiDataProvider>
+                    <ApiDataProvider endpoint="testimonial-portfolio">
                         <Testimonial/>
-                    </TestimonialFieldsProvider>
-                    <ContactFieldsProvider>
+                    </ApiDataProvider>
+                    <ApiDataProvider endpoint="contact-portfolio">
                         <Contact/>
-                    </ContactFieldsProvider>
+                    </ApiDataProvider>
                 </MainContainer>
                 <Footer />
-            </GeneralFieldsProvider>
+            </ApiDataProvider>
         </div>
     );
 };
