@@ -36,7 +36,7 @@ const Contact = () => {
                     subtitle={contactTitle.title}
                     title={contactTitle.overlay} />
                 <div className="row">
-                    <div className="col-md-4 col-xl-3 gx-1 mt-6 mt-sm-0 order-1 order-md-0 text-center text-md-start">
+                    <div className="col-md-4 col-xl-3 mt-6 mt-sm-0 order-1 order-md-0 text-center text-md-start">
                         <ContactContent contactInfo={contactInfo} />
                         <FollowUs
                             title="Follow Me"

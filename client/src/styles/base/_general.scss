@@ -9,7 +9,6 @@ html {
     scroll-behavior: smooth;
     scroll-padding-top: 175px;
     scrollbar-width: none;
-    //overflow-x: hidden;
     height: 100%;
 }
 ::-webkit-scrollbar {
@@ -21,8 +20,6 @@ body {
     margin: 0;
     padding: 0;
     cursor: default;
-    //overflow-x: hidden;
-
     font-family: $font-primary;
     font-size: var(--text-font-size);
     line-height: var(--text-lineheight);

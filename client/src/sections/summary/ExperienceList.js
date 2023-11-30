@@ -10,20 +10,20 @@ const ExperienceList = ({jobs}) => {
             <div className="col-md-6">
                 {firstThreeItems.map((jobs, index) => (
                     <div key={index} className={` ${classes['summary__featured-box']} rounded p-4 mb-4 bg-dark-2`}>
-                        <p className="badge p-2 bg-primary text-2 fw-400">{jobs.from} - {jobs.to}</p>
+                        <p className="badge p-2 bg-primary fw-400">{jobs.from} - {jobs.to}</p>
                         <h4 className="text-white">{jobs.title}</h4>
-                        <p className="text-primary">{jobs.company}</p>
-                        <p className="mb-0 text-white-50">{jobs.description}</p>
+                        <p className="text-primary mb-0">{jobs.company}</p>
+                        <p className={`${classes['summary__featured-description']} mb-0 text-white-50`}>{jobs.description}</p>
                     </div>
                 ))}
             </div>
             <div className="col-md-6">
                 {lastThreeItems.map((jobs, index) => (
                     <div key={index} className={` ${classes['summary__featured-box']} rounded p-4 mb-4 bg-dark-2`}>
-                        <p className="badge p-2 bg-primary text-2 fw-400">{jobs.from} - {jobs.to}</p>
+                        <p className="badge p-2 bg-primary fw-400">{jobs.from} - {jobs.to}</p>
                         <h4 className="text-white">{jobs.title}</h4>
-                        <p className="text-primary">{jobs.company}</p>
-                        <p className="mb-0 text-white-50">{jobs.description}</p>
+                        <p className="text-primary mb-0">{jobs.company}</p>
+                        <p className={`${classes['summary__featured-description']} mb-0 text-white-50`}>{jobs.description}</p>
                     </div>
                 ))}
             </div>
