@@ -1,6 +1,7 @@
 @import "../../styles/base/placeholders";
 @import "../../styles/variables/font-variables";
 @import "../../styles/variables/variables";
+@import "../../styles/vendor/bootstrap";
 
 .portfolioItem {
     #{block}: &;
@@ -69,8 +70,21 @@
     gap: 8px;
     transition: 200ms all ease;
     color: var(--color-white);
+
+    @include media-breakpoint-down(lg) {
+      flex-direction: column;
+      gap: 0;
+    }
+
     h2 {
       color: var(--color-white);
+
+      @include media-breakpoint-down(lg) {
+        flex-direction: column;
+        gap: 0;
+        font-size: map-get($text-sizes, base);
+      }
     }
+
   }
 }

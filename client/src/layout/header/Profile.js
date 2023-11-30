@@ -5,9 +5,10 @@ import ProfileImage from './ProfileImage'
 import ProfileName from "./ProfileName";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 const Profile = (props) => {
-    const profileContent = useContext(ApiDataContext);
-    if (!profileContent) {
-        return <p>Loading...</p>;
+    const profileContentData = useContext(ApiDataContext);
+    const profileContent = profileContentData['general-portfolio'];
+    if (profileContent === null) {
+        return null;
     }
     const profileName = profileContent['profile_title'];
     const profileImage = profileContent['profile_image'];

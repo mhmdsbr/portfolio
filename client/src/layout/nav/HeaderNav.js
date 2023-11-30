@@ -3,15 +3,16 @@ import classes from "./HeaderNav.module.scss";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const HeaderNav = (props) => {
-    const menuItems = useContext(ApiDataContext);
+    const menuItemsData = useContext(ApiDataContext);
+    const menuItems = menuItemsData['menu-items'];
     const [isToggled, setIsToggled] = useState(false);
     const toggleHandler = () => {
         setIsToggled(!isToggled);
     };
-
     if (menuItems === null) {
         return null;
     }
+
     return (
         <Fragment>
             <button

@@ -3,7 +3,6 @@ import React from 'react';
 import classes from "./IntroText.module.scss";
 import Typewriter from "./TypeWriter";
 
-
 const IntroText = (props) => {
     const titles = props.data[0].titles;
     const location = props.data[0].location;

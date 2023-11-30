@@ -10,9 +10,10 @@ import {ApiDataContext} from "../../store/ApiDataProvider";
 
 
 const Hero= (() => {
-    const heroData = useContext(ApiDataContext);
-    if (!heroData) {
-        return <p>Loading...</p>;
+    const heroDataApi = useContext(ApiDataContext);
+    const heroData = heroDataApi['hero-portfolio'];
+    if (heroData === null) {
+        return null;
     }
 
     const heroIntroText = [

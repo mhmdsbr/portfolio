@@ -99,3 +99,13 @@ body {
         line-height: 1.5;
     }
 }
+
+.data-spinner {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    background-color: var(--color-secondary);
+    height: 100%;
+    align-items: center;
+
+}

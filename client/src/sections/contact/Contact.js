@@ -8,9 +8,10 @@ import Section from '../../components/UI/section/Section';
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Contact = () => {
-    const contactSettings = useContext(ApiDataContext);
-    if (!contactSettings) {
-        return <p>Loading...</p>;
+    const contactSettingsApi = useContext(ApiDataContext);
+    const contactSettings = contactSettingsApi['contact-portfolio'];
+    if (contactSettings === null) {
+        return null;
     }
 
     const contactTitle = {

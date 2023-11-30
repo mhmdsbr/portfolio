@@ -22,7 +22,6 @@ class GeneralSettings extends ApiManager {
 		$terms_policies = get_field('terms_policies', 'option');
 		$disclaimer = get_field('disclaimer', 'option');
 
-		// Create an array with all the general settings
 		$global_settings = array(
 			'linkedin' => $global_linkedin,
 			'github' => $global_github,

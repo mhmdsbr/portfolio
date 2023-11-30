@@ -9,9 +9,10 @@ import AboutDetails from "./AboutDetails";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const About = (props) => {
-    const aboutData = useContext(ApiDataContext);
-    if (!aboutData) {
-        return <p>Loading...</p>;
+    const aboutDataApi = useContext(ApiDataContext);
+    const aboutData = aboutDataApi['about-portfolio'];
+    if (aboutData === null) {
+        return null;
     }
     const about_title = aboutData['about_title'];
     const about_title_overlay = aboutData['about_title_overlay'];

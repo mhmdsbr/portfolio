@@ -4,9 +4,10 @@ import Button from "../../components/UI/button/Button";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const AboutInfo = ({ data }) => {
-    const aboutData = useContext(ApiDataContext);
-    if (!aboutData) {
-        return <p>Loading...</p>;
+    const aboutDataApi = useContext(ApiDataContext);
+    const aboutData = aboutDataApi['about-portfolio'];
+    if (aboutData === null) {
+        return null;
     }
     const about_button = aboutData['about_button'];
 

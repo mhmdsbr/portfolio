@@ -5,7 +5,8 @@ import TestimonialSlider from "./TestimonialSlider";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Testimonial = () => {
-    const testimonialsData = useContext(ApiDataContext);
+    const testimonialsDataApi = useContext(ApiDataContext);
+    const testimonialsData = testimonialsDataApi['testimonial-portfolio'];
     if (testimonialsData === null) {
         return null;
     }
