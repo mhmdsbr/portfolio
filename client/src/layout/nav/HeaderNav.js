@@ -1,15 +1,17 @@
 import React, { Fragment, useContext, useState } from "react";
 import classes from "./HeaderNav.module.scss";
-import { MenuItemsContext } from "../../store/MenuItemsContext";
+import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const HeaderNav = (props) => {
-    const menuItems = useContext(MenuItemsContext);
+    const menuItems = useContext(ApiDataContext);
     const [isToggled, setIsToggled] = useState(false);
-
     const toggleHandler = () => {
         setIsToggled(!isToggled);
     };
 
+    if (menuItems === null) {
+        return null;
+    }
     return (
         <Fragment>
             <button

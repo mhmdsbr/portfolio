@@ -5,9 +5,7 @@ import Profile from "./Profile";
 import HeaderNav from "../nav/HeaderNav";
 import FollowUs from "../../components/UI/FollowUs";
 import useMobileCheck from "../../components/MobileCheck";
-
-import {MenuItemsProvider} from "../../store/MenuItemsContext";
-import {ApiDataContext} from "../../store/ApiDataProvider";
+import {ApiDataContext, ApiDataProvider} from "../../store/ApiDataProvider";
 
 
 const MainSidebar = (props) => {
@@ -21,9 +19,9 @@ const MainSidebar = (props) => {
     return (
         <header className={headerClasses}>
             <Profile />
-            <MenuItemsProvider>
+            <ApiDataProvider endpoint="menu-items">
                 <HeaderNav onClick = {props.onClick} />
-            </MenuItemsProvider>
+            </ApiDataProvider>
                 <FollowUs title="" />
         </header>
     );
