@@ -8,7 +8,8 @@ const ApiDataProvider = ({ endpoint, children }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(`http://portfolio.test/wp-json/portfolio/v2/${endpoint}`);
+                const baseURL = window.location.origin + '/server';
+                const res = await axios.get(`${baseURL}/wp-json/portfolio/v2/${endpoint}`);
                 const { data } = res;
                 setData(data);
             } catch (error) {
