@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from './Button.module.scss';
 
-const Button = ({ content, className, onClickHandler, id = null }) => {
+const Button = ({ content, onClickHandler, className, id = null }) => {
     return (
         <button
             id={id}

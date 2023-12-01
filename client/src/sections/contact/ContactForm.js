@@ -11,6 +11,8 @@ const ContactForm = (props) => {
         email: '',
         message: '',
     });
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleChange = (e) => {
         console.log(e.target.name, e.target.value);
@@ -30,9 +32,22 @@ const ContactForm = (props) => {
                     'Content-Type': 'application/json',
                 },
             });
-            console.log(response.data.message);
+            setSuccessMessage(response.data.message);
+            setErrorMessage('');
+            setTimeout(() => {
+                setSuccessMessage('');
+            }, 3000);
+            setFormData({
+                name: '',
+                email: '',
+                message: '',
+            });
         } catch (error) {
-            console.error('Error submitting form:', error.response.data.message);
+            setSuccessMessage('');
+            setErrorMessage(error.response.data.message);
+            setTimeout(() => {
+                setErrorMessage('');
+            }, 3000);
         }
     };
 
@@ -43,18 +58,19 @@ const ContactForm = (props) => {
                 {props.title}
             </h2>
             <form
-                className={`${classes.contactForm} `}
+                className={`${classes.contactForm}`}
                 id="contact-form"
-                onSubmit={handleSubmit}
                 method="post"
             >
                 <div className="row g-4">
                     <div className="col-xl-6">
                         <Input
+                            id="nameInput"
                             name="name"
+                            value={formData.name}
                             type="text"
                             className={`${classes['input']}`}
-                            required=""
+                            required="required"
                             placeholder="Name"
                             onChange={handleChange}
                         />
@@ -63,8 +79,9 @@ const ContactForm = (props) => {
                         <Input
                             name="email"
                             type="email"
+                            value={formData.email}
                             className={`${classes['input']}`}
-                            required=""
+                            required="required"
                             placeholder="Email"
                             onChange={handleChange}
                         />
@@ -73,6 +90,7 @@ const ContactForm = (props) => {
                         <Input
                             name="message"
                             type="textarea"
+                            value={formData.message}
                             className={`${classes['input']}`}
                             required=""
                             placeholder="Tell us more about your needs........"
@@ -81,6 +99,17 @@ const ContactForm = (props) => {
                         />
                     </div>
                 </div>
+                {successMessage && (
+                    <div className="alert alert-success mt-3" role="alert">
+                        {successMessage}
+                    </div>
+                )}
+
+                {errorMessage && (
+                    <div className="alert alert-danger mt-3" role="alert">
+                        {errorMessage}
+                    </div>
+                )}
                 <Button
                     id="submit-btn"
                     className="btn rounded-pill mt-4 mb-0 d-inline-flex"
