@@ -5,8 +5,6 @@ import Button from '../../components/UI/button/Button';
 import axios from 'axios';
 import ReCAPTCHA from 'react-google-recaptcha'
 
-
-
 const ContactForm = (props) => {
     const [formData, setFormData] = useState({
         name: '',
@@ -15,14 +13,12 @@ const ContactForm = (props) => {
     });
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -50,7 +46,6 @@ const ContactForm = (props) => {
             }, 3000);
         }
     };
-
 
     return (
         <React.Fragment>
@@ -102,9 +97,6 @@ const ContactForm = (props) => {
                         <ReCAPTCHA
                             sitekey="6LdeOCMpAAAAANg9qOCzf9jwGN6_qs9XWB5YYjjQ"
                             theme="dark"
-                            onChange={(value) => {
-                                console.log("reCAPTCHA value:", value);
-                            }}
                         />
                     </div>
                 </div>

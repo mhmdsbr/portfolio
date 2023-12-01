@@ -18,7 +18,6 @@ const FollowUs = ({title, className}) => {
         google,
     };
     const linksArray = Object.entries(socialMediaLinks).map(([icon, url]) => ({ icon, url }));
-    console.log(linksArray);
 
     return (
         <div className={`${classes['social-icons']} ${className}`} >
