@@ -43,6 +43,7 @@ const Hero= (() => {
                                 <Button
                                     url={heroButton.url}
                                     content={heroButton.title}
+                                    role="anchor"
                                 />
                             </div>
                         </div>

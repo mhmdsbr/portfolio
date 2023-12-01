@@ -15,7 +15,6 @@ const ContactForm = (props) => {
     const [errorMessage, setErrorMessage] = useState('');
 
     const handleChange = (e) => {
-        console.log(e.target.name, e.target.value);
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
@@ -24,7 +23,6 @@ const ContactForm = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData);
 
         try {
             const response = await axios.post('https://mohammadsaber.com/server/wp-json/portfolio/v2/send-email/', formData, {
@@ -115,6 +113,7 @@ const ContactForm = (props) => {
                     className="btn rounded-pill mt-4 mb-0 d-inline-flex"
                     onClickHandler={handleSubmit}
                     content={props.buttonTitle}
+                    buttonType="button"
                 />
             </form>
         </React.Fragment>
