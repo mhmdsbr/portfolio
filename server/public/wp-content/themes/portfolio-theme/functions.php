@@ -83,32 +83,25 @@ function custom_wp_mail_from_name($original_email_from) {
 }
 
 function send_custom_email(WP_REST_Request $request) {
-	// Get data from the request
 	$data = $request->get_json_params();
 
-	// Validate input
 	if (empty($data['name']) || empty($data['email']) || empty($data['message'])) {
 		return new WP_REST_Response(array('success' => false, 'message' => 'Name, email, and message are required.'), 400);
 	}
 
-	// Sanitize input
 	$name = sanitize_text_field($data['name']);
 	$email = sanitize_email($data['email']);
-	$message = wp_kses_post($data['message']);  // Allow HTML in the message
+	$message = wp_kses_post($data['message']);
 
-	// Use the configured SMTP settings
 	add_action('phpmailer_init', 'configure_smtp');
 
-	// Compose email
 	$to = 'saaber.mohamad@gmail.com';
 	$subject = 'Portfolio Message';
 	$message = "Name: $name<br>Email: $email<br>Message: $message";
 	$headers = array('Content-Type: text/html; charset=UTF-8');
 
-	// Send email
 	$result = wp_mail($to, $subject, $message, $headers);
 
-	// Return response based on email sending result
 	if ($result) {
 		return new WP_REST_Response(array('success' => true, 'message' => 'Email sent successfully!'), 200);
 	} else {
@@ -116,7 +109,6 @@ function send_custom_email(WP_REST_Request $request) {
 	}
 }
 
-// Move the configure_smtp function outside of the main function
 add_action('phpmailer_init', 'configure_smtp');
 
 function configure_smtp($phpmailer) {
