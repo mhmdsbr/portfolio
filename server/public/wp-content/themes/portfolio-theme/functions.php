@@ -56,3 +56,48 @@ add_action('rest_api_init', function () {
 		'callback' => 'custom_get_menu_items',
 	));
 });
+
+add_action('rest_api_init', function () {
+	register_rest_route('portfolio/v2', '/send-email/', array(
+		'methods'  => 'POST',
+		'callback' => 'send_custom_email',
+	));
+});
+
+function send_custom_email(WP_REST_Request $request) {
+	// Get data from the request
+	$data = $request->get_json_params();
+
+	// Example: Validate required fields
+	if (empty($data['name']) || empty($data['email']) || empty($data['message'])) {
+		return new WP_Error('invalid_params', 'Name, email, and message are required.', array('status' => 400));
+	}
+
+	// Use the configured SMTP settings
+	add_action( 'phpmailer_init', 'configure_smtp' );
+	function configure_smtp( $phpmailer ) {
+		$phpmailer->isSMTP();
+		$phpmailer->Host       = 'mail.mohammadsaber.com';
+		$phpmailer->Port       = 465;
+		$phpmailer->SMTPAuth   = true;
+		$phpmailer->Username   = 'info@mohammadsaber.com';
+		$phpmailer->Password   = ')~4I62#hIGr&';
+		$phpmailer->SMTPSecure = 'ssl';
+	}
+
+	// Compose email
+	$to = 'saaber.mohamad@gmail.com';
+	$subject = 'Contact Form Submission';
+	$message = "Name: {$data['name']}<br>Email: {$data['email']}<br>Message: {$data['message']}";
+	$headers = array('Content-Type: text/html; charset=UTF-8');
+
+	// Send email
+	$result = wp_mail($to, $subject, $message, $headers);
+
+	// Return response based on email sending result
+	if ($result) {
+		return new WP_REST_Response(array('message' => 'Email sent successfully!'), 200);
+	} else {
+		return new WP_Error('email_send_failed', 'Failed to send email. Check your SMTP settings.', array('status' => 500));
+	}
+}

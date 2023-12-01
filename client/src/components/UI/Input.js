@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import classes from "./Input.module.scss";
 
-const Input = ({ name, type, required, placeholder, className, rows }) => {
+const Input = ({ name, type, required, placeholder, className, rows, onChange }) => {
     if (type === 'textarea') {
         return (
             <Fragment>
@@ -11,6 +11,7 @@ const Input = ({ name, type, required, placeholder, className, rows }) => {
             required={required}
             placeholder={placeholder}
             rows={rows}
+            onChange={onChange}
         />
             </Fragment>
         );
@@ -23,6 +24,7 @@ const Input = ({ name, type, required, placeholder, className, rows }) => {
                     className={`${classes.input} form-control ${className}`}
                     required={required}
                     placeholder={placeholder}
+                    onChange={onChange}
                 />
             </Fragment>
         );
