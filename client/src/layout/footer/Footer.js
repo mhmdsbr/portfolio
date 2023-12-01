@@ -39,10 +39,14 @@ const Footer = (props) => {
                                     <div className="modal fade" id="terms-policy" tabIndex="-1" role="dialog" aria-labelledby="terms-policyLabel" aria-hidden="true">
                                         <div className="modal-dialog modal-xl" role="document">
                                             <div className="modal-content">
-                                                <div className="modal-header">
+                                                <div className="modal-header d-flex">
                                                     <h5 className="modal-title text-white" id="terms-policyLabel">
                                                         Terms and Policies
                                                     </h5>
+                                                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                                                    <a type="button" className="btn-secondary h4 mb-0 text-decoration-none" data-bs-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </a>
                                                 </div>
                                                 <div
                                                     className="modal-body"

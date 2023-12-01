@@ -3,6 +3,8 @@ import classes from './ContactForm.module.scss';
 import Input from '../../components/UI/Input';
 import Button from '../../components/UI/button/Button';
 import axios from 'axios';
+import ReCAPTCHA from 'react-google-recaptcha'
+
 
 
 const ContactForm = (props) => {
@@ -94,6 +96,15 @@ const ContactForm = (props) => {
                             placeholder="Tell us more about your needs........"
                             rows="5"
                             onChange={handleChange}
+                        />
+                    </div>
+                    <div className="col-12">
+                        <ReCAPTCHA
+                            sitekey="6LdeOCMpAAAAANg9qOCzf9jwGN6_qs9XWB5YYjjQ"
+                            theme="dark"
+                            onChange={(value) => {
+                                console.log("reCAPTCHA value:", value);
+                            }}
                         />
                     </div>
                 </div>

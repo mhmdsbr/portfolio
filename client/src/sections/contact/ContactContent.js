@@ -7,12 +7,12 @@ const ContactContent = ({ contactInfo }) => {
         <Fragment>
             <h2 className="mb-3 text-5 text-uppercase text-white">{contactInfo.title}</h2>
             <p className="mb-4 text-light">{contactInfo.address}</p>
-            <p className="mb-3 text-light">
+            <a href={'tel:' + contactInfo.phone} className="mb-3 text-decoration-none text-light">
                 <span className="pe-2 text-primary">
                   <FontAwesomeIcon icon={faPhone} size="1x" />
                 </span>
-                {contactInfo.phone}
-            </p>
+                (0098) - {contactInfo.phone}
+            </a>
             <p className="mb-4 text-light">
                 <span className="pe-2 text-primary">
                   <FontAwesomeIcon icon={faEnvelope} size="1x" />
