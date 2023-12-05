@@ -1,33 +1,64 @@
+# React Portfolio
 
-# Portfolio Theme
+A simple portfolio to showcasing the skills, projects, and experiences. This project combines the power of React for the front end and WordPress technology for the backend, providing a dynamic and engaging experience.
 
-The "_s" for Timber: a dead-simple theme that you can build from. The primary purpose of this theme is to provide a file structure rather than a framework for markup or styles. Configure your Sass, scripts, and task runners however you would like!
+## Table of Contents
+- [Introduction](#introduction)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-[![Build Status](https://travis-ci.com/timber/starter-theme.svg?branch=master)](https://travis-ci.com/github/timber/starter-theme)
+## Introduction
 
-## Installing the Theme
+This open-source portfolio project demonstrates the fusion of React and WordPress technologies, offering a user-friendly platform to showcase professional achievements.
 
-Install this theme as you would any other, and be sure the Timber plugin is activated. But hey, let's break it down into some bullets:
+scr![screenshot.png](screenshot.png)
 
-1. Make sure you have installed the plugin for the [Timber Library](https://wordpress.org/plugins/timber-library/) (and Advanced Custom Fields - they [play quite nicely](https://timber.github.io/docs/guides/acf-cookbook/#nav) together). 
-2. Download the zip for this theme (or clone it) and move it to `wp-content/themes` in your WordPress installation. 
-3. Rename the folder to something that makes sense for your website (generally no spaces and all lowercase). You could keep the name `timber-starter-theme` but the point of a starter theme is to make it your own!
-4. Activate the theme in Appearance >  Themes.
-5. Do your thing! And read [the docs](https://timber.github.io/docs/).
+## Features
 
-## What's here?
+- **Intuitive Design:** A clean and simple design for easy navigation.
+- **React Frontend:** Utilizes the power of React for a dynamic user interface.
+- **WordPress Backend:** Managed by Docker Compose, integrating a WordPress installation for efficient content management.
+- **Custom Theme:** A tailor-made theme to enhance the backend experience.
 
-`static/` is where you can keep your static front-end scripts, styles, or images. In other words, your Sass files, JS files, fonts, and SVGs would live here.
+## Project Structure
+The project is organized into two main directories:
 
-`templates/` contains all of your Twig templates. These pretty much correspond 1 to 1 with the PHP files that respond to the WordPress template hierarchy. At the end of each PHP template, you'll notice a `Timber::render()` function whose first parameter is the Twig file where that data (or `$context`) will be used. Just an FYI.
+- **`client`:** Contains the React front end.
+- **`server`:** Managed by Docker Compose, it includes a WordPress installation inside the `public` directory and a custom theme to manage the backend.
 
-`bin/` and `tests/` ... basically don't worry about (or remove) these unless you know what they are and want to.
+## Installation
 
-## Other Resources
+To run this project locally, follow these steps:
 
-* [This branch](https://github.com/laras126/timber-starter-theme/tree/tackle-box) of the starter theme has some more example code with ACF and a slightly different set up.
-* [Twig for Timber Cheatsheet](http://notlaura.com/the-twig-for-timber-cheatsheet/)
-* [Timber and Twig Reignited My Love for WordPress](https://css-tricks.com/timber-and-twig-reignited-my-love-for-wordpress/) on CSS-Tricks
-* [A real live Timber theme](https://github.com/laras126/yuling-theme).
-* [Timber Video Tutorials](http://timber.github.io/timber/#video-tutorials) and [an incomplete set of screencasts](https://www.youtube.com/playlist?list=PLuIlodXmVQ6pkqWyR6mtQ5gQZ6BrnuFx-) for building a Timber theme from scratch.
+1. Clone the repository: `git clone https://github.com/Mhmdsbr/your-portfolio.git`
+2. Navigate to the `client` directory: `cd your-portfolio/client`
+3. Install dependencies: `npm install`
+4. Start the development server: `npm start` (for development) or `npm run build` (for production)
+5. Open your browser and go to `http://localhost:3000`
 
+## Usage
+
+Navigate and interact with the portfolio seamlessly, experiencing the blend of React and WordPress technologies.
+
+
+## Contributing
+
+If you'd like to contribute to this project, please follow these steps:
+
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature-name`
+3. Make your changes and commit them: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature-name`
+5. Open a pull request
+
+
+
+## License
+
+This project is licensed under the MIT.
+
+Feel free to customize this template further based on your preferences and any additional details you'd like to include.

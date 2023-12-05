@@ -20,9 +20,5 @@ wp-cli.yml
 # Cache
 .php_cs.cache
 
-#react
 
-# WordPress & Theme
-/server/public/*
-
-!/server/public/wp-content/themes/portfolio-theme/*
+# Wordpress
