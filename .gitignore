@@ -25,4 +25,4 @@ wp-cli.yml
 # WordPress & Theme
 /server/public/*
 
-!/server/public/wp-content/*
+!/server/public/wp-content/themes/portfolio-theme/*
