@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import classes from './ContactForm.module.scss';
 import Input from '../../components/UI/Input';
 import Button from '../../components/UI/button/Button';
 import axios from 'axios';
-import ReCAPTCHA from 'react-google-recaptcha'
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const ContactForm = (props) => {
     const [formData, setFormData] = useState({
@@ -11,17 +11,30 @@ const ContactForm = (props) => {
         email: '',
         message: '',
     });
+    const [errors, setErrors] = useState({
+        name: '',
+        email: '',
+        message: '',
+    });
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+        const { name, value } = e.target;
+        setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+        setFormData({ ...formData, [name]: value });
     };
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        if (value.trim() === '') {
+            setErrors((prevErrors) => ({ ...prevErrors, [name]: `${name} is required.` }));
+        } else {
+            setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
             const response = await axios.post('https://mohammadsaber.com/server/wp-json/portfolio/v2/send-email/', formData, {
                 headers: {
@@ -49,14 +62,8 @@ const ContactForm = (props) => {
 
     return (
         <React.Fragment>
-            <h2 className="mb-3 text-uppercase text-center text-md-start text-white">
-                {props.title}
-            </h2>
-            <form
-                className={`${classes.contactForm}`}
-                id="contact-form"
-                method="post"
-            >
+            <h2 className="mb-3 text-uppercase text-center text-md-start text-white">{props.title}</h2>
+            <form className={`${classes.contactForm}`} id="contact-form" method="post">
                 <div className="row g-4">
                     <div className="col-xl-6">
                         <Input
@@ -68,7 +75,9 @@ const ContactForm = (props) => {
                             required="required"
                             placeholder="Name"
                             onChange={handleChange}
+                            onBlur={handleBlur}
                         />
+                        {errors.name && <div className="alert alert-danger mt-4">{errors.name}</div>}
                     </div>
                     <div className="col-xl-6">
                         <Input
@@ -78,8 +87,10 @@ const ContactForm = (props) => {
                             className={`${classes['input']}`}
                             required="required"
                             placeholder="Email"
+                            onBlur={handleBlur}
                             onChange={handleChange}
                         />
+                        {errors.email && <div className="alert alert-danger mt-4">{errors.email}</div>}
                     </div>
                     <div className="col">
                         <Input
@@ -91,7 +102,9 @@ const ContactForm = (props) => {
                             placeholder="Tell us more about your needs........"
                             rows="5"
                             onChange={handleChange}
+                            onBlur={handleBlur}
                         />
+                        {errors.message && <div className="alert alert-danger mt-4">{errors.message}</div>}
                     </div>
                     <div className="col-12">
                         <ReCAPTCHA
@@ -100,17 +113,8 @@ const ContactForm = (props) => {
                         />
                     </div>
                 </div>
-                {successMessage && (
-                    <div className="alert alert-success mt-3" role="alert">
-                        {successMessage}
-                    </div>
-                )}
-
-                {errorMessage && (
-                    <div className="alert alert-danger mt-3" role="alert">
-                        {errorMessage}
-                    </div>
-                )}
+                {successMessage && <div className="alert alert-success mt-3">{successMessage}</div>}
+                {errorMessage && <div className="alert alert-danger mt-3">{errorMessage}</div>}
                 <Button
                     id="submit-btn"
                     className="btn rounded-pill mt-4 mb-0 d-inline-flex"
@@ -124,4 +128,3 @@ const ContactForm = (props) => {
 };
 
 export default ContactForm;
-
