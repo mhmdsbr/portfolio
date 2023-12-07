@@ -23,4 +23,4 @@ wp-cli.yml
 
 # Wordpress
 /server/public/
-!/server/public/wp-content/themes/portfolio-theme/
+!/server/public/wp-content/
