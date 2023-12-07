@@ -5,14 +5,14 @@ endif
 .PHONY: up down restart update
 
 up:
-	docker-compose up -d
+	docker compose up -d
 
 down:
-	docker-compose down
+	docker compose down
 
 restart:
-	docker-compose down
-	docker-compose up -d
+	docker compose down
+	docker compose up -d
 
 update:
-	docker-compose run --rm node /bin/sh -c 'npm ci && npm run dev'
+	docker compose run --rm node /bin/sh -c 'npm ci && npm run dev'
