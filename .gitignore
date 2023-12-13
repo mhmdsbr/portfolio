@@ -25,6 +25,7 @@ wp-cli.yml
 /server/public/*
 !/server/public/wp-content/
 /server/public/wp-content/plugins
+/server/public/wp-content/uploads
 !/server/public/wp-content/themes
 /server/public/wp-content/themes/twentytwentyfour
 

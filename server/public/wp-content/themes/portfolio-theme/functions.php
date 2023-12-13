@@ -76,14 +76,14 @@ function custom_wp_mail_from($original_email_address) {
 	return $admin_email;
 }
 
-function custom_wp_mail_from_name($original_email_from) {
+function custom_wp_mail_from_name($original_email_from): string {
 	// Get the site name
 	$site_name = get_bloginfo('name');
 
 	return $site_name;
 }
 
-function send_custom_email(WP_REST_Request $request) {
+function send_custom_email(WP_REST_Request $request): WP_REST_Response {
 	$data = $request->get_json_params();
 
 	if (empty($data['name']) || empty($data['email']) || empty($data['message'])) {
@@ -112,12 +112,20 @@ function send_custom_email(WP_REST_Request $request) {
 
 add_action('phpmailer_init', 'configure_smtp');
 
-function configure_smtp($phpmailer) {
+$smtp_credentials = array(
+	'host' => get_field('smtp_host', 'option'),
+	'port' => get_field('smtp_port', 'option'),
+	'username' => get_field('smtp_username', 'option'),
+	'password' => get_field('smtp_password', 'option'),
+);
+
+
+function configure_smtp($phpmailer, $smtp_credentials): void {
 	$phpmailer->isSMTP();
-	$phpmailer->Host       = 'mail.mohammadsaber.com';
-	$phpmailer->Port       = 465;
+	$phpmailer->Host       = $smtp_credentials['host'];
+	$phpmailer->Port       = $smtp_credentials['port'];
 	$phpmailer->SMTPAuth   = true;
-	$phpmailer->Username   = 'info@mohammadsaber.com';
-	$phpmailer->Password   = ')~4I62#hIGr&';
+	$phpmailer->Username   = $smtp_credentials['username'];
+	$phpmailer->Password   = $smtp_credentials['password'];
 	$phpmailer->SMTPSecure = 'ssl';
 }

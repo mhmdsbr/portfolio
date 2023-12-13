@@ -90,6 +90,14 @@ class ACF
 		    'parent_slug' => 'theme-general-settings',
 	    ));
 
+	    acf_add_options_sub_page(array(
+		    'page_title' => __('Configuration', 'expedition'),
+		    'menu_title' => __('Configuration', 'expedition'),
+		    'menu_slug'  => 'theme-general-config',
+		    'parent_slug' => 'theme-general-settings',
+		    'redirect'   => false
+	    ));
+
     }
 
     /**
