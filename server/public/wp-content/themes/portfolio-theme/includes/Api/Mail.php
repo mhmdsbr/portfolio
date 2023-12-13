@@ -2,7 +2,7 @@
 
 namespace PORTFOLIO\Api;
 
-class MailApi extends ApiHandler {
+class Mail extends ApiHandler {
 	public function register_routes(): void {
 		register_rest_route($this->namespace, '/send-email', array(
 			'methods'  => 'POST',

@@ -49,8 +49,8 @@ class ACF
         ));
 
 	    acf_add_options_sub_page(array(
-		    'page_title'  => __('HeroApi Section', 'expedition'),
-		    'menu_title'  => __('HeroApi', 'expedition'),
+		    'page_title'  => __('Hero Section', 'expedition'),
+		    'menu_title'  => __('Hero', 'expedition'),
 		    'menu_slug'  => 'theme-hero-section',
 		    'parent_slug' => 'theme-general-settings',
 	    ));
@@ -63,22 +63,22 @@ class ACF
 	    ));
 
 	    acf_add_options_sub_page(array(
-		    'page_title'  => __('ServicesApi Section', 'expedition'),
-		    'menu_title'  => __('ServicesApi', 'expedition'),
+		    'page_title'  => __('Services Section', 'expedition'),
+		    'menu_title'  => __('Services', 'expedition'),
 		    'menu_slug'  => 'theme-services-section',
 		    'parent_slug' => 'theme-general-settings',
 	    ));
 
 	    acf_add_options_sub_page(array(
-		    'page_title'  => __('SummaryApi Section', 'expedition'),
-		    'menu_title'  => __('SummaryApi', 'expedition'),
+		    'page_title'  => __('Summary Section', 'expedition'),
+		    'menu_title'  => __('Summary', 'expedition'),
 		    'menu_slug'  => 'theme-summary-section',
 		    'parent_slug' => 'theme-general-settings',
 	    ));
 
 	    acf_add_options_sub_page(array(
-		    'page_title'  => __('TestimonialApi Section', 'expedition'),
-		    'menu_title'  => __('TestimonialApi', 'expedition'),
+		    'page_title'  => __('Testimonial Section', 'expedition'),
+		    'menu_title'  => __('Testimonial', 'expedition'),
 		    'menu_slug'  => 'theme-testimonial-section',
 		    'parent_slug' => 'theme-general-settings',
 	    ));

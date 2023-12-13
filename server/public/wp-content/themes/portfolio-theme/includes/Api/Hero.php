@@ -2,7 +2,7 @@
 
 namespace PORTFOLIO\Api;
 
-class HeroApi extends ApiHandler {
+class Hero extends ApiHandler {
 	public function register_routes(): void {
 		register_rest_route($this->namespace, '/hero-portfolio', array(
 			'methods'  => 'GET',

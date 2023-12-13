@@ -3,7 +3,7 @@
 namespace PORTFOLIO\Api;
 
 
-class ContactApi extends ApiHandler {
+class Contact extends ApiHandler {
 	public function register_routes(): void {
 		register_rest_route($this->namespace, '/contact-portfolio', array(
 			'methods'  => 'GET',

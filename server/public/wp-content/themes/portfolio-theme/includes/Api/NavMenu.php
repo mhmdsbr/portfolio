@@ -2,7 +2,7 @@
 
 namespace Portfolio\Api;
 
-class NavMenuApi extends ApiHandler {
+class NavMenu extends ApiHandler {
 	public function register_routes(): void {
 		register_rest_route($this->namespace, '/menu-items', array(
 			'methods'  => 'GET',

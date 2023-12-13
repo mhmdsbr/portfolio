@@ -1,4 +1,5 @@
 <?php
+
 // Register an autoloader function to load classes dynamically
 spl_autoload_register( function ( $classname ) {
 	$parts = explode( '\\', $classname );
@@ -9,23 +10,26 @@ spl_autoload_register( function ( $classname ) {
 		include_once $classpath;
 	}
 } );
+
 /** Core **/
 new PORTFOLIO\Core\Cleaner();
 new PORTFOLIO\Core\Enqueues();
 new PORTFOLIO\Core\General();
 new PORTFOLIO\Core\PostType();
+
 /** Api **/
 new PORTFOLIO\Api\ApiHandler("portfolio/v2");
-new PORTFOLIO\Api\GeneralSettingsApi("portfolio/v2");
-new PORTFOLIO\Api\NavMenuApi("portfolio/v2");
-new PORTFOLIO\Api\HeroApi("portfolio/v2");
-new PORTFOLIO\Api\AboutApi("portfolio/v2");
-new PORTFOLIO\Api\ServicesApi("portfolio/v2");
-new PORTFOLIO\Api\SummaryApi("portfolio/v2");
-new PORTFOLIO\Api\ProjectsApi("portfolio/v2");
-new PORTFOLIO\Api\TestimonialApi("portfolio/v2");
-new PORTFOLIO\Api\ContactApi("portfolio/v2");
-new PORTFOLIO\Api\MailApi("portfolio/v2");
+new PORTFOLIO\Api\GeneralSettings("portfolio/v2");
+new PORTFOLIO\Api\NavMenu("portfolio/v2");
+new PORTFOLIO\Api\Hero("portfolio/v2");
+new PORTFOLIO\Api\About("portfolio/v2");
+new PORTFOLIO\Api\Services("portfolio/v2");
+new PORTFOLIO\Api\Summary("portfolio/v2");
+new PORTFOLIO\Api\Projects("portfolio/v2");
+new PORTFOLIO\Api\Testimonial("portfolio/v2");
+new PORTFOLIO\Api\Contact("portfolio/v2");
+new PORTFOLIO\Api\Mail("portfolio/v2");
+
 /** ThirdParty **/
 new PORTFOLIO\ThirdParty\ACF();
 

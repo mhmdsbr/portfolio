@@ -2,7 +2,7 @@
 
 namespace PORTFOLIO\Api;
 
-class TestimonialApi extends ApiHandler {
+class Testimonial extends ApiHandler {
 	public function register_routes(): void {
 		register_rest_route($this->namespace, '/testimonial-portfolio', array(
 			'methods'  => 'GET',

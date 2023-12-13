@@ -2,7 +2,7 @@
 
 namespace PORTFOLIO\Api;
 
-class GeneralSettingsApi extends ApiHandler {
+class GeneralSettings extends ApiHandler {
 
 	public function register_routes(): void {
 		register_rest_route($this->namespace, '/general-portfolio', array(
