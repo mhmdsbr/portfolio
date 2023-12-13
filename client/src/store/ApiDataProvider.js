@@ -10,7 +10,8 @@ const ApiDataProvider = ({ endpoints, children }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const baseURL = 'https://mohammadsaber.com/server';
+                // const baseURL = 'https://mohammadsaber.com/server';
+                const baseURL = 'http://localhost';
                 // const baseURL = window.location.origin + '/server';
                 const fetchDataForEndpoint = async (endpoint) => {
                     const res = await axios.get(`${baseURL}/wp-json/portfolio/v2/${endpoint}`);

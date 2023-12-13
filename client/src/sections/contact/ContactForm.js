@@ -107,10 +107,10 @@ const ContactForm = (props) => {
                         {errors.message && <div className="alert alert-danger mt-4">{errors.message}</div>}
                     </div>
                     <div className="col-12">
-                        <ReCAPTCHA
-                            sitekey="6LdeOCMpAAAAANg9qOCzf9jwGN6_qs9XWB5YYjjQ"
-                            theme="dark"
-                        />
+                        {/*<ReCAPTCHA*/}
+                        {/*    sitekey="6LdeOCMpAAAAANg9qOCzf9jwGN6_qs9XWB5YYjjQ"*/}
+                        {/*    theme="dark"*/}
+                        {/*/>*/}
                     </div>
                 </div>
                 {successMessage && <div className="alert alert-success mt-3">{successMessage}</div>}

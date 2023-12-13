@@ -1,5 +1,4 @@
 <?php
-
 // Register an autoloader function to load classes dynamically
 spl_autoload_register( function ( $classname ) {
 	$parts = explode( '\\', $classname );
@@ -10,122 +9,23 @@ spl_autoload_register( function ( $classname ) {
 		include_once $classpath;
 	}
 } );
-
-
-/** Core */
-// Instantiate and initialize Core classes
+/** Core **/
 new PORTFOLIO\Core\Cleaner();
 new PORTFOLIO\Core\Enqueues();
 new PORTFOLIO\Core\General();
 new PORTFOLIO\Core\PostType();
-new PORTFOLIO\Core\ApiManager("portfolio/v2");
-new PORTFOLIO\Core\GeneralSettings("portfolio/v2");
-new PORTFOLIO\Core\Hero("portfolio/v2");
-new PORTFOLIO\Core\About("portfolio/v2");
-new PORTFOLIO\Core\Services("portfolio/v2");
-new PORTFOLIO\Core\Summary("portfolio/v2");
-new PORTFOLIO\Core\Projects("portfolio/v2");
-new PORTFOLIO\Core\Testimonial("portfolio/v2");
-new PORTFOLIO\Core\Contact("portfolio/v2");
+/** Api **/
+new PORTFOLIO\Api\ApiHandler("portfolio/v2");
+new PORTFOLIO\Api\GeneralSettingsApi("portfolio/v2");
+new PORTFOLIO\Api\NavMenuApi("portfolio/v2");
+new PORTFOLIO\Api\HeroApi("portfolio/v2");
+new PORTFOLIO\Api\AboutApi("portfolio/v2");
+new PORTFOLIO\Api\ServicesApi("portfolio/v2");
+new PORTFOLIO\Api\SummaryApi("portfolio/v2");
+new PORTFOLIO\Api\ProjectsApi("portfolio/v2");
+new PORTFOLIO\Api\TestimonialApi("portfolio/v2");
+new PORTFOLIO\Api\ContactApi("portfolio/v2");
+new PORTFOLIO\Api\MailApi("portfolio/v2");
+/** ThirdParty **/
+new PORTFOLIO\ThirdParty\ACF();
 
-// Instantiate and initialize ThirdParty class
-new EXP\ThirdParty\ACF();
-
-// Define custom MIME types for SVG and SVGZ files
-function cc_mime_types( $mimes ) {
-	$mimes['svg']  = 'image/svg+xml';
-	$mimes['svgz'] = 'image/svg+xml';
-
-	return $mimes;
-}
-
-// Add the custom MIME types to WordPress
-add_filter( 'upload_mimes', 'cc_mime_types' );
-
-// Function to retrieve menu items for a custom REST API route
-function custom_get_menu_items(): WP_Error|WP_REST_Response|WP_HTTP_Response {
-	// Replace 'primary-menu' with your desired menu location.
-	$menu_items = wp_get_nav_menu_items('primary-menu');
-
-	return rest_ensure_response($menu_items);
-}
-
-// Register a custom REST API route for retrieving menu items
-add_action('rest_api_init', function () {
-	register_rest_route('portfolio/v2', '/menu-items', array(
-		'methods' => 'GET',
-		'callback' => 'custom_get_menu_items',
-	));
-});
-
-add_action('rest_api_init', function () {
-	register_rest_route('portfolio/v2', '/send-email/', array(
-		'methods'  => 'POST',
-		'callback' => 'send_custom_email',
-	));
-});
-
-// Use a filter to modify the "From" name and email address for outgoing emails
-add_filter('wp_mail_from', 'custom_wp_mail_from');
-add_filter('wp_mail_from_name', 'custom_wp_mail_from_name');
-
-function custom_wp_mail_from($original_email_address) {
-	// Get the site admin email address
-	$admin_email = get_option('admin_email');
-
-	return $admin_email;
-}
-
-function custom_wp_mail_from_name($original_email_from): string {
-	// Get the site name
-	$site_name = get_bloginfo('name');
-
-	return $site_name;
-}
-
-function send_custom_email(WP_REST_Request $request): WP_REST_Response {
-	$data = $request->get_json_params();
-
-	if (empty($data['name']) || empty($data['email']) || empty($data['message'])) {
-		return new WP_REST_Response(array('success' => false, 'message' => 'Name, email, and message are required.'), 400);
-	}
-
-	$name = sanitize_text_field($data['name']);
-	$email = sanitize_email($data['email']);
-	$message = wp_kses_post($data['message']);
-
-	add_action('phpmailer_init', 'configure_smtp');
-
-	$to = 'saaber.mohamad@gmail.com';
-	$subject = 'Portfolio Message';
-	$message = "Name: $name<br>Email: $email<br>Message: $message";
-	$headers = array('Content-Type: text/html; charset=UTF-8');
-
-	$result = wp_mail($to, $subject, $message, $headers);
-
-	if ($result) {
-		return new WP_REST_Response(array('success' => true, 'message' => 'Email sent successfully!'), 200);
-	} else {
-		return new WP_REST_Response(array('success' => false, 'message' => 'Failed to send email. Please try again later'), 500);
-	}
-}
-
-add_action('phpmailer_init', 'configure_smtp');
-
-$smtp_credentials = array(
-	'host' => get_field('smtp_host', 'option'),
-	'port' => get_field('smtp_port', 'option'),
-	'username' => get_field('smtp_username', 'option'),
-	'password' => get_field('smtp_password', 'option'),
-);
-
-
-function configure_smtp($phpmailer, $smtp_credentials): void {
-	$phpmailer->isSMTP();
-	$phpmailer->Host       = $smtp_credentials['host'];
-	$phpmailer->Port       = $smtp_credentials['port'];
-	$phpmailer->SMTPAuth   = true;
-	$phpmailer->Username   = $smtp_credentials['username'];
-	$phpmailer->Password   = $smtp_credentials['password'];
-	$phpmailer->SMTPSecure = 'ssl';
-}

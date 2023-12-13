@@ -1,8 +1,9 @@
 <?php
 
-namespace PORTFOLIO\Core;
+namespace PORTFOLIO\Api;
 
-class Contact extends ApiManager {
+
+class ContactApi extends ApiHandler {
 	public function register_routes(): void {
 		register_rest_route($this->namespace, '/contact-portfolio', array(
 			'methods'  => 'GET',

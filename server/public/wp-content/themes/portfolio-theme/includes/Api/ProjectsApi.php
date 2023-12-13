@@ -1,8 +1,9 @@
 <?php
 
-namespace PORTFOLIO\Core;
+namespace PORTFOLIO\Api;
 
-class Projects extends ApiManager {
+
+class ProjectsApi extends ApiHandler {
 	public function register_routes(): void {
 		register_rest_route($this->namespace, '/projects-portfolio', array(
 			'methods'  => 'GET',

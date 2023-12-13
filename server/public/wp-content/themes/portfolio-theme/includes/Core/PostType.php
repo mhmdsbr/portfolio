@@ -22,7 +22,7 @@ class PostType
 
         $this->registerPostType(
             'project',
-            'Projects',
+            'ProjectsApi',
             'Project',
             'project',
             true,

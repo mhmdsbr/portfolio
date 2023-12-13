@@ -1,8 +1,8 @@
 <?php
 
-namespace PORTFOLIO\Core;
+namespace PORTFOLIO\Api;
 
-class ApiManager {
+class ApiHandler {
 	protected string $namespace;
 
 	public function __construct($namespace) {
