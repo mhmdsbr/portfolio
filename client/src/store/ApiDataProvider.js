@@ -6,15 +6,29 @@ const ApiDataContext = createContext();
 const ApiDataProvider = ({ endpoints, children }) => {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
+    const [baseUrl, setBaseUrl] = useState('');
+    useEffect(() => {
+        const fetchBaseUrl = async () => {
+            const mainConfURL = window.location.origin + '/server'; // use this based on your live environment
+            // const mainConfURL = 'http://localhost';
+            try {
+                const res = await axios.get(`${mainConfURL}/wp-json/portfolio/v2/config-portfolio`);
+                setBaseUrl(res.data.api_base_url);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchBaseUrl().then(r => {});
+    }, []);
 
     useEffect(() => {
+        if (!baseUrl) return;
+
         const fetchData = async () => {
             try {
-                // const baseURL = 'https://mohammadsaber.com/server';
-                const baseURL = 'http://localhost';
-                // const baseURL = window.location.origin + '/server';
                 const fetchDataForEndpoint = async (endpoint) => {
-                    const res = await axios.get(`${baseURL}/wp-json/portfolio/v2/${endpoint}`);
+                    const res = await axios.get(`${baseUrl}/wp-json/portfolio/v2/${endpoint}`);
                     return res.data;
                 };
 
@@ -35,7 +49,7 @@ const ApiDataProvider = ({ endpoints, children }) => {
         };
 
         fetchData().then(r => {});
-    }, [endpoints]);
+    }, [baseUrl, endpoints]);
 
     if (loading) {
         return <div className="data-spinner bs-primary">

@@ -19,6 +19,7 @@ new PORTFOLIO\Core\PostType();
 
 /** Api **/
 new PORTFOLIO\Api\ApiHandler("portfolio/v2");
+new PORTFOLIO\Api\Config("portfolio/v2");
 new PORTFOLIO\Api\GeneralSettings("portfolio/v2");
 new PORTFOLIO\Api\NavMenu("portfolio/v2");
 new PORTFOLIO\Api\Hero("portfolio/v2");
