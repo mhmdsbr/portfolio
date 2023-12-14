@@ -8,7 +8,6 @@ class General
     {
         /** General setup methods */
         add_action('after_setup_theme', [&$this, 'generalSetup']);
-	    add_action('phpmailer_init', [&$this, 'setupSmtp']);
 	    /** Custom Admin footer */
         add_filter('admin_footer_text', [&$this, 'customAdminFooterText']);
 	    add_filter( 'upload_mimes', [&$this,'cc_mime_types'] );
@@ -84,32 +83,6 @@ class General
 		$site_name = get_bloginfo('name');
 		return $site_name;
 	}
-
-	/**
-	 * Set up SMTP configuration
-	 *
-	 * @return void
-	 */
-	public function setupSmtp(): void
-	{
-		$smtp_credentials = array(
-			'host'     => get_field('smtp_host', 'option'),
-			'port'     => get_field('smtp_port', 'option'),
-			'username' => get_field('smtp_username', 'option'),
-			'password' => get_field('smtp_password', 'option'),
-		);
-
-		add_action('phpmailer_init', function ($phpmailer) use ($smtp_credentials) {
-			$phpmailer->isSMTP();
-			$phpmailer->Host       = $smtp_credentials['host'];
-			$phpmailer->Port       = $smtp_credentials['port'];
-			$phpmailer->SMTPAuth   = true;
-			$phpmailer->Username   = $smtp_credentials['username'];
-			$phpmailer->Password   = $smtp_credentials['password'];
-			$phpmailer->SMTPSecure = 'ssl';
-		});
-	}
-
 }
 
 

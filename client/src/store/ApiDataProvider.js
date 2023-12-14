@@ -9,8 +9,8 @@ const ApiDataProvider = ({ endpoints, children }) => {
     const [baseUrl, setBaseUrl] = useState('');
     useEffect(() => {
         const fetchBaseUrl = async () => {
-            const mainConfURL = window.location.origin + '/server'; // use this based on your live environment
-            // const mainConfURL = 'http://localhost';
+            const mainConfURL = window.location.origin + '/server'; // change this based on ur API base url
+            // const mainConfURL = 'http://localhost/'; // change this based on ur API base url
             try {
                 const res = await axios.get(`${mainConfURL}/wp-json/portfolio/v2/config-portfolio`);
                 setBaseUrl(res.data.api_base_url);
@@ -28,7 +28,7 @@ const ApiDataProvider = ({ endpoints, children }) => {
         const fetchData = async () => {
             try {
                 const fetchDataForEndpoint = async (endpoint) => {
-                    const res = await axios.get(`${baseUrl}/wp-json/portfolio/v2/${endpoint}`);
+                    const res = await axios.get(`${baseUrl}/${endpoint}`);
                     return res.data;
                 };
 
