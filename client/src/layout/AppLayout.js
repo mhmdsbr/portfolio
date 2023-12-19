@@ -14,7 +14,6 @@ import { ApiDataProvider } from "../store/ApiDataProvider";
 const AppLayout = () => {
     const endpoints = [
         "general-portfolio",
-        "config-portfolio",
         "menu-items",
         "hero-portfolio",
         "about-portfolio",

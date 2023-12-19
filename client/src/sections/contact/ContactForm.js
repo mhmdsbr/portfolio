@@ -1,14 +1,14 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import classes from './ContactForm.module.scss';
 import Input from '../../components/UI/Input';
 import Button from '../../components/UI/button/Button';
 import axios from 'axios';
-import ReCAPTCHA from 'react-google-recaptcha';
-import {ApiDataContext} from "../../store/ApiDataProvider";
+// import ReCAPTCHA from 'react-google-recaptcha';
+// import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const ContactForm = (props) => {
-    const recaptchaApi = useContext(ApiDataContext);
-    const recaptchaData = recaptchaApi['config-portfolio'];
+    // const recaptchaApi = useContext(ApiDataContext);
+    // const recaptchaData = recaptchaApi['config-portfolio'];
 
     const [formData, setFormData] = useState({
         name: '',
@@ -111,10 +111,10 @@ const ContactForm = (props) => {
                         {errors.message && <div className="alert alert-danger mt-4">{errors.message}</div>}
                     </div>
                     <div className="col-12">
-                        <ReCAPTCHA
-                            sitekey={recaptchaData.recaptcha}
-                            theme="dark"
-                        />
+                        {/*<ReCAPTCHA*/}
+                        {/*    sitekey={recaptchaData.recaptcha}*/}
+                        {/*    theme="dark"*/}
+                        {/*/>*/}
                     </div>
                 </div>
                 {successMessage && <div className="alert alert-success mt-3">{successMessage}</div>}

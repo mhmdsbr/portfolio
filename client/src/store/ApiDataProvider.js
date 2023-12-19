@@ -1,25 +1,16 @@
 import React, { createContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import useBaseUrlFetcher from './apiBaseUrlFetch';
 
 const ApiDataContext = createContext();
 
 const ApiDataProvider = ({ endpoints, children }) => {
+    const baseUrl = useSelector((state) => state.config.baseUrl);
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
-    const [baseUrl, setBaseUrl] = useState('');
-    useEffect(() => {
-        const fetchBaseUrl = async () => {
-            const mainConfURL = window.location.origin + '/server'; // change this based on ur API base url
-            try {
-                const res = await axios.get(`${mainConfURL}/wp-json/portfolio/v2/config-portfolio`);
-                setBaseUrl(res.data.api_base_url);
-            } catch (error) {
-                console.error(error);
-            }
-        };
 
-        fetchBaseUrl().then(r => {});
-    }, []);
+    useBaseUrlFetcher();
 
     useEffect(() => {
         if (!baseUrl) return;

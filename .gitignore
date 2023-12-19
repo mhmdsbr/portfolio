@@ -2,6 +2,7 @@
 .idea
 .vscode
 
+/node_modules/
 # React
 /client/node_modules/
 
