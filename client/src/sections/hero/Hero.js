@@ -1,18 +1,17 @@
-import React, {useContext} from 'react';
-
+import React from 'react';
+import { useSelector } from 'react-redux';
 import classes from "./Hero.module.scss";
 import Button from "../../components/UI/button/Button";
 import IntroText from "./IntroText";
 import SectionContainer from "../../components/UI/section/SectionContainer";
 import Section from "../../components/UI/section/Section";
 import HeroScrollButton from "./HeroScrollButton";
-import {ApiDataContext} from "../../store/ApiDataProvider";
 
+const Hero = () => {
+    const heroData = useSelector((state) => state.data.items);
+    const loading = useSelector((state) => state.data.loading);
 
-const Hero= (() => {
-    const heroDataApi = useContext(ApiDataContext);
-    const heroData = heroDataApi['hero-portfolio'];
-    if (heroData === null) {
+    if (loading || !heroData) {
         return null;
     }
 
@@ -21,14 +20,15 @@ const Hero= (() => {
             titles: heroData.titles,
             location: heroData.location,
         }
-    ]
+    ];
+
     const heroBgImage = heroData.background_image ? heroData.background_image : '';
     const heroButton = heroData.button ? heroData.button : '';
 
     return (
         <Section id="home" className={`p-0`}>
             <div className={classes['hero__wrap']}>
-                <div className={`${classes['hero__mask']} opacity-75 bg-dark`}></div>
+                <div className={`${classes['hero__mask']} opacity-75 bg-dark`}/>
                 <div
                     className={`${classes['hero__bg']} parallax`}
                     style={{ backgroundImage: `url(${heroBgImage.url})` }}
@@ -53,6 +53,6 @@ const Hero= (() => {
             </div>
         </Section>
     );
-});
+};
 
 export default Hero;

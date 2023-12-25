@@ -1,7 +1,7 @@
 import React, { Fragment, useContext } from 'react';
 import classes from "./About.module.scss";
 import Button from "../../components/UI/button/Button";
-import {ApiDataContext} from "../../store/ApiDataProvider";
+import {ApiDataContext} from "../../store/dataProvider";
 
 const AboutInfo = ({ data }) => {
     const aboutDataApi = useContext(ApiDataContext);

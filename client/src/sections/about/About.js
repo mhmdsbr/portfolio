@@ -6,7 +6,7 @@ import AboutContent from "./AboutContent";
 import AboutInfo from "./AboutInfo";
 import SectionContainer from "../../components/UI/section/SectionContainer";
 import AboutDetails from "./AboutDetails";
-import {ApiDataContext} from "../../store/ApiDataProvider";
+import {ApiDataContext} from "../../store/apiDataProvider";
 
 const About = (props) => {
     const aboutDataApi = useContext(ApiDataContext);

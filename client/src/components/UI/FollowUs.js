@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import classes from "./FollowUs.module.scss";
-import {ApiDataContext} from "../../store/ApiDataProvider";
+import {ApiDataContext} from "../../store/dataProvider";
 
 const FollowUs = ({title, className}) => {
     const socialApi = useContext(ApiDataContext);
