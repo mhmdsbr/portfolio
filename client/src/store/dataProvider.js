@@ -1,9 +1,12 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchDataAsync } from './dataSlice'
+import { fetchDataAsync } from './dataSlice';
 
-const DataProvider = ({ url }) => {
+const baseUrl = 'https://mohammadsaber.com/server/wp-json/portfolio/v2';
+
+const DataProvider = ({ endpoint }) => {
     const dispatch = useDispatch();
+    const url = `${baseUrl}/${endpoint}`;
 
     useEffect(() => {
         dispatch(fetchDataAsync(url));

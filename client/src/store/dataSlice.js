@@ -14,7 +14,6 @@ const dataSlice = createSlice({
         error: null,
     },
     reducers: {
-        // You can add any specific synchronous reducers if needed
     },
     extraReducers: (builder) => {
         builder
