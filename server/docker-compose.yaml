@@ -1,0 +1,104 @@
+services:
+  wordpress:
+    build:
+      context: ./docker/php-fpm
+      dockerfile: Dockerfile
+    container_name: wordpress-portfolio
+    restart: always
+    env_file:
+      - .env
+    environment:
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_FS_METHOD: direct
+      WORDPRESS_WP_DEBUG: ${WP_DEBUG}
+    working_dir: /var/www/html
+    volumes:
+      - ./public:/var/www/html
+      - ./docker/php-fpm/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./docker/nginx/conf:/etc/nginx/conf.d
+    depends_on:
+      - sql
+    networks:
+      - wp-project
+
+  sql:
+    image: mysql:latest
+    container_name: mysql-portfolio
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: ${WORDPRESS_DB_NAME}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "1"
+      MYSQL_ROOT_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3306:3306"
+    networks:
+      - wp-project
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-portfolio
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: ${WORDPRESS_DB_HOST}
+      MYSQL_ROOT_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      UPLOAD_LIMIT: 64M
+    depends_on:
+      - sql
+    networks:
+      - wp-project
+
+  nginx:
+    image: nginx:1.23
+    container_name: nginx-portfolio
+    restart: unless-stopped
+    volumes:
+      - ./docker/nginx/conf:/etc/nginx/conf.d
+      - ./public:/var/www/html
+      - ./docker/nginx/certs:/etc/nginx/certs
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - wordpress
+    networks:
+      - wp-project
+
+  node:
+    image: node:latest
+    container_name: node-portfolio
+    volumes:
+      - ./:/app:cached
+    working_dir: /app
+    networks:
+      - wp-project
+
+  composer:
+    image: composer:latest
+    container_name: composer-portfolio
+    volumes:
+      - ./public/wp-content/themes/portfolio-theme:/var/www/html/wp-content/themes/portfolio-theme
+    working_dir: /var/www/html/wp-content/themes/portfolio-theme
+    command: ["install"]
+    depends_on:
+      - wordpress
+    networks:
+      - wp-project
+
+volumes:
+  db_data:
+  wp_data:
+
+networks:
+  wp-project:
+    driver: bridge
