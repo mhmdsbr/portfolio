@@ -30,4 +30,5 @@ wp-cli.yml
 /server/public/wp-content/themes/twentytwentyfour
 /server/public/wp-content/db.php
 /server/public/wp-content/index.php
+/server/docker/nginx/certs
 
