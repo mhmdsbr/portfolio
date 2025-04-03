@@ -10,6 +10,7 @@ const AboutInfo = ({ data }) => {
         return null;
     }
     const about_button = aboutData['about_button'];
+    const shouldShowButton = about_button?.url && about_button?.title;
 
     return (
         <Fragment>
@@ -25,11 +26,13 @@ const AboutInfo = ({ data }) => {
                         </li>
                     ))}
                 </ul>
-                <Button
-                    className="p-1"
-                    url={about_button.url}
-                    content={about_button.title
-                }/>
+                {shouldShowButton && (
+                    <Button
+                        className="p-1"
+                        url={about_button.url}
+                        content={about_button.title}
+                    />
+                )}
             </div>
         </Fragment>
     );

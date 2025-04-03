@@ -20,6 +20,10 @@ wp-cli.yml
 # Cache
 .php_cs.cache
 
+# Docker Config
+/server/docker/mysql
+!/server/docker/mysql/my.cnf
+
 
 # Wordpress
 /server/public/*

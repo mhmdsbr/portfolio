@@ -9,7 +9,7 @@ const ApiDataProvider = ({ endpoints, children }) => {
     const [baseUrl, setBaseUrl] = useState('');
     useEffect(() => {
         const fetchBaseUrl = async () => {
-            const mainConfURL = window.location.origin + '/server'; // change this based on ur API base url
+            const mainConfURL = 'https://portfolio.test/'; // change this based on ur API base url
             try {
                 const res = await axios.get(`${mainConfURL}/wp-json/portfolio/v2/config-portfolio`);
                 setBaseUrl(res.data.api_base_url);
