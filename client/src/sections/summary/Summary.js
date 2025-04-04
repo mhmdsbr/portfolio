@@ -9,14 +9,14 @@ import ExperienceList from "./ExperienceList";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Summary = () => {
-    const summariesDataApi = useContext(ApiDataContext);
-    const summariesData = summariesDataApi['summary-portfolio'];
-    if (summariesData === null) {
-        return null;
-    }
+    const { data } = useContext(ApiDataContext);
+    const summariesData = data['summary-portfolio'];
+    if (!summariesData) return null;
+
     const jobs = summariesData.summaries;
     const experiences = summariesData.experiences;
     const buttonContent = summariesData.summary_button;
+    const shouldShowButton = buttonContent?.url && buttonContent?.title;
 
     return (
         <Section id="summary" className={`${classes.summary} bg-dark`}>
@@ -25,9 +25,15 @@ const Summary = () => {
                 <ExperienceList jobs={jobs} />
                 <div className="row justify-content-center">
                     <ProgressBar progressBarData={experiences}  />
-                    <div className="col-6 mt-5 w-100 text-center">
-                        <Button url={buttonContent['url']} className="btn-secondary text-white border-secondary" content={buttonContent['title']} />
-                    </div>
+                    {shouldShowButton && (
+                        <div className="col-6 mt-5 w-100 text-center">
+                            <Button 
+                                url={buttonContent.url} 
+                                className="btn-secondary text-white border-secondary" 
+                                content={buttonContent.title} 
+                            />
+                        </div>
+                    )}
                 </div>
             </SectionContainer>
         </Section>

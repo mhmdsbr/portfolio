@@ -6,12 +6,10 @@ import Section from "../../components/UI/section/Section";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Portfolio = () => {
-    const projectsTitlesApi = useContext(ApiDataContext);
-    const projectsTitles = projectsTitlesApi['projects-portfolio'];
+    const { data } = useContext(ApiDataContext);
+    const projectsTitles = data['projects-portfolio'];
+    if (projectsTitles === null) return null;
 
-    if (projectsTitles === null) {
-        return null;
-    }
     return (
         <Section id="portfolio" className={`${classes.portfolio} bg-dark-2`}>
             <TitleSection

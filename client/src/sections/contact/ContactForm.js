@@ -7,8 +7,8 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const ContactForm = (props) => {
-    const recaptchaApi = useContext(ApiDataContext);
-    const recaptchaData = recaptchaApi['config-portfolio'];
+    const { config } = useContext(ApiDataContext);
+    const recaptchaData = config['recaptcha'];
 
     const [formData, setFormData] = useState({
         name: '',
@@ -112,7 +112,7 @@ const ContactForm = (props) => {
                     </div>
                     <div className="col-12">
                         <ReCAPTCHA
-                            sitekey={recaptchaData.recaptcha}
+                            sitekey={recaptchaData}
                             theme="dark"
                         />
                     </div>

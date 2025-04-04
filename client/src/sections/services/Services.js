@@ -7,11 +7,10 @@ import ServicesList from "./ServicesList";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Services = () => {
-    const servicesDataApi = useContext(ApiDataContext);
-    const servicesData = servicesDataApi['services-portfolio'];
-    if (servicesData === null) {
-        return null;
-    }
+    const { data } = useContext(ApiDataContext);
+    const servicesData = data['services-portfolio'];
+    if (!servicesData) return null;
+
     const services_title = servicesData['services_title'];
     const services_title_overlay = servicesData['services_title_overlay'];
     const services = servicesData['services'];

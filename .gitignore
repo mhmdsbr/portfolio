@@ -4,6 +4,8 @@
 
 # React
 /client/node_modules/
+/client/build/
+/client/package-lock.json
 
 # Dotenv
 .env
@@ -12,13 +14,15 @@
 !.env.j2
 !.env.vars.*
 
-docker-compose.yaml
-
 # WP-CLI
 wp-cli.yml
 
 # Cache
 .php_cs.cache
+
+# Docker Config
+/server/docker/mysql
+!/server/docker/mysql/my.cnf
 
 
 # Wordpress
@@ -28,4 +32,7 @@ wp-cli.yml
 /server/public/wp-content/uploads
 !/server/public/wp-content/themes
 /server/public/wp-content/themes/twentytwentyfour
+/server/public/wp-content/db.php
+/server/public/wp-content/index.php
+/server/docker/nginx/certs
 

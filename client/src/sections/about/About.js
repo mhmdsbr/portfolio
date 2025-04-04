@@ -9,11 +9,10 @@ import AboutDetails from "./AboutDetails";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const About = (props) => {
-    const aboutDataApi = useContext(ApiDataContext);
-    const aboutData = aboutDataApi['about-portfolio'];
-    if (aboutData === null) {
-        return null;
-    }
+    const { data } = useContext(ApiDataContext);
+    const aboutData = data['about-portfolio'];
+    if (!aboutData) return null;
+
     const about_title = aboutData['about_title'];
     const about_title_overlay = aboutData['about_title_overlay'];
     const about_name = aboutData['about_name'];
@@ -41,7 +40,7 @@ const About = (props) => {
                         />
                     </div>
                     <div className="col-lg-5 col-xl-4">
-                        <AboutInfo data={infoData} />
+                        <AboutInfo dataInfo={infoData} />
                     </div>
                 </div>
                 <AboutDetails detailsData={detailsData} />

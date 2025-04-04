@@ -4,8 +4,8 @@ import classes from "./PortfolioGallery.module.scss";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 function PortfolioGallery() {
-    const projectsDataApi = useContext(ApiDataContext);
-    const projectsData = projectsDataApi['projects-portfolio'];
+    const { data } = useContext(ApiDataContext);
+    const projectsData = data['projects-portfolio'];
     const projects = projectsData.project_data;
     const [portfolioList, setPortfolioList] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("all");

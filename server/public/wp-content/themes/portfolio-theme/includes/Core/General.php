@@ -66,7 +66,7 @@ class General
      */
     public function customAdminFooterText(): string
     {
-        return '<a href="https://www.mohammadsaber.ir/" target="_blank" rel="noopener">Mohammad Saber</a>';
+        return '<a href="https://www.mohammadsaber.com/" target="_blank" rel="noopener">Mohammad Saber</a>';
     }
 
 	// Define custom MIME types for SVG and SVGZ files
