@@ -62,3 +62,7 @@ If you'd like to contribute to this project, please follow these steps:
 This project is licensed under the MIT.
 
 Feel free to customize this template further based on your preferences and any additional details you'd like to include.
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for version history and release notes.
