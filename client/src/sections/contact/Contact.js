@@ -9,11 +9,9 @@ import {ApiDataContext} from "../../store/ApiDataProvider";
 
 
 const Contact = () => {
-    const contactSettingsApi = useContext(ApiDataContext);
-    const contactSettings = contactSettingsApi['contact-portfolio'];
-    if (contactSettings === null) {
-        return null;
-    }
+    const { data } = useContext(ApiDataContext);
+    const contactSettings = data['contact-portfolio'];
+    if (!contactSettings) return null;
 
     const contactTitle = {
         title: contactSettings.contact_title,

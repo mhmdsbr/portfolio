@@ -9,11 +9,10 @@ import ExperienceList from "./ExperienceList";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Summary = () => {
-    const summariesDataApi = useContext(ApiDataContext);
-    const summariesData = summariesDataApi['summary-portfolio'];
-    if (summariesData === null) {
-        return null;
-    }
+    const { data } = useContext(ApiDataContext);
+    const summariesData = data['summary-portfolio'];
+    if (!summariesData) return null;
+
     const jobs = summariesData.summaries;
     const experiences = summariesData.experiences;
     const buttonContent = summariesData.summary_button;

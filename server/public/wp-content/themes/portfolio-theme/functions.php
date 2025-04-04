@@ -33,3 +33,27 @@ new PORTFOLIO\Api\Mail("portfolio/v2");
 
 /** ThirdParty **/
 new PORTFOLIO\ThirdParty\ACF();
+
+// Handle CORS and preflight requests
+add_action('init', function() {
+    $origin = get_http_origin();
+    if ($origin && in_array($origin, ['http://localhost:3000', 'https://yourproductiondomain.com'])) {
+        header("Access-Control-Allow-Origin: $origin");
+        header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE");
+        header("Access-Control-Allow-Credentials: true");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+        
+        if ('OPTIONS' == $_SERVER['REQUEST_METHOD']) {
+            status_header(200);
+            exit();
+        }
+    }
+});
+
+// Specifically handle REST API CORS
+add_filter('rest_pre_serve_request', function($value) {
+    header("Access-Control-Allow-Origin: " . get_http_origin());
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE");
+    header("Access-Control-Allow-Credentials: true");
+    return $value;
+});

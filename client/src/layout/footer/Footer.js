@@ -5,12 +5,11 @@ import useMobileCheck from "../../components/MobileCheck";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Footer = (props) => {
-    const footerApi = useContext(ApiDataContext);
-    const footerData = footerApi['general-portfolio'];
+    const { data } = useContext(ApiDataContext);
+    const footerData = data['general-portfolio'];
     const isMobile = useMobileCheck();
-    if (footerData === null) {
-        return null;
-    }
+
+    if (footerData === null) return null;
     const termsDisclaimer = {
         terms: footerData.terms,
         disclaimer: footerData.disclaimer

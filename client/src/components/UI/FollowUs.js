@@ -4,11 +4,10 @@ import classes from "./FollowUs.module.scss";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const FollowUs = ({title, className}) => {
-    const socialApi = useContext(ApiDataContext);
-    const socialMediaData = socialApi['general-portfolio'];
-    if (socialMediaData === null) {
-        return null
-    }
+    const { data } = useContext(ApiDataContext);
+    const socialMediaData = data['general-portfolio'];
+    if (!socialMediaData) return null
+
     const { linkedin, github, twitter, google} = socialMediaData
 
     const socialMediaLinks = {

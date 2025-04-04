@@ -5,11 +5,9 @@ import TestimonialSlider from "./TestimonialSlider";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Testimonial = () => {
-    const testimonialsDataApi = useContext(ApiDataContext);
-    const testimonialsData = testimonialsDataApi['testimonial-portfolio'];
-    if (testimonialsData === null) {
-        return null;
-    }
+    const { data } = useContext(ApiDataContext);
+    const testimonialsData = data['testimonial-portfolio'];
+    if (!testimonialsData) return null;
 
     return (
         <section id="testimonial" className={`${classes.testimonial} bg-dark`}>

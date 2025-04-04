@@ -3,66 +3,155 @@ import axios from 'axios';
 
 const ApiDataContext = createContext();
 
-const ApiDataProvider = ({ endpoints, children }) => {
-    const [data, setData] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [baseUrl, setBaseUrl] = useState('');
-    useEffect(() => {
-        const fetchBaseUrl = async () => {
-            const mainConfURL = 'https://portfolio.test/'; // change this based on ur API base url
-            try {
-                const res = await axios.get(`${mainConfURL}/wp-json/portfolio/v2/config-portfolio`);
-                setBaseUrl(res.data.api_base_url);
-            } catch (error) {
-                console.error(error);
-            }
-        };
+// Validate and sanitize URLs
+const isValidUrl = (url) => {
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.protocol !== 'https:') {
+      return false;
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 
-        fetchBaseUrl().then(r => {});
-    }, []);
+// Configuration fetcher (POST)
+const fetchConfig = async (signal) => {
+  const mainConfURL = process.env.REACT_APP_API_BASE_URL || 'https://portfolio.test/';
 
-    useEffect(() => {
-        if (!baseUrl) return;
+  try {
+    const res = await axios.post(
+      `${mainConfURL}/wp-json/portfolio/v2/config-portfolio`,
+      {},
+      {
+        maxRedirects: 0,
+        timeout: 5000,
+        signal
+      }
+    );
 
-        const fetchData = async () => {
-            try {
-                const fetchDataForEndpoint = async (endpoint) => {
-                    const res = await axios.get(`${baseUrl}/${endpoint}`);
-                    return res.data;
-                };
+    const { api_base_url, recaptcha} = res.data;
 
-                const dataPromises = endpoints.map(fetchDataForEndpoint);
-                const responseData = await Promise.all(dataPromises);
-
-                const dataObject = endpoints.reduce((acc, endpoint, index) => {
-                    acc[endpoint] = responseData[index];
-                    return acc;
-                }, {});
-
-                setData(dataObject);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData().then(r => {});
-    }, [baseUrl, endpoints]);
-
-    if (loading) {
-        return <div className="data-spinner bs-primary">
-            <div className="spinner-border text-white" role="status">
-                <span className="sr-only">Loading...</span>
-            </div>
-        </div>;
+ 
+    if (!res.data?.api_base_url || !isValidUrl(res.data.api_base_url)) {
+      throw new Error('Invalid API base URL received');
     }
 
-    return (
-        <ApiDataContext.Provider value={data}>
-            {children}
-        </ApiDataContext.Provider>
+    return {
+      baseUrl: api_base_url,
+      config: { recaptcha }
+    };
+
+  } catch (error) {
+    console.error('Failed to fetch base URL:', error.message);
+    throw error;
+  }
+};
+
+// Data endpoints fetcher (GET)
+const fetchDataEndpoints = async (baseUrl, endpoints, signal) => {
+  try {
+    // Filter out the config endpoint
+    const dataEndpoints = endpoints.filter(
+      endpoint => !endpoint.includes('config-portfolio')
     );
+
+    const fetchDataForEndpoint = async (endpoint) => {
+      const sanitizedEndpoint = endpoint.replace(/[^a-zA-Z0-9-_/]/g, '');
+      const url = `${baseUrl}/${sanitizedEndpoint}`;
+
+      if (!isValidUrl(url)) {
+        throw new Error(`Invalid URL constructed: ${url}`);
+      }
+
+      const res = await axios.get(url, {
+        timeout: 5000,
+        maxRedirects: 0,
+        signal
+      });
+      return res.data;
+    };
+
+    const dataPromises = dataEndpoints.map(fetchDataForEndpoint);
+    const responseData = await Promise.all(dataPromises);
+
+    return dataEndpoints.reduce((acc, endpoint, index) => {
+      acc[endpoint] = responseData[index];
+      return acc;
+    }, {});
+
+  } catch (error) {
+    console.error('API request failed:', error.message);
+    throw error;
+  }
+};
+
+const ApiDataProvider = ({ endpoints, children }) => {
+  const [data, setData] = useState({});
+  const [config, setConfig] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const initializeApp = async () => {
+      try {
+        const { baseUrl, config } = await fetchConfig(controller.signal);
+        const endpointData = await fetchDataEndpoints(baseUrl, endpoints, controller.signal);
+
+        setData(endpointData);
+        setConfig(config);
+
+      } catch (err) {
+        if (!controller.signal.aborted) {
+          setError(err.message || 'Failed to initialize application');
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    initializeApp();
+
+    return () => controller.abort();
+
+  }, [endpoints]);
+
+  if (error) {
+    return (
+      <div className="data-error bs-danger">
+        <div className="alert alert-danger">
+          {error}
+          <button
+            className="btn btn-link"
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="data-spinner bs-primary">
+        <div className="spinner-border text-white" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <ApiDataContext.Provider value={{data, config}}>
+      {children}
+    </ApiDataContext.Provider>
+  );
 };
 
 export { ApiDataProvider, ApiDataContext };

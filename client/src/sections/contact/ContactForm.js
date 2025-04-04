@@ -110,12 +110,12 @@ const ContactForm = (props) => {
                         />
                         {errors.message && <div className="alert alert-danger mt-4">{errors.message}</div>}
                     </div>
-                    <div className="col-12">
+                    {/* <div className="col-12">
                         <ReCAPTCHA
                             sitekey={recaptchaData.recaptcha}
                             theme="dark"
                         />
-                    </div>
+                    </div> */}
                 </div>
                 {successMessage && <div className="alert alert-success mt-3">{successMessage}</div>}
                 {errorMessage && <div className="alert alert-danger mt-3">{errorMessage}</div>}

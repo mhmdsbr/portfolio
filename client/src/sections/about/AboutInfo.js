@@ -3,12 +3,11 @@ import classes from "./About.module.scss";
 import Button from "../../components/UI/button/Button";
 import {ApiDataContext} from "../../store/ApiDataProvider";
 
-const AboutInfo = ({ data }) => {
-    const aboutDataApi = useContext(ApiDataContext);
-    const aboutData = aboutDataApi['about-portfolio'];
-    if (aboutData === null) {
-        return null;
-    }
+const AboutInfo = ({ dataInfo }) => {
+    const { data } = useContext(ApiDataContext);
+    const aboutData = data['about-portfolio'];
+    if (aboutData === null) return null;
+
     const about_button = aboutData['about_button'];
     const shouldShowButton = about_button?.url && about_button?.title;
 
@@ -16,7 +15,7 @@ const AboutInfo = ({ data }) => {
         <Fragment>
             <div className={`${classes['about__my-info']} ps-lg-4`}>
                 <ul className="list-style text-light">
-                    {data.map((item, index) => (
+                    {dataInfo.map((item, index) => (
                         <li key={index}>
                             <span
                                 className={`${classes['about__info']}`}>
