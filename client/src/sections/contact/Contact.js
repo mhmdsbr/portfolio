@@ -13,6 +13,7 @@ const Contact = () => {
     const contactSettings = data['contact-portfolio'];
     if (!contactSettings) return null;
 
+
     const contactTitle = {
         title: contactSettings.contact_title,
         overlay: contactSettings.contact_title_overlay
