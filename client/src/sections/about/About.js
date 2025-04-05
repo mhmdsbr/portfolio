@@ -11,14 +11,15 @@ import {ApiDataContext} from "../../store/ApiDataProvider";
 const About = (props) => {
     const { data } = useContext(ApiDataContext);
     const aboutData = data['about-portfolio'];
+
     if (!aboutData) return null;
 
     const about_title = aboutData['about_title'];
-    const about_title_overlay = aboutData['about_title_overlay'];
+    const about_title_overlay = aboutData['about_title_secondary'];
     const about_name = aboutData['about_name'];
     const about_job = aboutData['about_job_title'];
     const about_content = aboutData['about_description'];
-    const infoData = aboutData['about_contact_info'];
+    const infoData = aboutData['about_contact'];
     const detailsData = aboutData['about_details'];
 
     return (

@@ -2,35 +2,35 @@
 
 namespace PORTFOLIO\Api;
 
+use PORTFOLIO\Services\ACFLoaderInterface;
 
 class Contact extends ApiHandler {
-	public function register_routes(): void {
-		register_rest_route($this->namespace, '/contact-portfolio', array(
-			'methods'  => 'GET',
-			'callback' => array($this, 'get_contact_settings'),
-		));
-	}
+    private ACFLoaderInterface $acf_loader;
 
-	public function get_contact_settings(): \WP_Error|\WP_REST_Response|\WP_HTTP_Response {
-		$contact_title = get_field('contact_title', 'option');
-		$contact_title_secondary = get_field('contact_overlay_title', 'option');
-		$contact_form_title = get_field('contact_form_title', 'option');
-		$contact_button = get_field('contact_button', 'option');
-		$contact_info_title = get_field('contact_info_title', 'option');
-		$contact_info_address = get_field('contact_info_address', 'option');
-		$contact_info_phone = get_field('contact_info_phone', 'option');
-		$contact_info_email = get_field('contact_info_email', 'option');
+    public function __construct(
+        string $namespace,
+        ACFLoaderInterface $acf_loader
+    ) {
+        parent::__construct($namespace);
+        $this->acf_loader = $acf_loader;
+        
+        $this->add_route(
+            '/contact-portfolio',
+            'GET',
+            'get_contact_settings'
+        );
+    }
 
-		$contact_settings = array(
-			'contact_title' => $contact_title,
-			'contact_title_overlay' => $contact_title_secondary,
-			'contact_form_title' => $contact_form_title,
-			'contact_button' => $contact_button,
-			'contact_info_title' => $contact_info_title,
-			'contact_info_address' => $contact_info_address,
-			'contact_info_phone' => $contact_info_phone,
-			'contact_info_email' => $contact_info_email
-		);
-		return rest_ensure_response($contact_settings);
-	}
+    public function get_contact_settings(): \WP_Error|\WP_REST_Response|\WP_HTTP_Response {
+        return rest_ensure_response([
+            'contact_title' => $this->acf_loader->get_field('contact_title', 'option'),
+            'contact_title_overlay' => $this->acf_loader->get_field('contact_overlay_title', 'option'),
+            'contact_form_title' => $this->acf_loader->get_field('contact_form_title', 'option'),
+            'contact_button' => $this->acf_loader->get_field('contact_button', 'option'),
+            'contact_info_title' => $this->acf_loader->get_field('contact_info_title', 'option'),
+            'contact_info_address' => $this->acf_loader->get_field('contact_info_address', 'option'),
+            'contact_info_phone' => $this->acf_loader->get_field('contact_info_phone', 'option'),
+            'contact_info_email' => $this->acf_loader->get_field('contact_info_email', 'option')
+        ]);
+    }
 }
