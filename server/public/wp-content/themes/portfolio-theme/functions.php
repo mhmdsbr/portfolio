@@ -1,42 +1,71 @@
 <?php
 
-// Register an autoloader function to load classes dynamically
-spl_autoload_register( function ( $classname ) {
-	$parts = explode( '\\', $classname );
-	array_shift( $parts );
-	$path      = implode( DIRECTORY_SEPARATOR, $parts );
-	$classpath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . $path . '.php';
-	if ( file_exists( $classpath ) ) {
-		include_once $classpath;
-	}
-} );
+// Register an optimized autoloader
+spl_autoload_register(function ($classname) {
+    $prefix = 'PORTFOLIO\\';
+    
+    if (strpos($classname, $prefix) !== 0) {
+        return;
+    }
 
-/** Core **/
-new PORTFOLIO\Core\Cleaner();
-new PORTFOLIO\Core\Enqueues();
-new PORTFOLIO\Core\General();
-new PORTFOLIO\Core\PostType();
+    $relative_class = substr($classname, strlen($prefix));
+    $path = dirname(__FILE__) . '/includes/' . str_replace('\\', '/', $relative_class) . '.php';
+    
+    if (file_exists($path)) {
+        require_once $path;
+    }
+});
 
-/** Services **/
-$acf_loader = new PORTFOLIO\Services\ACFLoader();
+/**
+ * Dependency Container Setup
+ */
+$dependencies = [
+    'namespace' => 'portfolio/v2',
+    'services' => [
+        'acf_loader' => new PORTFOLIO\Services\ACFLoader(),
+        'sanitizer' => new PORTFOLIO\Services\SanitizationService()
+    ],
+    'core' => [
+        PORTFOLIO\Core\Cleaner::class,
+        PORTFOLIO\Core\Enqueues::class,
+        PORTFOLIO\Core\General::class,
+        PORTFOLIO\Core\PostType::class
+    ],
+    'api' => [
+        PORTFOLIO\Api\Config::class => ['acf_loader', 'sanitizer'],
+        PORTFOLIO\Api\GeneralSettings::class => ['acf_loader', 'sanitizer'],
+        PORTFOLIO\Api\Hero::class => ['acf_loader', 'sanitizer'],
+        PORTFOLIO\Api\About::class => ['acf_loader', 'sanitizer'],
+        PORTFOLIO\Api\Services::class => ['acf_loader', 'sanitizer'],
+        PORTFOLIO\Api\Summary::class => ['acf_loader', 'sanitizer'],
+        PORTFOLIO\Api\Projects::class => ['acf_loader', 'sanitizer'],
+        PORTFOLIO\Api\Testimonial::class => ['acf_loader', 'sanitizer'],
+        PORTFOLIO\Api\Contact::class => ['acf_loader', 'sanitizer'],
+        PORTFOLIO\Api\NavMenu::class => ['sanitizer'],
+        PORTFOLIO\Api\Mail::class => []
+    ],
+    'third_party' => [
+        PORTFOLIO\ThirdParty\ACF::class
+    ]
+];
 
-/** Api **/
-new PORTFOLIO\Api\ApiHandler("portfolio/v2");
-new PORTFOLIO\Api\Config("portfolio/v2", $acf_loader);
-new PORTFOLIO\Api\GeneralSettings("portfolio/v2", $acf_loader);
-new PORTFOLIO\Api\NavMenu("portfolio/v2");
-new PORTFOLIO\Api\Hero("portfolio/v2", $acf_loader);
-new PORTFOLIO\Api\About("portfolio/v2", $acf_loader);
-new PORTFOLIO\Api\Services("portfolio/v2");
-new PORTFOLIO\Api\Summary("portfolio/v2");
-new PORTFOLIO\Api\Projects("portfolio/v2", $acf_loader);
-new PORTFOLIO\Api\Testimonial("portfolio/v2");
-new PORTFOLIO\Api\Contact("portfolio/v2", $acf_loader);
-new PORTFOLIO\Api\Mail("portfolio/v2");
+new PORTFOLIO\Api\ApiHandler($dependencies['namespace']);
 
+foreach ($dependencies['core'] as $core_class) {
+    new $core_class();
+}
 
-/** ThirdParty **/
-new PORTFOLIO\ThirdParty\ACF();
+foreach ($dependencies['api'] as $api_class => $required_services) {
+    $args = [$dependencies['namespace']];
+    foreach ($required_services as $service) {
+        $args[] = $dependencies['services'][$service];
+    }
+    new $api_class(...$args);
+}
+
+foreach ($dependencies['third_party'] as $third_party_class) {
+    new $third_party_class();
+}
 
 
 // Handle CORS and preflight requests
