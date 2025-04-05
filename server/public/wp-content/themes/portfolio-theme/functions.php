@@ -17,9 +17,12 @@ new PORTFOLIO\Core\Enqueues();
 new PORTFOLIO\Core\General();
 new PORTFOLIO\Core\PostType();
 
+/** Services **/
+$acf_loader = new PORTFOLIO\Services\ACFLoader();
+
 /** Api **/
 new PORTFOLIO\Api\ApiHandler("portfolio/v2");
-new PORTFOLIO\Api\Config("portfolio/v2");
+new PORTFOLIO\Api\Config("portfolio/v2", $acf_loader);
 new PORTFOLIO\Api\GeneralSettings("portfolio/v2");
 new PORTFOLIO\Api\NavMenu("portfolio/v2");
 new PORTFOLIO\Api\Hero("portfolio/v2");
@@ -31,13 +34,15 @@ new PORTFOLIO\Api\Testimonial("portfolio/v2");
 new PORTFOLIO\Api\Contact("portfolio/v2");
 new PORTFOLIO\Api\Mail("portfolio/v2");
 
+
 /** ThirdParty **/
 new PORTFOLIO\ThirdParty\ACF();
+
 
 // Handle CORS and preflight requests
 add_action('init', function() {
     $origin = get_http_origin();
-    if ($origin && in_array($origin, ['http://localhost:3000', 'https://yourproductiondomain.com'])) {
+    if ($origin && in_array($origin, ['http://localhost:3000', 'https://mohammadsaber.com'])) {
         header("Access-Control-Allow-Origin: $origin");
         header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE");
         header("Access-Control-Allow-Credentials: true");
