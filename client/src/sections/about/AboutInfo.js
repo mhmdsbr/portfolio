@@ -6,7 +6,7 @@ import {ApiDataContext} from "../../store/ApiDataProvider";
 const AboutInfo = ({ dataInfo }) => {
     const { data } = useContext(ApiDataContext);
     const aboutData = data['about-portfolio'];
-    if (aboutData === null) return null;
+    if (!aboutData) return null;
 
     const about_button = aboutData['about_button'];
     const shouldShowButton = about_button?.url && about_button?.title;

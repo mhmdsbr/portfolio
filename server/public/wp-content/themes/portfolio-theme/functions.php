@@ -26,7 +26,7 @@ new PORTFOLIO\Api\Config("portfolio/v2", $acf_loader);
 new PORTFOLIO\Api\GeneralSettings("portfolio/v2", $acf_loader);
 new PORTFOLIO\Api\NavMenu("portfolio/v2");
 new PORTFOLIO\Api\Hero("portfolio/v2", $acf_loader);
-new PORTFOLIO\Api\About("portfolio/v2");
+new PORTFOLIO\Api\About("portfolio/v2", $acf_loader);
 new PORTFOLIO\Api\Services("portfolio/v2");
 new PORTFOLIO\Api\Summary("portfolio/v2");
 new PORTFOLIO\Api\Projects("portfolio/v2", $acf_loader);
