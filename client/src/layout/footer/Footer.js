@@ -6,14 +6,13 @@ import {ApiDataContext} from "../../store/ApiDataProvider";
 
 const Footer = (props) => {
     const { data } = useContext(ApiDataContext);
-    const footerData = data['general-portfolio'];
+    const generalSettings = data['general-portfolio'];
     const isMobile = useMobileCheck();
 
-    if (footerData === null) return null;
-    const termsDisclaimer = {
-        terms: footerData.terms,
-        disclaimer: footerData.disclaimer
-    }
+    if (!generalSettings?.legal) return null;
+
+    const { terms, disclaimer } = generalSettings.legal;
+
     return (
         <footer id="footer" className={`${classes.footer} ${isMobile ? 'col-12' : 'col-10 offset-2'} bg-dark text-white gx-0`}>
             <div className="container max-width">
@@ -49,7 +48,7 @@ const Footer = (props) => {
                                                 </div>
                                                 <div
                                                     className="modal-body"
-                                                    dangerouslySetInnerHTML={{ __html: termsDisclaimer.terms }}
+                                                    dangerouslySetInnerHTML={{ __html: terms }}
                                                 >
                                                 </div>
                                             </div>
@@ -80,7 +79,7 @@ const Footer = (props) => {
                                                         <span aria-hidden="true">&times;</span>
                                                     </a>
                                                 </div>
-                                                <div className="modal-body" dangerouslySetInnerHTML={{ __html: termsDisclaimer.disclaimer }}>
+                                                <div className="modal-body" dangerouslySetInnerHTML={{ __html: disclaimer }}>
                                                 </div>
                                             </div>
                                         </div>

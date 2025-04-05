@@ -2,45 +2,53 @@
 
 namespace PORTFOLIO\Api;
 
+use PORTFOLIO\Services\ACFLoaderInterface;
 
 class Projects extends ApiHandler {
-	public function register_routes(): void {
-		register_rest_route($this->namespace, '/projects-portfolio', array(
-			'methods'  => 'GET',
-			'callback' => array($this, 'get_projects_settings'),
-		));
-	}
+    private ACFLoaderInterface $acf_loader;
 
-	public function get_projects_settings($request): \WP_Error|\WP_REST_Response|\WP_HTTP_Response {
-		$portfolio_title = get_field('portfolio_title', 'option');
-		$portfolio_title_secondary = get_field('portfolio_overlay_title', 'option');
-		$projects = get_posts(array(
-			'post_type' => 'project',
-			'numberposts' => -1,
-		));
+    public function __construct(
+        string $namespace,
+        ACFLoaderInterface $acf_loader
+    ) {
+        parent::__construct($namespace);
+        $this->acf_loader = $acf_loader;
+        
+        $this->add_route(
+            '/projects-portfolio',
+            'GET',
+            'get_projects_settings'
+        );
+    }
 
-		$project_data = array();
+    public function get_projects_settings($request): \WP_Error|\WP_REST_Response|\WP_HTTP_Response {
 
-		foreach ($projects as $project) {
-			$project_id = $project->ID;
-			$title = get_the_title($project);
-			$project_types = wp_get_post_terms($project_id, 'project-type');
-			$featured_image_url = get_the_post_thumbnail_url($project, 'full');
-			$project_data[] = array(
-				'post_id' => $project_id,
-				'title' => $title,
-				'project_types' => $project_types,
-				'featured_image' => $featured_image_url,
-			);
-		}
+        $portfolio_title = $this->acf_loader->get_field('portfolio_title', 'option');
+        $portfolio_title_secondary = $this->acf_loader->get_field('portfolio_overlay_title', 'option');
+        
+        $projects = get_posts([
+            'post_type' => 'project',
+            'numberposts' => -1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+        ]);
 
-		$project_settings = array(
-			'portfolio_title' => $portfolio_title,
-			'portfolio_overlay_title' => $portfolio_title_secondary,
-			'project_data' => $project_data,
-		);
+        $project_data = array_map(function($project_id) {
+            $project = get_post($project_id);
+            
+            return [
+                'post_id' => $project_id,
+                'title' => get_the_title($project),
+                'project_types' => wp_get_post_terms($project_id, 'project-type', ['fields' => 'names']),
+                'featured_image' => get_the_post_thumbnail_url($project_id, 'full'),
+                'permalink' => get_permalink($project_id),
+            ];
+        }, $projects);
 
-		return rest_ensure_response($project_settings);
-	}
-
+        return rest_ensure_response([
+            'portfolio_title' => $portfolio_title,
+            'portfolio_overlay_title' => $portfolio_title_secondary,
+            'projects' => $project_data,
+        ]);
+    }
 }

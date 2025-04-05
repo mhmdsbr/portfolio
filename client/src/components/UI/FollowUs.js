@@ -1,33 +1,38 @@
-import React, {useContext} from 'react';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import React, { useContext } from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classes from "./FollowUs.module.scss";
-import {ApiDataContext} from "../../store/ApiDataProvider";
+import { ApiDataContext } from "../../store/ApiDataProvider";
 
-const FollowUs = ({title, className}) => {
+const FollowUs = ({ title, className }) => {
     const { data } = useContext(ApiDataContext);
-    const socialMediaData = data['general-portfolio'];
-    if (!socialMediaData) return null
+    const generalSettings = data['general-portfolio'];
+    
+    if (!generalSettings?.social_links) return null;
 
-    const { linkedin, github, twitter, google} = socialMediaData
+    // Destructure social links from the nested object
+    const { linkedin, github, twitter, email } = generalSettings.social_links;
 
-    const socialMediaLinks = {
-        linkedin,
-        github,
-        twitter,
-        google,
-    };
-    const linksArray = Object.entries(socialMediaLinks).map(([icon, url]) => ({ icon, url }));
+    const socialMediaLinks = [
+        { icon: 'linkedin', url: linkedin },
+        { icon: 'github', url: github },
+        { icon: 'twitter', url: twitter },
+        { icon: 'google', url: `mailto:${email}` }
+    ];
 
     return (
-        <div className={`${classes['social-icons']} ${className}`} >
-            <h2 className={`${classes['social-icons__title']} mb-3 text-uppercase text-white`}>{title}</h2>
+        <div className={`${classes['social-icons']} ${className}`}>
+            <h2 className={`${classes['social-icons__title']} mb-3 text-uppercase text-white`}>
+                {title}
+            </h2>
             <ul className={`${classes['social-icons__items']} social-icons d-flex gap-3 justify-content-center list-unstyled justify-content-md-start`}>
-                {linksArray?.map((link, index) => (
-                    <li className={`text-secondary`} key={index}>
-                        <a href={link.icon === 'google' ? 'mailto:' + link.url : link.url} target="_blank" rel="noreferrer">
-                            <FontAwesomeIcon icon={['fab', link.icon]}/>
-                        </a>
-                    </li>
+                {socialMediaLinks.map((link, index) => (
+                    link.url && (
+                        <li className="text-secondary" key={index}>
+                            <a href={link.url} target="_blank" rel="noreferrer">
+                                <FontAwesomeIcon icon={['fab', link.icon]} />
+                            </a>
+                        </li>
+                    )
                 ))}
             </ul>
         </div>
@@ -35,4 +40,3 @@ const FollowUs = ({title, className}) => {
 };
 
 export default FollowUs;
-

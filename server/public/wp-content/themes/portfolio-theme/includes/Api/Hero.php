@@ -2,39 +2,47 @@
 
 namespace PORTFOLIO\Api;
 
+use PORTFOLIO\Services\ACFLoaderInterface;
+
 class Hero extends ApiHandler {
-	public function register_routes(): void {
-		register_rest_route($this->namespace, '/hero-portfolio', array(
-			'methods'  => 'GET',
-			'callback' => array($this, 'get_hero_settings'),
-		));
-	}
+    private ACFLoaderInterface $acf_loader;
 
-	public function get_hero_settings(): \WP_Error|\WP_REST_Response|\WP_HTTP_Response {
-		// Retrieve values from the repeater field 'hero_titles'
-		$hero_titles = get_field('hero_titles', 'option');
+    public function __construct(
+        string $namespace,
+        ACFLoaderInterface $acf_loader
+    ) {
+        parent::__construct($namespace);
+        $this->acf_loader = $acf_loader;
+        
+        $this->add_route(
+            '/hero-portfolio',
+            'GET',
+            'get_hero_settings'
+        );
+    }
 
-		// Initialize an array to store hero title values
-		$hero_titles_data = array();
+    public function get_hero_settings(): \WP_Error|\WP_REST_Response|\WP_HTTP_Response {
+        // Get all fields through ACF loader
+        $hero_titles = $this->acf_loader->get_field('hero_titles', 'option');
+        $hero_button = $this->acf_loader->get_field('hero_button', 'option');
+        $hero_location = $this->acf_loader->get_field('hero_location', 'option');
+        $hero_background_image = $this->acf_loader->get_field('hero_background_image', 'option');
 
-		foreach ($hero_titles as $hero_title) {
-			$hero_titles_data[] = $hero_title['hero_title'];
-		}
+        // Process repeater field
+        $hero_titles_data = [];
+        if (is_array($hero_titles)) {
+            foreach ($hero_titles as $hero_title) {
+                if (isset($hero_title['hero_title'])) {
+                    $hero_titles_data[] = $hero_title['hero_title'];
+                }
+            }
+        }
 
-		// Retrieve other hero settings
-		$hero_button = get_field('hero_button', 'option');
-		$hero_location = get_field('hero_location', 'option');
-		$hero_background_image = get_field('hero_background_image', 'option');
-
-		// Create an array with all the hero settings
-		$hero_settings = array(
-			'titles' => $hero_titles_data,
-			'button' => $hero_button,
-			'location' => $hero_location,
-			'background_image' => $hero_background_image,
-		);
-
-		// Return the hero settings as JSON
-		return rest_ensure_response($hero_settings);
-	}
+        return rest_ensure_response([
+            'titles' => $hero_titles_data,
+            'button' => $hero_button,
+            'location' => $hero_location,
+            'background_image' => $hero_background_image,
+        ]);
+    }
 }

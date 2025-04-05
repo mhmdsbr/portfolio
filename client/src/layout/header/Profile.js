@@ -1,26 +1,27 @@
-import React, {useContext} from "react";
-
+import React, { useContext } from "react";
 import classes from "./Profile.module.scss";
-import ProfileImage from './ProfileImage'
+import ProfileImage from './ProfileImage';
 import ProfileName from "./ProfileName";
-import {ApiDataContext} from "../../store/ApiDataProvider";
+import { ApiDataContext } from "../../store/ApiDataProvider";
+
 const Profile = (props) => {
     const { data } = useContext(ApiDataContext);
-    const profileContent = data['general-portfolio'];
-    if (!profileContent) return null;
+    const generalSettings = data['general-portfolio'];
+    
+    if (!generalSettings?.profile) return null;
 
-    const profileName = profileContent['profile_title'];
-    const profileImage = profileContent['profile_image'];
-    const imageUrl = profileImage['url'];
+    const { image: profileImage, title: profileTitle } = generalSettings.profile;
 
     return (
         <div className={`${classes.msProfile} mt-lg-4`}>
-            <ProfileImage
-                src={imageUrl}
-                alt={profileImage['title']}
-            />
+            {profileImage && (
+                <ProfileImage
+                    src={profileImage.url}
+                    alt={profileImage.alt || "Profile Image"}
+                />
+            )}
             <ProfileName
-                name={profileName}
+                name={profileTitle}
             />
         </div>
     );

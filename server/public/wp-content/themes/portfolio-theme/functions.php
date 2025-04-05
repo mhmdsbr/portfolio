@@ -23,15 +23,15 @@ $acf_loader = new PORTFOLIO\Services\ACFLoader();
 /** Api **/
 new PORTFOLIO\Api\ApiHandler("portfolio/v2");
 new PORTFOLIO\Api\Config("portfolio/v2", $acf_loader);
-new PORTFOLIO\Api\GeneralSettings("portfolio/v2");
+new PORTFOLIO\Api\GeneralSettings("portfolio/v2", $acf_loader);
 new PORTFOLIO\Api\NavMenu("portfolio/v2");
-new PORTFOLIO\Api\Hero("portfolio/v2");
+new PORTFOLIO\Api\Hero("portfolio/v2", $acf_loader);
 new PORTFOLIO\Api\About("portfolio/v2");
 new PORTFOLIO\Api\Services("portfolio/v2");
 new PORTFOLIO\Api\Summary("portfolio/v2");
-new PORTFOLIO\Api\Projects("portfolio/v2");
+new PORTFOLIO\Api\Projects("portfolio/v2", $acf_loader);
 new PORTFOLIO\Api\Testimonial("portfolio/v2");
-new PORTFOLIO\Api\Contact("portfolio/v2");
+new PORTFOLIO\Api\Contact("portfolio/v2", $acf_loader);
 new PORTFOLIO\Api\Mail("portfolio/v2");
 
 
