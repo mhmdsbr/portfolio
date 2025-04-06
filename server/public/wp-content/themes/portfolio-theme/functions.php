@@ -42,7 +42,7 @@ $dependencies = [
         PORTFOLIO\Api\Testimonial::class => ['acf_loader', 'sanitizer'],
         PORTFOLIO\Api\Contact::class => ['acf_loader', 'sanitizer'],
         PORTFOLIO\Api\NavMenu::class => ['sanitizer'],
-        PORTFOLIO\Api\Mail::class => []
+        PORTFOLIO\Api\Mail::class => ['acf_loader', 'sanitizer']
     ],
     'third_party' => [
         PORTFOLIO\ThirdParty\ACF::class
