@@ -2,73 +2,87 @@
 
 namespace PORTFOLIO\Api;
 
+use PORTFOLIO\Services\ACFLoaderInterface;
+use PORTFOLIO\Services\SanitizationService;
 use WP_REST_Request;
 use WP_REST_Response;
 
-class Mail {
-	protected string $namespace;
-	public function __construct($namespace) {
-		$this->namespace = $namespace;
-		add_action('rest_api_init', array($this, 'register_routes'));
-		add_action('phpmailer_init', [&$this, 'setupSmtp']);
-	}
-	public function register_routes(): void {
-		register_rest_route($this->namespace, '/send-email', array(
-			'methods'  => 'POST',
-			'callback' => array($this, 'send_custom_email'),
-		));
-	}
+class Mail extends ApiHandler {
+    private ACFLoaderInterface $acf_loader;
+    private SanitizationService $sanitizer;
 
-	function send_custom_email(WP_REST_Request $request): WP_REST_Response {
-		$data = $request->get_json_params();
+    private const SMTP_HOST = 'smtp_host';
+    private const SMTP_PORT = 'smtp_port';
+    private const SMTP_USERNAME = 'smtp_username';
+    private const SMTP_PASSWORD = 'smtp_password';
 
-		if (empty($data['name']) || empty($data['email']) || empty($data['message'])) {
-			return new WP_REST_Response(array('success' => false, 'message' => 'Name, email, and message are required.'), 400);
-		}
+    public function __construct(
+        string $namespace,
+        ACFLoaderInterface $acf_loader,
+        SanitizationService $sanitizer
+    ) {
+        parent::__construct($namespace);
+        $this->acf_loader = $acf_loader;
+        $this->sanitizer = $sanitizer;
+        
+        $this->add_route(
+            '/send-email',
+            'POST',
+            'send_custom_email'
+        );
+        
+        add_action('phpmailer_init', [$this, 'setupSmtp']);
+    }
 
-		$name = sanitize_text_field($data['name']);
-		$email = sanitize_email($data['email']);
-		$message = wp_kses_post($data['message']);
+    public function send_custom_email(WP_REST_Request $request): WP_REST_Response {
+        $data = $request->get_json_params();
 
-		add_action('phpmailer_init', [$this, 'setupSmtp']);
+        // Validate required fields
+        if (empty($data['name']) || empty($data['email']) || empty($data['message'])) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => 'Name, email, and message are required.'
+            ], 400);
+        }
 
-		$to = 'saaber.mohamad@gmail.com';
-		$subject = 'Portfolio Message';
-		$message = "Name: $name<br>Email: $email<br>Message: $message";
-		$headers = array('Content-Type: text/html; charset=UTF-8');
+        // Sanitize input
+        $name = $this->sanitizer->text($data['name']);
+        $email = $this->sanitizer->email($data['email']);
+        $message = $this->sanitizer->html($data['message']);
 
-		$result = wp_mail($to, $subject, $message, $headers);
+        // Prepare email
+        $to = 'saaber.mohamad@gmail.com';
+        $subject = 'Portfolio Contact form Message';
+        $body = "Name: $name<br>Email: $email<br>Message: $message";
+        $headers = ['Content-Type: text/html; charset=UTF-8'];
 
-		if ($result) {
-			return new WP_REST_Response(array('success' => true, 'message' => 'Email sent successfully!'), 200);
-		} else {
-			return new WP_REST_Response(array('success' => false, 'message' => 'Failed to send email. Please try again later'), 500);
-		}
-	}
+        // Send email
+        $result = wp_mail($to, $subject, $body, $headers);
 
-	/**
-	 * Set up SMTP configuration
-	 *
-	 * @return void
-	 */
-	public function setupSmtp(): void
-	{
-		$smtp_credentials = array(
-			'host'     => get_field('smtp_host', 'option'),
-			'port'     => get_field('smtp_port', 'option'),
-			'username' => get_field('smtp_username', 'option'),
-			'password' => get_field('smtp_password', 'option'),
-		);
+        return new WP_REST_Response([
+            'success' => $result,
+            'message' => $result
+                ? 'Email sent successfully!'
+                : 'Failed to send email. Please try again later'
+        ], $result ? 200 : 500);
+    }
 
-		add_action('phpmailer_init', function ($phpmailer) use ($smtp_credentials) {
-			$phpmailer->isSMTP();
-			$phpmailer->Host       = $smtp_credentials['host'];
-			$phpmailer->Port       = $smtp_credentials['port'];
-			$phpmailer->SMTPAuth   = true;
-			$phpmailer->Username   = $smtp_credentials['username'];
-			$phpmailer->Password   = $smtp_credentials['password'];
-			$phpmailer->SMTPSecure = 'ssl';
-		});
-	}
+    public function setupSmtp($phpmailer): void {
+        $credentials = [
+            'host' => $this->acf_loader->get_field(self::SMTP_HOST, 'option'),
+            'port' => $this->acf_loader->get_field(self::SMTP_PORT, 'option'),
+            'username' => $this->acf_loader->get_field(self::SMTP_USERNAME, 'option'),
+            'password' => $this->acf_loader->get_field(self::SMTP_PASSWORD, 'option'),
+        ];
 
+        if (!empty($credentials['host'])) {
+            $phpmailer->isSMTP();
+            $phpmailer->Host = $this->sanitizer->text($credentials['host']);
+            $phpmailer->Port = $this->sanitizer->int($credentials['port']);
+            $phpmailer->SMTPAuth = true;
+            $phpmailer->Username = $this->sanitizer->text($credentials['username']);
+            $phpmailer->Password = $this->sanitizer->text($credentials['password']);
+            $phpmailer->SMTPSecure = 'ssl';
+        }
+    }
 }

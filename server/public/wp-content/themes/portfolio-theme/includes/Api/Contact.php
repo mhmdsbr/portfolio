@@ -43,7 +43,7 @@ class Contact extends ApiHandler {
             'contact_title' => $this->sanitizer->text($this->acf_loader->get_field(self::FIELD_TITLE, 'option') ?: ''),
             'contact_title_overlay' => $this->sanitizer->text($this->acf_loader->get_field(self::FIELD_OVERLAY, 'option') ?: ''),
             'contact_form_title' => $this->sanitizer->text($this->acf_loader->get_field(self::FIELD_FORM_TITLE, 'option') ?: ''),
-            'contact_button' => $this->sanitize_button($this->acf_loader->get_field(self::FIELD_BUTTON, 'option') ?: []),
+            'contact_button' => $this->acf_loader->get_field(self::FIELD_BUTTON, 'option') ?: [],
             'contact_info_title' => $this->sanitizer->text($this->acf_loader->get_field(self::FIELD_INFO_TITLE, 'option') ?: ''),
             'contact_info_address' => $this->sanitizer->text($this->acf_loader->get_field(self::FIELD_ADDRESS, 'option') ?: ''),
             'contact_info_phone' => $this->sanitizer->text($this->acf_loader->get_field(self::FIELD_PHONE, 'option') ?: ''),
@@ -51,10 +51,4 @@ class Contact extends ApiHandler {
         ]);
     }
 
-    private function sanitize_button(array $button): array {
-        return [
-            'text' => $this->sanitizer->text($button['text'] ?? ''),
-            'url' => $this->sanitizer->url($button['url'] ?? '')
-        ];
-    }
 }
