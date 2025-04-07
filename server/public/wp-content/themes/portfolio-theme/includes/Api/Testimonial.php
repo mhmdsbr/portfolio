@@ -25,7 +25,7 @@ class Testimonial extends ApiHandler {
         parent::__construct($namespace);
         $this->acf_loader = $acf_loader;
         $this->sanitizer = $sanitizer;
-        
+
         $this->add_route(
             '/testimonial-portfolio',
             'GET',
@@ -37,13 +37,13 @@ class Testimonial extends ApiHandler {
         $testimonial_title = $this->sanitizer->text(
             $this->acf_loader->get_field(self::FIELD_TITLE, 'option') ?: ''
         );
-        
+
         $testimonial_title_secondary = $this->sanitizer->text(
             $this->acf_loader->get_field(self::FIELD_OVERLAY, 'option') ?: ''
         );
-        
+
         $testimonial_items = $this->acf_loader->get_field(self::FIELD_ITEMS, 'option') ?: [];
-        
+
         $testimonials = [];
         foreach ($testimonial_items as $item) {
             $testimonials[] = [

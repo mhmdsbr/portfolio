@@ -25,7 +25,7 @@ class Hero extends ApiHandler {
         parent::__construct($namespace);
         $this->acf_loader = $acf_loader;
         $this->sanitizer = $sanitizer;
-        
+
         $this->add_route(
             '/hero-portfolio',
             'GET',
@@ -46,12 +46,12 @@ class Hero extends ApiHandler {
     private function process_titles(): array {
         $titles = $this->acf_loader->get_field(self::FIELD_TITLES, 'option') ?: [];
         $processed = [];
-        
+
         foreach ($titles as $title) {
             if (!is_array($title)) {
                 continue;
             }
-            
+
             $processed[] = $this->sanitizer->text($title['hero_title'] ?? '');
         }
 

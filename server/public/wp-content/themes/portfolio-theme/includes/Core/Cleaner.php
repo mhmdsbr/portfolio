@@ -23,9 +23,6 @@ class Cleaner
         /** Completely disable attachment permalinks */
         add_filter('attachment_link', '__return_false');
 
-        /** REST API */
-//        add_filter('rest_authentication_errors', [&$this, 'restApiAuth'], 20);
-
         /** Admin bar */
         add_action('wp_before_admin_bar_render', [&$this, 'removeAdminBarItems']);
 
