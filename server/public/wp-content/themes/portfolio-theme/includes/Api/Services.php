@@ -24,7 +24,7 @@ class Services extends ApiHandler {
         parent::__construct($namespace);
         $this->acf_loader = $acf_loader;
         $this->sanitizer = $sanitizer;
-        
+
         $this->add_route(
             '/services-portfolio',
             'GET',
@@ -34,7 +34,7 @@ class Services extends ApiHandler {
 
     public function get_services_settings(): WP_Error|WP_REST_Response|WP_HTTP_Response {
         $data = $this->get_services_data();
-        
+
         if (is_wp_error($data)) {
             return $data;
         }
@@ -66,7 +66,7 @@ class Services extends ApiHandler {
 
     private function get_sanitized_service_items(): array {
         $items = $this->acf_loader->get_field(self::FIELD_ITEMS, 'option') ?: [];
-        
+
         if (!is_array($items)) {
             return [];
         }

@@ -2,12 +2,18 @@
 
 namespace PORTFOLIO\Api;
 
+use PORTFOLIO\Services\SecurityMiddleware;
+
 class ApiHandler {
     protected string $namespace;
     protected array $routes = [];
 
     public function __construct($namespace) {
         $this->namespace = $namespace;
+
+        // Initialize security middleware
+        SecurityMiddleware::init();
+
         add_action('rest_api_init', [$this, 'register_routes']);
     }
 
@@ -24,7 +30,8 @@ class ApiHandler {
             'endpoint' => $endpoint,
             'method'   => $method,
             'callback' => $callback,
-            'args'     => $args
+            'args'     => $args,
+            'permission_callback' => [SecurityMiddleware::class, 'validate_request']
         ];
     }
 
@@ -39,7 +46,8 @@ class ApiHandler {
                 [
                     'methods'  => $route['method'],
                     'callback' => [$this, $route['callback']],
-                    'args'     => $route['args']
+                    'args'     => $route['args'],
+                    'permission_callback' => $route['permission_callback']
                 ]
             );
         }

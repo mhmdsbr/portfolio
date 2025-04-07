@@ -30,7 +30,7 @@ class Contact extends ApiHandler {
         parent::__construct($namespace);
         $this->acf_loader = $acf_loader;
         $this->sanitizer = $sanitizer;
-        
+
         $this->add_route(
             '/contact-portfolio',
             'GET',

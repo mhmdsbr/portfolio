@@ -24,13 +24,13 @@ class Mail extends ApiHandler {
         parent::__construct($namespace);
         $this->acf_loader = $acf_loader;
         $this->sanitizer = $sanitizer;
-        
+
         $this->add_route(
             '/send-email',
             'POST',
             'send_custom_email'
         );
-        
+
         add_action('phpmailer_init', [$this, 'setupSmtp']);
     }
 

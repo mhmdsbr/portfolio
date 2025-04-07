@@ -17,7 +17,7 @@ class NavMenu extends ApiHandler {
     ) {
         parent::__construct($namespace);
         $this->sanitizer = $sanitizer;
-        
+
         $this->add_route(
             '/menu-items',
             'GET',
@@ -32,7 +32,7 @@ class NavMenu extends ApiHandler {
 
     private function process_menu_items(array $items): array {
         $processed = [];
-        
+
         foreach ($items as $item) {
             if (!is_object($item)) {
                 continue;

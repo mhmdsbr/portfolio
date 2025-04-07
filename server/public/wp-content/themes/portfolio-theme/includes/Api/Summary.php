@@ -26,7 +26,7 @@ class Summary extends ApiHandler {
         parent::__construct($namespace);
         $this->acf_loader = $acf_loader;
         $this->sanitizer = $sanitizer;
-        
+
         $this->add_route(
             '/summary-portfolio',
             'GET',
@@ -52,12 +52,12 @@ class Summary extends ApiHandler {
 
     private function process_summary_items(array $items): array {
         $processed = [];
-        
+
         foreach ($items as $item) {
             if (!is_array($item)) {
                 continue;
             }
-            
+
             $processed[] = [
                 'from' => $this->sanitizer->text($item['from'] ?? ''),
                 'to' => $this->sanitizer->text($item['to'] ?? ''),
@@ -72,12 +72,12 @@ class Summary extends ApiHandler {
 
     private function process_experience_items(array $items): array {
         $processed = [];
-        
+
         foreach ($items as $item) {
             if (!is_array($item)) {
                 continue;
             }
-            
+
             $processed[] = [
                 'skill' => $this->sanitizer->text($item['skill'] ?? ''),
                 'level' => $this->sanitizer->experienceLevel($item['level'] ?? 0),

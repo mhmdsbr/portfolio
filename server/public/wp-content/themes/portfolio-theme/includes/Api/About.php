@@ -29,7 +29,7 @@ class About extends ApiHandler {
         parent::__construct($namespace);
         $this->acf_loader = $acf_loader;
         $this->sanitizer = $sanitizer;
-        
+
         $this->add_route(
             '/about-portfolio',
             'GET',
@@ -55,28 +55,28 @@ class About extends ApiHandler {
     private function get_contact_information(): array {
         $about_contact = $this->acf_loader->get_field(self::FIELD_CONTACT, 'option') ?: [];
         $contact_info = [];
-        
+
         foreach ($about_contact as $item) {
             $contact_info[] = [
                 'title' => $this->sanitizer->text($item['title'] ?? ''),
                 'content' => $this->sanitizer->text($item['content'] ?? '')
             ];
         }
-        
+
         return $contact_info;
     }
 
     private function get_details_information(): array {
         $about_details = $this->acf_loader->get_field(self::FIELD_DETAILS, 'option') ?: [];
         $details_info = [];
-        
+
         foreach ($about_details as $item) {
             $details_info[] = [
                 'title' => $this->sanitizer->text($item['title'] ?? ''),
                 'content' => $this->sanitizer->text($item['number'] ?? '')
             ];
         }
-        
+
         return $details_info;
     }
 

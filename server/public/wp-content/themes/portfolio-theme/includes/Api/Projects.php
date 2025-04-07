@@ -25,7 +25,7 @@ class Projects extends ApiHandler {
         parent::__construct($namespace);
         $this->acf_loader = $acf_loader;
         $this->sanitizer = $sanitizer;
-        
+
         $this->add_route(
             '/projects-portfolio',
             'GET',
@@ -52,7 +52,7 @@ class Projects extends ApiHandler {
         ]);
 
         $projects = [];
-        
+
         foreach ($project_ids as $project_id) {
             $projects[] = [
                 'post_id' => $this->sanitizer->int($project_id),
