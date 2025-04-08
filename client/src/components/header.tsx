@@ -4,9 +4,10 @@ import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { TextPlugin } from 'gsap/TextPlugin'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 // Register plugins
-gsap.registerPlugin(TextPlugin)
+gsap.registerPlugin(TextPlugin, ScrollTrigger)
 
 export default function Header() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -24,12 +25,21 @@ export default function Header() {
     const tl = gsap.timeline()
     tl.to(containerRef.current, {
       opacity: 1,
-      duration: 0.2
+      duration: 0.5
     })
     .to(headerRef.current, {
-      y: 40,
+      y: 20,
       duration: 1.5,
       ease: "bounce.out"
+    })
+
+    // Set up sticky scroll effect
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top top",
+      end: "+=200%",
+      pin: true,
+      pinSpacing: false,
     })
   }, [])
 
@@ -45,7 +55,6 @@ export default function Header() {
 
     const hoverTl = gsap.timeline({
       paused: true,
-      defaults: { ease: "none" }
     })
 
     // Expand container
@@ -53,16 +62,16 @@ export default function Header() {
       maxWidth: 400,
       opacity: 1,
       paddingRight: '0.75rem',
-      duration: 0.3
+      duration: 0.5,
+      ease: "power1.in"
     })
     // Typing animation
     .to(reloadText, {
       text: {
         value: originalText,
-        speed: .5,
-        type: "diff"
+        speed: 1
       },
-      duration: originalText.length * 0.08
+      duration: originalText.length * 0.05
     })
 
     // Event handlers
@@ -78,6 +87,7 @@ export default function Header() {
     return () => {
       header.removeEventListener('mouseenter', playAnimation)
       header.removeEventListener('mouseleave', reverseAnimation)
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
     }
   }, [])
 
@@ -85,7 +95,7 @@ export default function Header() {
     <div ref={containerRef} className="flex py-5 justify-center w-full opacity-0">
       <div
         ref={headerRef}
-        className="text-2xl lg:text-3xl font-semibold px-10 cursor-pointer"
+        className="text-2xl lg:text-3xl font-semibold px-10 cursor-pointer sticky top-0 z-50"
       >
         <span className="flex items-baseline">
           &lt;
