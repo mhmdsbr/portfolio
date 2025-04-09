@@ -1,120 +1,45 @@
 'use client'
 
 import { useRef } from 'react'
-import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
+import useHeroAnimations from '@/hooks/useHeroAnimations'
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const line1Ref = useRef<HTMLSpanElement>(null)
+  const line1Ref = useRef<HTMLHeadingElement>(null)
   const line2Ref = useRef<HTMLSpanElement>(null)
   const line3Ref = useRef<HTMLSpanElement>(null)
+  const descriptionRef = useRef<HTMLParagraphElement>(null)
 
-  useGSAP(() => {
-    gsap.set(line1Ref.current, { y: 0, scale: 0 });
-    const firstLineTl = gsap.timeline();
-    firstLineTl.to(line1Ref.current, {
-      scale: 2,
-      duration: 1.5,
-      ease: "power2.out"
-    });
-
-    firstLineTl.to(line1Ref.current, {
-      y: -150,
-      duration: 1,
-      ease: "elastic.out(1, .5)"
-    });
-
-    // Create timeline for scroll-triggered animations
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 10%",
-        end: "+=200%", // Scroll distance for all animations
-        scrub: 1, // Smooth scrubbing
-        pin: true, // Pins the element during scroll
-        markers: false
-      }
-    })
-
-    tl.fromTo(
-      line2Ref.current,
-      { scale: 4, y: 0, opacity: 0 },
-      {
-        scale: 1,
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        ease: "back.out(3)",
-        onUpdate: function () {
-          const progress = this.progress(); // 0 → 1
-          // Interpolate from colorA to colorB
-          const colorA = { r: 255, g: 0, b: 0 };
-          const colorB = { r: 0, g: 255, b: 0 };
-
-          const r = Math.floor(colorA.r + (colorB.r - colorA.r) * progress);
-          const g = Math.floor(colorA.g + (colorB.g - colorA.g) * progress);
-          const b = Math.floor(colorA.b + (colorB.b - colorA.b) * progress);
-
-          gsap.set(line2Ref.current, {
-            color: `rgb(${r}, ${g}, ${b})`
-          });
-        },
-      },
-      "+=0.1"
-    )
-    .to(
-      line2Ref.current,
-      {
-        y: -100,
-        duration: 0.7,
-        ease: "back.out(2)",
-        onUpdate: function () {
-          const progress = this.progress();
-          // Now interpolate from Green → Blue
-          const colorA = { r: 0, g: 255, b: 0 };
-          const colorB = { r: 0, g: 0, b: 255 };
-
-          const r = Math.floor(colorA.r + (colorB.r - colorA.r) * progress);
-          const g = Math.floor(colorA.g + (colorB.g - colorA.g) * progress);
-          const b = Math.floor(colorA.b + (colorB.b - colorA.b) * progress);
-
-          gsap.set(line2Ref.current, {
-            color: `rgb(${r}, ${g}, ${b})`
-          });
-        },
-      },
-      ">0.3"
-    );
-
-    // Third line animation (slide up from bottom)
-    tl.fromTo(line3Ref.current,
-      { y: window.innerHeight/2, scale: 4, opacity: 0 },
-      { y: 0, scale: 1, opacity: 1, duration: 1.5, ease: "power3.out" },
-      "-=0.3"
-    )
-    .to(line3Ref.current,
-      { y: -100, duration: 1, ease: "elastic.out(1, 0.5)" },
-      ">0.2" // Starts 0.2s after scaling completes
-    );
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-    }
-  }, [])
+  useHeroAnimations({
+    containerRef,
+    line1Ref,
+    line2Ref,
+    line3Ref,
+    descriptionRef
+  })
 
   return (
-    <div ref={containerRef} className="h-screen flex flex-col space-y-8 items-center justify-center text-center">
-      <div className="z-20">
-        <h1 className="text-4xl lg:text-6xl font-semibold px-10">
-          <span className="block" ref={line1Ref}>Hi, I&apos;m Mo</span>
-          <span className="block mt-8 opacity-0" ref={line2Ref}>A Web Developer</span>
-          <span className="block mt-8 opacity-0" ref={line3Ref}>An English Instructor</span>
+    <section ref={containerRef} className="relative overflow-x-hidden h-[80vh] flex flex-col items-center gap-4 justify-evenly text-center">
+      <div>
+        <h1 className="px-10" ref={line1Ref}>
+          <span className="block text-lg sm:text-xl md:text-3xl lg:text-4xl xl:text-6xl pink-gradient-text font-extrabold">MOHAMMAD SABER</span>
         </h1>
+        <h2 className="flex justify-center gap-5">
+          <span className="block md:text-2xl lg:text-3xl font-roboto font-semibold uppercase mt-8 opacity-0" ref={line2Ref}>Web Developer,</span>
+          <span className="block md:text-2xl lg:text-3xl font-roboto font-semibold uppercase mt-8 opacity-0" ref={line3Ref}>English Instructor</span>
+        </h2>
       </div>
-    </div>
+      <div className="flex justify-center items-center text-white absolute left-auto lg:left-4 bottom-0 z-10">
+        <p className="bg-primary-cyan border-r-1 border-white p-5 z-20">Mo</p>
+        <p className="bg-primary-orange border-r-1 border-white p-5 z-20">Berlin, Germany</p>
+        <p className="bg-primary-purple border-white p-5 z-20">Be in touch</p>
+        <p
+          ref={descriptionRef}
+          className="bg-white text-black border-r-4 border-primary-cyan p-5 z-0 hidden lg:block"
+        >
+          Turning ideas into interactive, responsive, bug-resistant (ish) experiences.
+       </p>
+      </div>
+    </section>
   )
 }

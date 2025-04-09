@@ -1,22 +1,41 @@
 @import "tailwindcss";
 
+
 :root {
-  --background: #030E1C;
-  --foreground: #171717;
-  --accent: #66d9ed;
+  --deep-navy-blue: #030E1C;       /* Very dark blue (background) */
+  --primary-white: #FFFFFF;           /* white (foreground) */
+  --sky-cyan: #66d9ed;            /* Bright cyan-blue (accent) */
+  --soft-pink: #FCDDFD;           /* Light pastel pink */
+  --light-sky-blue: #BCEFFA;      /* Pale blue with a hint of cyan */
+  --vibrant-cobalt: #4657F2;      /* Bright, saturated blue */
+  --electric-purple: #7A28E3;     /* Deep purple with blue undertones */
+  --peach-orange: #F6C781;        /* Warm light orange (like peach) */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--deep-navy-blue);
+  --color-foreground: var(--primary-white);
+  --color-primary-purple: var(--electric-purple);
+  --color-primary-cobalt: var(--vibrant-cobalt);
+  --color-primary-cyan: var(--sky-cyan);
+  --color-primary-sky-blue: var(--light-sky-blue);
+  --color-primary-pink: var(--soft-pink);
+  --color-primary-orange: var(--peach-orange);
+  --font-poppins: var(--font-poppins);
+  --font-roboto: var(--font-roboto-mono);
 }
 
+@layer utilities {
+  .pink-gradient-text {
+    background: linear-gradient(90.43deg, #FFFFFF 23.32%, #FCDDFD 50.48%, #BCEFFA 50.56%, #F6C781 81.32%, #4657F2 85.09%, #7A28E3 89.33%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
 
 body {
-  background: var(--background);
+  background: var(--color-background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins);
 }
