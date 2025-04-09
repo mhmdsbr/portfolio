@@ -1,5 +1,20 @@
 import { RefObject } from 'react'
 
+export interface BackgroundGradientMouse {
+  x: number
+  y: number
+}
+
+export interface BackgroundGradientStar {
+  x: number
+  y: number
+  baseX: number
+  baseY: number
+  radius: number
+  alpha: number
+  delta: number
+}
+
 // Types for useHeaderAnimations hook
 export interface HeaderAnimationRefs {
   containerRef: RefObject<HTMLElement | null>

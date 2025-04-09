@@ -19,7 +19,7 @@ export default function Hero() {
   })
 
   return (
-    <section ref={containerRef} className="relative overflow-x-hidden h-[80vh] flex flex-col items-center gap-4 justify-evenly text-center">
+    <section ref={containerRef} className="relative overflow-x-hidden h-screen min-h-[700px] flex flex-col items-center gap-4 justify-evenly text-center">
       <div>
         <h1 className="px-10" ref={line1Ref}>
           <span className="block text-lg sm:text-xl md:text-3xl lg:text-4xl xl:text-6xl pink-gradient-text font-extrabold">MOHAMMAD SABER</span>
@@ -29,16 +29,22 @@ export default function Hero() {
           <span className="block md:text-2xl lg:text-3xl font-roboto font-semibold uppercase mt-8 opacity-0" ref={line3Ref}>English Instructor</span>
         </h2>
       </div>
-      <div className="flex justify-center items-center text-white absolute left-auto lg:left-4 bottom-0 z-10">
-        <p className="bg-primary-cyan border-r-1 border-white p-5 z-20">Mo</p>
-        <p className="bg-primary-orange border-r-1 border-white p-5 z-20">Berlin, Germany</p>
-        <p className="bg-primary-purple border-white p-5 z-20">Be in touch</p>
-        <p
+      <div className="flex justify-center items-center h-16 text-white uppercase font-medium absolute left-auto lg:left-4 bottom-20 z-10">
+        <div className="flex items-center bg-primary-cyan h-full border-r-1 rounded-l-xs border-white p-3 z-20">
+          <p>Mo</p>
+        </div>
+        <div className="flex items-center bg-primary-orange h-full border-r-1 border-white p-2 z-20">
+          <p>Berlin, Germany</p>
+        </div>
+        <div className="flex items-center bg-primary-purple h-full border-white p-2 z-20">
+          <p>Be in Touch</p>
+        </div>
+        <div
           ref={descriptionRef}
-          className="bg-white text-black border-r-4 border-primary-cyan p-5 z-0 hidden lg:block"
+          className="items-center bg-white text-black h-full border-r-6 rounded-r-md border-primary-cyan p-2 z-0 opacity-0 flex"
         >
-          Turning ideas into interactive, responsive, bug-resistant (ish) experiences.
-       </p>
+          <p>Turning ideas into interactive, responsive, bug-resistant (ish) experiences.</p>
+       </div>
       </div>
     </section>
   )

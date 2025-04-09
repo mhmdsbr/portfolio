@@ -20,26 +20,24 @@ export default function useHeroAnimations({
 
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
-      const isMobile = window.innerWidth < 980;
+      const isMobile = window.innerWidth < 1024;
 
       // Entry animation timeline
-      const masterTimeline = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      masterTimeline
-        .fromTo(
+      const titleTimeline = gsap.timeline();
+        titleTimeline.fromTo(
           line1Ref.current,
           { scale: 0, opacity: 0 },
           { scale: 2, opacity: 1, duration: 1, ease: "back.out(3)" }
         )
-        .to(line1Ref.current, { y: -100 })
+        .to(line1Ref.current, { y: -50 })
         .fromTo(
           line2Ref.current,
           { scale: 4, opacity: 0 },
           {
             scale: 1,
             opacity: 1,
-            duration: 1.3,
-            ease: "back.out(3)",
+            duration: 1.5,
+            ease: "back.out(2)",
             onStart: () => {
               gsap.set(line2Ref.current, { color: "rgb(168 85 247)" });
             },
@@ -55,38 +53,38 @@ export default function useHeroAnimations({
             },
           }
         )
-        .to(line2Ref.current, { y: -100 })
+        .to(line2Ref.current, { y: -50 })
         .fromTo(
           line3Ref.current,
-          { scale: 4, opacity: 0 },
+          { scale: 5, opacity: 0 },
           {
             scale: 1,
             opacity: 1,
-            duration: 1.2,
-            ease: "elastic.out(1, 0.5)",
+            duration: 1,
+            ease: "elastic.out(1, 1.5)",
           }
         )
-        .to(line3Ref.current, { y: -100 });
+        .to(line3Ref.current, { y: -50 });
 
       // Scroll-triggered description animation (only on non-mobile)
       if (!isMobile && descriptionRef?.current && containerRef?.current) {
-        const expandTimeline = gsap.timeline({
+        const descriptionTimeline = gsap.timeline({
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top top",
-            end: "+=500",
-            scrub: 0.5,
+            end: "+=70",
+            scrub: 1,
             pin: true,
-            markers: false,
+            pinSpacing: true,
             invalidateOnRefresh: true,
           },
         });
 
-        expandTimeline.fromTo(
+        descriptionTimeline.fromTo(
           descriptionRef.current,
           {
+            x: -400,
             opacity: 0,
-            x: -300,
             paddingLeft: 0,
             paddingRight: 0,
             marginLeft: "auto",
