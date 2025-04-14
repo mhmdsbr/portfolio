@@ -26,6 +26,10 @@
 }
 
 @layer utilities {
+  .pf-container {
+    @apply container mx-auto my-16;
+  }
+
   .pink-gradient-text {
     background: linear-gradient(90.43deg, #FFFFFF 23.32%, #FCDDFD 50.48%, #BCEFFA 50.56%, #F6C781 81.32%, #4657F2 85.09%, #7A28E3 89.33%);
     -webkit-background-clip: text;

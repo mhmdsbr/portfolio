@@ -22,21 +22,22 @@ export default function useHeroAnimations({
 
       const isMobile = window.innerWidth < 1024;
 
-      // Entry animation timeline
       const titleTimeline = gsap.timeline();
-        titleTimeline.fromTo(
+
+      titleTimeline
+        .fromTo(
           line1Ref.current,
           { scale: 0, opacity: 0 },
-          { scale: 2, opacity: 1, duration: 1, ease: "back.out(3)" }
+          { scale: 2, opacity: 1, duration: 0.6, ease: "back.out(3)" }
         )
-        .to(line1Ref.current, { y: -50 })
+        .to(line1Ref.current, { y: -50, duration: 0.4, ease: "power1.out" })
         .fromTo(
           line2Ref.current,
-          { scale: 4, opacity: 0 },
+          { scale: 3, opacity: 0 },
           {
             scale: 1,
             opacity: 1,
-            duration: 1.5,
+            duration: 0.8,
             ease: "back.out(2)",
             onStart: () => {
               gsap.set(line2Ref.current, { color: "rgb(168 85 247)" });
@@ -53,20 +54,19 @@ export default function useHeroAnimations({
             },
           }
         )
-        .to(line2Ref.current, { y: -50 })
+        .to(line2Ref.current, { y: -50, duration: 0.4, ease: "power1.out" })
         .fromTo(
           line3Ref.current,
-          { scale: 5, opacity: 0 },
+          { scale: 2, opacity: 0 },
           {
             scale: 1,
             opacity: 1,
-            duration: 1,
-            ease: "elastic.out(1, 1.5)",
+            duration: 0.7,
+            ease: "power3.out",
           }
         )
-        .to(line3Ref.current, { y: -50 });
+        .to(line3Ref.current, { y: -50, duration: 0.4, ease: "power1.out" });
 
-      // Scroll-triggered description animation (only on non-mobile)
       if (!isMobile && descriptionRef?.current && containerRef?.current) {
         const descriptionTimeline = gsap.timeline({
           scrollTrigger: {
@@ -93,7 +93,7 @@ export default function useHeroAnimations({
           {
             x: 0,
             opacity: 1,
-            paddingLeft: 40,
+            paddingLeft: 20,
             paddingRight: 20,
             marginLeft: 0,
             marginRight: 0,
@@ -102,7 +102,6 @@ export default function useHeroAnimations({
         );
       }
 
-      // Debounced refresh on resize
       let resizeTimeout: ReturnType<typeof setTimeout>;
       const handleResize = () => {
         clearTimeout(resizeTimeout);

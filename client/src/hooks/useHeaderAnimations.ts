@@ -29,7 +29,6 @@ export default function useHeaderAnimations({
       duration: 1.5,
       ease: 'bounce.out'
     })
-
   }, [containerRef, headerRef])
 
   useEffect(() => {
@@ -69,4 +68,24 @@ export default function useHeaderAnimations({
       header.removeEventListener('mouseleave', reverseAnimation)
     }
   }, [expandRef, reloadTextRef, headerRef])
+
+  useEffect(() => {
+    const header = headerRef.current
+    if (!header) return
+
+    requestAnimationFrame(() => {
+      ScrollTrigger.create({
+        trigger: document.body,
+        start: 'top+=50',
+        onEnter: () => {
+          header.classList.add('bg-primary-cyan/80', 'backdrop-blur', 'transition-colors', 'duration-300')
+        },
+        onLeaveBack: () => {
+          header.classList.remove('bg-primary-cyan/80', 'backdrop-blur')
+        },
+      })
+    })
+
+    return () => ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+  }, [headerRef])
 }

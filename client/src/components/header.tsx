@@ -17,10 +17,10 @@ export default function Header() {
   })
 
   return (
-    <header ref={containerRef} className="flex justify-center w-full opacity-0">
+    <header ref={containerRef} className="flex justify-center w-full opacity-0 z-50">
       <div
         ref={headerRef}
-        className="flex justify-center mt-10 text-2xl fixed lg:text-3xl font-semibold px-10 cursor-pointer top-0 z-50"
+        className="flex justify-center w-full py-5 text-2xl fixed lg:text-3xl font-semibold px-10 cursor-pointer top-0 z-50"
       >
         <span className="flex items-baseline">
           &lt;

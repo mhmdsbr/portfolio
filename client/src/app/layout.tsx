@@ -2,6 +2,8 @@ import Head from 'next/head';
 import type { Metadata } from "next";
 import { Poppins, Roboto_Mono } from "next/font/google";
 import "./globals.css";
+import { ReactLenis } from 'lenis/react'
+
 
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -36,7 +38,9 @@ export default function RootLayout({
         <meta name="description" content="Personal portfolio website" />
       </Head>
       <body className={`${poppins.variable} ${robotoMono.variable} font-sans antialiased`}>
-        {children}
+      <ReactLenis root>
+          {children}
+        </ReactLenis>
       </body>
     </html>
   );
