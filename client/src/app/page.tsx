@@ -5,6 +5,7 @@ import About from '@/components/about';
 import Services from '@/components/services';
 import Experience from '@/components/experience';
 import Projects from '@/components/projects';
+import Testimonials from '@/components/testimonials';
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
         <Services />
         <Experience />
         <Projects />
+        <Testimonials />
         <div>
           <p>
             Results-driven JavaScript, React, TypeScript, Next.js, and WordPress developer with over five years of experience leading and implementing projects of varying scales.

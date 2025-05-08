@@ -43,3 +43,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-poppins);
 }
+
+.swiper-wrapper {
+  transition-timing-function: linear !important;
+}

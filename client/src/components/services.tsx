@@ -14,8 +14,8 @@ export default function About() {
       scrollTrigger: {
         trigger: '.services-container',
         start: '20% bottom',
-        end: '200px 50%',
-        scrub: true, // Makes the animation smooth during scroll
+        end: '200px 70%',
+        scrub: 1, // Makes the animation smooth during scroll
         toggleActions: 'play none none none',
         markers: true
       }
@@ -29,7 +29,7 @@ export default function About() {
       y: 0,
       opacity: 1,
       duration: 0.8,
-      stagger: 0.1,
+      stagger: 1,
       ease: 'power2.out'
     });
 
