@@ -22,13 +22,15 @@ export default function About() {
           </span>
         ))}
         </h2>
-        <div ref={textRef} className='flex flex-col justify-start h-[400px] gap-4 w-8/12 mx-auto text-2xl gap-3 text-justify'>
-          <p className="text-2xl text-gray-300 font-mono">
-          Results-driven JavaScript, React, TypeScript, Next.js, and WordPress developer with over five years of experience leading and implementing projects of varying scales.
-          </p>
-          <p className="text-2xl text-gray-300 font-mono">
-          Successfully led, developed and delivered 30+ projects using React and WordPress. Possesses an in-depth understanding of Javascript, React.js, and the WordPress CMS. Recognized for critical thinking, problem-solving, and an Agile mindset.
-          </p>
+        <div className='container flex flex-col gap-8 m-auto'>
+          <div ref={textRef} className='flex flex-col justify-start h-[400px] gap-4 w-8/12 mx-auto text-2xl text-justify'>
+            <p className='text-2xl text-gray-300 font-mono'>
+            Results-driven JavaScript, React, TypeScript, Next.js, and WordPress developer with over five years of experience leading and implementing projects of varying scales.
+            </p>
+            <p className='text-2xl text-gray-300 font-mono'>
+            Successfully led, developed and delivered 30+ projects using React and WordPress. Possesses an in-depth understanding of Javascript, React.js, and the WordPress CMS. Recognized for critical thinking, problem-solving, and an Agile mindset.
+            </p>
+          </div>
         </div>
       </div>
     </section>

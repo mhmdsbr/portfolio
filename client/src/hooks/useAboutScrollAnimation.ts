@@ -42,9 +42,9 @@ export default function useAboutScrollAnimation({
         id: triggerId,
         trigger: containerRef.current,
         start: "top center",
-        end: "+=200",
-        pin: true,
+        end: "+=100",
         pinSpacing: false,
+        pin: true,
         scrub: 0.5,
       },
     });

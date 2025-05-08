@@ -1,7 +1,10 @@
 import Header from '@/components/header';
+import BackgroundGradient from '@/components/backgroundGradient';
 import Hero from '@/components/hero';
 import About from '@/components/about';
-import BackgroundGradient from '@/components/backgroundGradient';
+import Services from '@/components/services';
+import Experience from '@/components/experience';
+import Projects from '@/components/projects';
 
 export default function Home() {
   return (
@@ -10,11 +13,21 @@ export default function Home() {
         <Header />
         <Hero />
         <About />
-        <p>
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-        </p>
+        <Services />
+        <Experience />
+        <Projects />
+        <div>
+          <p>
+            Results-driven JavaScript, React, TypeScript, Next.js, and WordPress developer with over five years of experience leading and implementing projects of varying scales.
+            Results-driven JavaScript, React, TypeScript, Next.js, and WordPress developer with over five years of experience leading and implementing projects of varying scales.
+            Successfully led, developed and delivered 30+ projects using React and WordPress. Possesses an in-depth understanding of Javascript, React.js, and the WordPress CMS. Recognized for critical thinking, problem-solving, and an Agile mindset.
+          </p>
+          <p>
+            Results-driven JavaScript, React, TypeScript, Next.js, and WordPress developer with over five years of experience leading and implementing projects of varying scales.
+            Results-driven JavaScript, React, TypeScript, Next.js, and WordPress developer with over five years of experience leading and implementing projects of varying scales.
+            Successfully led, developed and delivered 30+ projects using React and WordPress. Possesses an in-depth understanding of Javascript, React.js, and the WordPress CMS. Recognized for critical thinking, problem-solving, and an Agile mindset.
+          </p>
+        </div>
     </main>
   );
 }

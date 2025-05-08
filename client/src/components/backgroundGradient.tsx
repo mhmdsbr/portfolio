@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { BackgroundGradientStar } from "@/types/animation";
+import { drawStarsWithGradient } from "@/utils/drawStars";
 
 export default function BackgroundGradient() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -27,41 +28,26 @@ export default function BackgroundGradient() {
     }));
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      stars.current.forEach(star => {
-        star.baseX = star.x;
-        star.baseY = star.y;
-      });
-    };
+      const dpr = window.devicePixelRatio || 1;
+      const width = document.documentElement.scrollWidth;
+      const height = document.documentElement.scrollHeight;
 
-    const drawGradientBackground = () => {
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      gradient.addColorStop(0, "#000000");
-      gradient.addColorStop(1, "#000428");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    };
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
 
-    const drawStars = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawGradientBackground();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
 
       stars.current.forEach(star => {
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
-        ctx.fill();
-
-        star.alpha += star.delta;
-        if (star.alpha <= 0 || star.alpha >= 1) {
-          star.delta = -star.delta;
-        }
+        star.baseX = star.x = Math.random() * width;
+        star.baseY = star.y = Math.random() * height;
       });
     };
 
     const animate = () => {
-      drawStars();
+      drawStarsWithGradient(ctx, canvas, stars.current);
       animationFrameId = requestAnimationFrame(animate);
     };
 
@@ -79,7 +65,7 @@ export default function BackgroundGradient() {
     <>
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 -z-10 h-full"
+        className="fixed inset-0 -z-10 w-full h-full"
         aria-hidden="true"
       />
     </>
