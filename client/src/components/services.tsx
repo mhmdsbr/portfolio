@@ -15,9 +15,8 @@ export default function About() {
         trigger: '.services-container',
         start: '20% bottom',
         end: '200px 70%',
-        scrub: 1, // Makes the animation smooth during scroll
+        scrub: 1,
         toggleActions: 'play none none none',
-        markers: true
       }
     });
 
