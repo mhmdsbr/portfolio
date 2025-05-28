@@ -9,7 +9,7 @@ class SecurityMiddleware {
     /**
      * Rate limit configuration
      */
-    private const RATE_LIMIT = 100; // Requests per hour
+    private const RATE_LIMIT = 300; // Requests per hour
     private const RATE_LIMIT_PERIOD = HOUR_IN_SECONDS;
 
     /**

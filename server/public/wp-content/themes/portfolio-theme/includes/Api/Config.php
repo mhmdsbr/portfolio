@@ -12,7 +12,6 @@ class Config extends ApiHandler {
     private ACFLoaderInterface $acf_loader;
     private SanitizationService $sanitizer;
 
-    private const FIELD_API_BASE_URL = 'api_base_url';
     private const FIELD_RECAPTCHA = 'recaptcha';
 
     public function __construct(
@@ -33,9 +32,6 @@ class Config extends ApiHandler {
 
     public function get_configs(): WP_Error|WP_REST_Response|WP_HTTP_Response {
         return rest_ensure_response([
-            'api_base_url' => $this->sanitizer->url(
-                $this->acf_loader->get_field(self::FIELD_API_BASE_URL, 'option') ?: ''
-            ),
             'recaptcha' => $this->sanitizer->text(
                 $this->acf_loader->get_field(self::FIELD_RECAPTCHA, 'option') ?: ''
             )

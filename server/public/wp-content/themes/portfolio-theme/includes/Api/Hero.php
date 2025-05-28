@@ -13,9 +13,10 @@ class Hero extends ApiHandler {
     private SanitizationService $sanitizer;
 
     private const FIELD_TITLES = 'hero_titles';
-    private const FIELD_BUTTON = 'hero_button';
+    private const FIELD_LOGO = 'hero_logo';
     private const FIELD_LOCATION = 'hero_location';
-    private const FIELD_BACKGROUND = 'hero_background_image';
+    private const FIELD_SUBTITLEONE = 'hero_subtitle_one';
+    private const FIELD_SUBTITLETWO = 'hero_subtitle_two';
 
     public function __construct(
         string $namespace,
@@ -37,9 +38,10 @@ class Hero extends ApiHandler {
     public function get_hero_settings(): WP_Error|WP_REST_Response|WP_HTTP_Response {
         return rest_ensure_response([
             'titles' => $this->process_titles(),
-            'button' => $this->acf_loader->get_field(self::FIELD_BUTTON, 'option') ?: [],
+            'logo' => $this->acf_loader->get_field(self::FIELD_LOGO, 'option') ?: [],
             'location' => $this->sanitizer->text($this->acf_loader->get_field(self::FIELD_LOCATION, 'option') ?: ''),
-            'background_image' => $this->acf_loader->get_field(self::FIELD_BACKGROUND, 'option')
+            'subtitle_one' => $this->acf_loader->get_field(self::FIELD_SUBTITLEONE, 'option'),
+            'subtitle_two' => $this->acf_loader->get_field(self::FIELD_SUBTITLETWO, 'option'),
         ]);
     }
 

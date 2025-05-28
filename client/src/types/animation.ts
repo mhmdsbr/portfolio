@@ -15,7 +15,6 @@ export interface BackgroundGradientStar {
   delta: number
 }
 
-// Types for useHeaderAnimations hook
 export interface HeaderAnimationRefs {
   containerRef: RefObject<HTMLElement | null>
   headerRef: RefObject<HTMLElement | null>
@@ -23,7 +22,6 @@ export interface HeaderAnimationRefs {
   reloadTextRef: RefObject<HTMLElement | null>
 }
 
-// Types for useHeroAnimations hook
 export interface HeroAnimationRefs {
   containerRef: RefObject<HTMLDivElement | null>
   line1Ref: RefObject<HTMLSpanElement | null>
