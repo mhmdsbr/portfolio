@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import useAboutScrollAnimation from '@/hooks/useAboutScrollAnimation';
+import useAboutScrollAnimation from '@/hooks/animations/useAboutScrollAnimation';
 
 export default function About() {
   const containerRef = useRef<HTMLDivElement>(null);

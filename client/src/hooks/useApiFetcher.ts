@@ -1,8 +1,9 @@
 import useSWR from 'swr';
+import { getApiBaseUrl, DEFAULT_SWR_OPTIONS } from '@/lib/api-config';
 import { EndpointMap } from '@/types/apiTypes';
 
 const useApiFetcher = <T extends keyof EndpointMap>(endpoints: T[]) => {
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiBaseUrl = getApiBaseUrl();
 
   if (!apiBaseUrl) {
     throw new Error('NEXT_PUBLIC_API_URL environment variable is not set');
@@ -29,10 +30,7 @@ const useApiFetcher = <T extends keyof EndpointMap>(endpoints: T[]) => {
         return acc;
       }, {} as { [K in T]: EndpointMap[K] });
     },
-    {
-      revalidateOnFocus: false,
-      shouldRetryOnError: false,
-    }
+    DEFAULT_SWR_OPTIONS
   );
 
   return {

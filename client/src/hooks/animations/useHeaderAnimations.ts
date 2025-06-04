@@ -39,10 +39,10 @@ export default function useHeaderAnimations({
     if (!expandElement || !reloadText || !header) return
 
     const originalText = reloadText.textContent || ''
-    reloadText.textContent = ''
 
     const hoverTl = gsap.timeline({ paused: true })
 
+    hoverTl.set(reloadText, { text: '' })
     hoverTl.to(expandElement, {
       maxWidth: 400,
       opacity: 1,

@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
-import useHeroAnimations from '@/hooks/useHeroAnimations';
-import { useHeroData } from '@/hooks/useHeroData';
+import { useEffect, useRef, useState } from 'react';
+import { useApiEntry } from '@/hooks/useApiEntry';
 import Image from 'next/image';
+import useHeroAnimations from '@/hooks/animations/useHeroAnimations';
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -12,19 +12,36 @@ export default function Hero() {
   const line3Ref = useRef<HTMLSpanElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
-  const { hero, isLoading } = useHeroData();
+  const { data: hero, isLoading } = useApiEntry('portfolio/v2/hero-portfolio');
+  const [animationReady, setAnimationReady] = useState(false);
 
-  useHeroAnimations({
-    containerRef,
-    line1Ref,
-    line2Ref,
-    line3Ref,
-    descriptionRef,
-  });
+  useEffect(() => {
+    if (
+      !isLoading &&
+      hero &&
+      line1Ref.current &&
+      line2Ref.current &&
+      line3Ref.current &&
+      containerRef.current &&
+      descriptionRef.current
+    ) {
+      setAnimationReady(true);
+    }
+  }, [isLoading, hero]);
+
+  useHeroAnimations(
+    {
+      containerRef,
+      line1Ref,
+      line2Ref,
+      line3Ref,
+      descriptionRef,
+    },
+    animationReady
+  );
 
   if (isLoading) return <div>Loading projects...</div>;
   if (!hero) return <div>No hero data found</div>;
-
 
   return (
     <section

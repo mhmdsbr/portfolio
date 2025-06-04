@@ -38,7 +38,7 @@ export default function RootLayout({
         <meta name="description" content="Personal portfolio website" />
       </Head>
       <body className={`${poppins.variable} ${robotoMono.variable} font-sans antialiased`}>
-      <ReactLenis root>
+        <ReactLenis root>
           {children}
         </ReactLenis>
       </body>

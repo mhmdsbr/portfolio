@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLinkedin, faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
-import useTitleScrollAnimation from '@/hooks/useTitleScrollAnimation';
+import useTitleScrollAnimation from '@/hooks/animations/useTitleScrollAnimation';
 
 export default function About() {
   const titleRef = useRef<HTMLHeadingElement | null>(null);

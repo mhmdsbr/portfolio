@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import useHeaderAnimations from '@/hooks/useHeaderAnimations'
+import useHeaderAnimations from '@/hooks/animations/useHeaderAnimations'
 
 export default function Header() {
   const containerRef = useRef<HTMLDivElement>(null)
