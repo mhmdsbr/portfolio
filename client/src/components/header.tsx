@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import useHeaderAnimations from '@/hooks/animations/useHeaderAnimations'
 
 export default function Header() {
@@ -8,12 +8,17 @@ export default function Header() {
   const headerRef = useRef<HTMLDivElement>(null)
   const expandRef = useRef<HTMLDivElement>(null)
   const reloadTextRef = useRef<HTMLSpanElement>(null)
+  const titleRef = useRef<HTMLSpanElement>(null)
+
+  const [currentTitle, setCurrentTitle] = useState('Welcome')
 
   useHeaderAnimations({
     containerRef,
     headerRef,
     expandRef,
-    reloadTextRef
+    reloadTextRef,
+    titleRef,
+    setCurrentTitle
   })
 
   return (
@@ -24,7 +29,7 @@ export default function Header() {
       >
         <span className="flex items-baseline">
           &lt;
-          <span className="px-2">Welcome</span>
+          <span ref={titleRef} className="px-2">{currentTitle}</span>
           <div
             ref={expandRef}
             className="whitespace-nowrap text-primary-orange overflow-hidden max-w-0 opacity-0 border-r-2 border-r-transparent"

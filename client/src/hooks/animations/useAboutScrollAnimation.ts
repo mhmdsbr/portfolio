@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,15 +9,19 @@ export default function useAboutScrollAnimation({
   titleRef,
   textRef,
   containerRef,
+  isReady,
 }: {
   titleRef: React.RefObject<HTMLElement | null>;
   textRef: React.RefObject<HTMLElement | null>;
   containerRef: React.RefObject<HTMLElement | null>;
+  isReady: boolean;
 }) {
   const originalTextsRef = useRef<string[]>([]);
   const hasInitialized = useRef(false);
 
   useEffect(() => {
+    if (!isReady) return;
+
     gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
     if (!titleRef.current || !textRef.current || !containerRef.current) return;
@@ -116,5 +121,5 @@ export default function useAboutScrollAnimation({
       if (t) t.kill();
       window.removeEventListener("resize", resizeHandler);
     };
-  }, [titleRef, textRef, containerRef]);
+  }, [titleRef, textRef, containerRef, isReady]);
 }

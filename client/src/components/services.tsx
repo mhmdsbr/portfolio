@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function About() {
+export default function Services() {
   useLayoutEffect(() => {
     const cards = gsap.utils.toArray('.service-card');
 
@@ -39,7 +39,7 @@ export default function About() {
   }, []);
 
   return (
-    <section className="block w-full overflow-hidden mx-auto my-10 text-center">
+    <section id="services" className="block w-full overflow-hidden mx-auto my-10 text-center">
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto">
         <h2 className="flex justify-center text-8xl font-bold text-center font-mono">
           What I do

@@ -7,6 +7,8 @@ export const getApiBaseUrl = () => {
 export const API_CONFIG = {
   endpoints: {
     hero: 'portfolio/v2/hero-portfolio',
+    about: 'portfolio/v2/about-portfolio',
+    experience: 'portfolio/v2/summary-portfolio',
   },
   defaultParams: {
     cache: 'force-cache',

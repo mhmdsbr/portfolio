@@ -128,7 +128,7 @@ export default function Projects() {
   }, []);
 
   return (
-    <section className="px-6 py-16 text-white">
+    <section id="projects" className="px-6 py-16 text-white">
       <h2 className="text-5xl md:text-8xl font-bold text-center font-mono mb-12">
         Projects
       </h2>

@@ -1,4 +1,5 @@
-import { RefObject } from 'react'
+import { RefObject, Dispatch, SetStateAction } from 'react'
+
 
 export interface BackgroundGradientMouse {
   x: number
@@ -20,6 +21,8 @@ export interface HeaderAnimationRefs {
   headerRef: RefObject<HTMLElement | null>
   expandRef: RefObject<HTMLElement | null>
   reloadTextRef: RefObject<HTMLElement | null>
+  titleRef?: RefObject<HTMLSpanElement | null>
+  setCurrentTitle?: Dispatch<SetStateAction<string>> | null
 }
 
 export interface HeroAnimationRefs {

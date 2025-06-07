@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLinkedin, faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
 import useTitleScrollAnimation from '@/hooks/animations/useTitleScrollAnimation';
 
-export default function About() {
+export default function Contact() {
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   useTitleScrollAnimation(titleRef);
 
@@ -26,7 +26,7 @@ export default function About() {
   };
 
   return (
-    <section className="block w-full overflow-hidden mx-auto text-center">
+    <section id="contact" className="block w-full overflow-hidden mx-auto text-center">
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto max-w-5xl px-4">
         <h2 ref={titleRef} className="text-8xl font-bold text-center font-mono mb-12">
           <span className="word inline-block">Contact</span>{" "}

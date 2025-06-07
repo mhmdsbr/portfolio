@@ -1,36 +1,26 @@
-'use client'
+'use client';
 
-import React, { useEffect, useRef } from "react";
-import { BackgroundGradientStar } from "@/types/animation";
-import { drawStarsWithGradient } from "@/utils/drawStars";
+import React, { useEffect, useRef } from 'react';
+import { BackgroundGradientStar } from '@/types/animation';
+import { drawStarsWithGradient } from '@/utils/drawStars';
 
 export default function BackgroundGradient() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stars = useRef<BackgroundGradientStar[]>([]);
+  const animationFrameId = useRef<number | null>(null);
+  const timeoutId = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationFrameId: number;
-
-    stars.current = Array.from({ length: 100 }, () => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      baseX: 0,
-      baseY: 0,
-      radius: Math.random() * 1 + 0.5,
-      alpha: Math.random(),
-      delta: Math.random() * 0.02
-    }));
-
+    const dpr = window.devicePixelRatio || 1;
     const resizeCanvas = () => {
-      const dpr = window.devicePixelRatio || 1;
-      const width = document.documentElement.scrollWidth;
-      const height = document.documentElement.scrollHeight;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
 
       canvas.width = width * dpr;
       canvas.height = height * dpr;
@@ -40,34 +30,40 @@ export default function BackgroundGradient() {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
 
-      stars.current.forEach(star => {
-        star.baseX = star.x = Math.random() * width;
-        star.baseY = star.y = Math.random() * height;
-      });
+      stars.current = Array.from({ length: 100 }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        baseX: 0,
+        baseY: 0,
+        radius: Math.random() * 1 + 0.5,
+        alpha: Math.random(),
+        delta: 0.01 + Math.random() * 0.04,
+      }));
     };
 
     const animate = () => {
       drawStarsWithGradient(ctx, canvas, stars.current);
-      animationFrameId = requestAnimationFrame(animate);
+      timeoutId.current = setTimeout(() => {
+        animationFrameId.current = requestAnimationFrame(animate);
+      }, 33);
     };
 
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener('resize', resizeCanvas);
     animate();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", resizeCanvas);
+      if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
+      if (timeoutId.current) clearTimeout(timeoutId.current);
+      window.removeEventListener('resize', resizeCanvas);
     };
   }, []);
 
   return (
-    <>
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 -z-10 w-full h-full"
-        aria-hidden="true"
-      />
-    </>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 -z-10 w-full h-full"
+      aria-hidden="true"
+    />
   );
 }

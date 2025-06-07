@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useApiEntry } from '@/hooks/useApiEntry';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,8 +30,24 @@ const experiences = [
 
 export default function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { data: experience, isLoading } = useApiEntry('portfolio/v2/summary-portfolio');
+  const [animationReady, setAnimationReady] = useState(false);
+  const title = experience?.summary_title;
+
+  useEffect(()=> {
+    if(
+      !isLoading
+      && experience
+      && containerRef.current
+    ) {
+      setAnimationReady(true);
+    }
+  }, [experience, isLoading]);
+
 
   useEffect(() => {
+    if (!animationReady) return;
+
     const elements = containerRef.current?.querySelectorAll('.experience-item');
 
     elements?.forEach((el, index) => {
@@ -51,11 +68,11 @@ export default function Experience() {
         }
       );
     });
-  }, []);
+  }, [animationReady]);
 
   return (
-    <section ref={containerRef} className="px-6 py-16 text-white">
-      <h2 className="text-8xl font-bold text-center font-mono mb-12">Experience</h2>
+    <section id="experience" ref={containerRef} className="px-6 py-16 text-white">
+      <h2 className="text-8xl font-bold text-center font-mono mb-12">{title}</h2>
       <div className="space-y-10 max-w-3xl mx-auto">
         {experiences.map((exp, i) => (
           <div

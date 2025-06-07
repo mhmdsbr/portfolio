@@ -24,8 +24,6 @@ export default function useHeroAnimations(
 
         if (!line1Ref.current || !line2Ref.current || !line3Ref.current) return;
 
-        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-
         const isMobile = window.innerWidth < 1024;
 
         const titleTimeline = gsap.timeline();
@@ -115,7 +113,6 @@ export default function useHeroAnimations(
 
         return () => {
           window.removeEventListener('resize', handleResize);
-          ScrollTrigger.getAll().forEach(trigger => trigger.kill());
         };
       });
     },

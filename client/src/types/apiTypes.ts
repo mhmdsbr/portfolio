@@ -9,6 +9,17 @@ export interface Hero {
   subtitle_two: string;
 }
 
+export interface About {
+  about_title: string;
+  about_description: string;
+}
+
+export interface Experience {
+  summary_title: string;
+}
+
 export type EndpointMap = {
   [API_CONFIG.endpoints.hero]: Hero;
+  [API_CONFIG.endpoints.about]: About;
+  [API_CONFIG.endpoints.experience]: Experience;
 };
