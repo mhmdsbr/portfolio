@@ -1,8 +1,8 @@
 export const SECTIONS = [
   { id: "hero", title: "Welcome" },
-  { id: "about", title: "Who I am?" },
-  { id: "experience", title: "What I do?" },
-  { id: "services", title: "What I offer?" },
+  { id: "about", title: "Know me more." },
+  { id: "experience", title: "What I've done so far!" },
+  { id: "services", title: "I can help you with:" },
   { id: "projects", title: "Here is my portfolio" },
   { id: "contact", title: "Let's talk more" },
 ];

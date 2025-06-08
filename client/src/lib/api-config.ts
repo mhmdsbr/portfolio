@@ -9,6 +9,7 @@ export const API_CONFIG = {
     hero: 'portfolio/v2/hero-portfolio',
     about: 'portfolio/v2/about-portfolio',
     experience: 'portfolio/v2/summary-portfolio',
+    services: 'portfolio/v2/services-portfolio',
   },
   defaultParams: {
     cache: 'force-cache',

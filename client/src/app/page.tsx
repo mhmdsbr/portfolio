@@ -5,17 +5,19 @@ import Footer from '@/components/footer';
 import Hero from '@/components/hero';
 import About from '@/components/about';
 import Experience from '@/components/experience';
-// import Services from '@/components/services';
-// import Projects from '@/components/projects';
-// import Contact from '@/components/contact';
+import Services from '@/components/services';
+import Projects from '@/components/projects';
+import Contact from '@/components/contact';
 import BackgroundGradient from '@/components/backgroundGradient';
 import { ApiDataProvider } from '@/providers/ApiDataProvider';
 import { API_CONFIG } from '@/lib/api-config';
+import Testimonials from '@/components/testimonials';
 
 const endpoints = [
   API_CONFIG.endpoints.hero,
   API_CONFIG.endpoints.about,
   API_CONFIG.endpoints.experience,
+  API_CONFIG.endpoints.services,
 ]
 
 export default function Home() {
@@ -27,9 +29,10 @@ export default function Home() {
         <Hero />
         <About />
         <Experience />
-        {/* <Services />
+        <Services />
         <Projects />
-        <Contact /> */}
+        <Testimonials />
+        <Contact />
         <Footer />
       </main>
     </ApiDataProvider>

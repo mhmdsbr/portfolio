@@ -16,10 +16,26 @@ export interface About {
 
 export interface Experience {
   summary_title: string;
+  summaries: {
+    from: string;
+    to: string;
+    title: string;
+    company: string;
+    description: string;
+  };
+}
+
+export interface Services {
+  services_title: string;
+  services: {
+    title: string;
+    content: string;
+  }
 }
 
 export type EndpointMap = {
   [API_CONFIG.endpoints.hero]: Hero;
   [API_CONFIG.endpoints.about]: About;
   [API_CONFIG.endpoints.experience]: Experience;
+  [API_CONFIG.endpoints.services]: Services;
 };
