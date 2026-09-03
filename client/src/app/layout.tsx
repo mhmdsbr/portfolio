@@ -1,9 +1,11 @@
 import Head from 'next/head';
 import type { Metadata } from "next";
 import { Poppins, Roboto_Mono } from "next/font/google";
-import "./globals.css";
 import { ReactLenis } from 'lenis/react'
+import { ApiDataProvider } from '@/providers/ApiDataProvider';
+import { API_CONFIG } from '@/lib/api-config';
 
+import "./globals.css";
 
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'

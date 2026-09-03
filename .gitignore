@@ -14,25 +14,6 @@
 !.env.j2
 !.env.vars.*
 
-# WP-CLI
-wp-cli.yml
-
-# Cache
-.php_cs.cache
-
 # Docker Config
 /server/docker/mysql
 !/server/docker/mysql/my.cnf
-
-
-# Wordpress
-/server/public/*
-!/server/public/wp-content/
-/server/public/wp-content/plugins
-/server/public/wp-content/uploads
-!/server/public/wp-content/themes
-/server/public/wp-content/themes/twentytwentyfour
-/server/public/wp-content/db.php
-/server/public/wp-content/index.php
-/server/docker/nginx/certs
-

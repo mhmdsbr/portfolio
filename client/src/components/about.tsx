@@ -2,20 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import useAboutScrollAnimation from "@/hooks/animations/useAboutScrollAnimation";
-import { useApiEntry } from "@/hooks/useApiEntry";
+import { useAllData } from '@/hooks/useAllData';
 
 export default function About() {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
 
-  const { data: about, isLoading } = useApiEntry(
-    "portfolio/v2/about-portfolio"
-  );
-  const [ animationReady, setAnimationReady ] = useState(false);
+  const { data: allData, isLoading } = useAllData();
+  const [animationReady, setAnimationReady] = useState(false);
 
-  const titleWords = about?.about_title?.split(" ") || [];
-  const content = about?.about_description;
+  const about = allData?.about;
+
+  const titleWords = about?.title?.split(" ") || [];
+  const content = about?.description;
 
   useEffect(() => {
     if (
@@ -29,8 +29,12 @@ export default function About() {
     }
   }, [isLoading, about]);
 
-  useAboutScrollAnimation({ titleRef, textRef, containerRef, isReady: animationReady });
-
+  useAboutScrollAnimation({
+    titleRef,
+    textRef,
+    containerRef,
+    isReady: animationReady,
+  });
 
   return (
     <section

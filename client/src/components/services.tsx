@@ -3,19 +3,17 @@
 import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useApiEntry } from "@/hooks/useApiEntry";
+import { useAllData } from "@/hooks/useAllData";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Services() {
-  const { data: services, isLoading } = useApiEntry(
-    "portfolio/v2/services-portfolio"
-  );
+  const { data: allData, isLoading } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
 
-  const title = services?.services_title;
-  const content = services?.services;
-  console.log(content);
+  const services = allData?.services
+  const title = services?.title;
+  const content = services?.items;
 
 
   useEffect(() => {

@@ -3,18 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useApiEntry } from "@/hooks/useApiEntry";
+import { useAllData } from "@/hooks/useAllData";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { data: experience, isLoading } = useApiEntry(
-    "portfolio/v2/summary-portfolio"
-  );
+  const { data: allData, isLoading } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
-  const title = experience?.summary_title;
-  const experiencItems = experience?.summaries;
+
+  const experience = allData?.summary
+  const title = experience?.title;
+  const experiencItems = experience?.jobs;
 
   useEffect(() => {
     if (!isLoading && experience && containerRef.current) {

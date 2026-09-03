@@ -1,27 +1,27 @@
 import useSWR from 'swr';
 import { getApiBaseUrl, DEFAULT_SWR_OPTIONS } from '@/lib/api-config';
-import { EndpointMap } from '@/types/apiTypes';
+import { EndpointMap, EndpointKeys } from '@/types/api';
 
-const useApiFetcher = <T extends keyof EndpointMap>(endpoints: T[]) => {
+const useApiFetcher = <T extends EndpointKeys>(endpoints: T[]) => {
   const apiBaseUrl = getApiBaseUrl();
 
-  if (!apiBaseUrl) {
-    throw new Error('NEXT_PUBLIC_API_URL environment variable is not set');
-  }
-
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     endpoints,
     async (endpoints) => {
       const results = await Promise.all(
         endpoints.map(async (endpoint) => {
-          const sanitizedEndpoint = endpoint.replace(/[^a-zA-Z0-9-_/]/g, '');
-          const url = `${apiBaseUrl}/${sanitizedEndpoint}`;
-
+          // Build URL - if apiBaseUrl is empty, use relative path
+          const url = apiBaseUrl ? `${apiBaseUrl}/${endpoint}` : `/${endpoint}`;
+          
           const response = await fetch(url);
+          
           if (!response.ok) {
-            throw new Error(`Failed to fetch ${endpoint}`);
+            const errorText = await response.text();
+            throw new Error(`Failed to fetch ${endpoint}: ${response.status} ${errorText}`);
           }
-          return response.json() as Promise<EndpointMap[typeof endpoint]>;
+          
+          const json = await response.json();
+          return json as EndpointMap[T];
         })
       );
 
@@ -30,13 +30,18 @@ const useApiFetcher = <T extends keyof EndpointMap>(endpoints: T[]) => {
         return acc;
       }, {} as { [K in T]: EndpointMap[K] });
     },
-    DEFAULT_SWR_OPTIONS
+    {
+      ...DEFAULT_SWR_OPTIONS,
+      // Custom fetcher key to avoid re-fetching
+      revalidateIfStale: false,
+    }
   );
 
   return {
     data: data || ({} as { [K in T]: EndpointMap[K] }),
     isLoading,
-    error
+    error,
+    mutate,
   };
 };
 

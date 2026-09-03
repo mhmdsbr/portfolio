@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useApiEntry } from '@/hooks/useApiEntry';
+import { useAllData } from '@/hooks/useAllData';
+
 import Image from 'next/image';
 import useHeroAnimations from '@/hooks/animations/useHeroAnimations';
 
@@ -12,7 +13,12 @@ export default function Hero() {
   const line3Ref = useRef<HTMLSpanElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
-  const { data: hero, isLoading } = useApiEntry('portfolio/v2/hero-portfolio');
+    const { data: allData, isLoading } = useAllData();
+
+
+      const hero = allData?.hero;
+
+
   const [animationReady, setAnimationReady] = useState(false);
 
   useEffect(() => {
