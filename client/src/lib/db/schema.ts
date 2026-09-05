@@ -341,3 +341,48 @@ export const config = pgTable('config', {
 
 export type Config = typeof config.$inferSelect
 export type NewConfig = typeof config.$inferInsert
+
+
+// =============================================
+// 13. HEADER SECTIONS (Individual records)
+// =============================================
+export const headerSections = pgTable('header_sections', {
+  id: serial('id').primaryKey(),
+  sectionId: text('section_id').notNull().unique(), // hero, about, experience, etc.
+  title: text('title').notNull(),
+  sortOrder: integer('sort_order').default(0),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+
+export type HeaderSection = typeof headerSections.$inferSelect
+export type NewHeaderSection = typeof headerSections.$inferInsert
+
+// =============================================
+// 14. HEADER SETTINGS (Default title, etc.)
+// =============================================
+export const headerSettings = pgTable('header_settings', {
+  id: serial('id').primaryKey(),
+  defaultTitle: text('default_title').default('Welcome'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+
+export type HeaderSettings = typeof headerSettings.$inferSelect
+export type NewHeaderSettings = typeof headerSettings.$inferInsert
+
+// =============================================
+// 14. FOOTER SECTION
+// =============================================
+export const footerSection = pgTable('footer_section', {
+  id: serial('id').primaryKey(),
+  companyName: text('company_name').default('Your Company'),
+  privacyPolicy: text('privacy_policy'),
+  termsOfService: text('terms_of_service'),
+  copyrightText: text('copyright_text'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+
+export type FooterSection = typeof footerSection.$inferSelect
+export type NewFooterSection = typeof footerSection.$inferInsert

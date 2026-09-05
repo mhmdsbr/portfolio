@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { TextPlugin } from "gsap/TextPlugin";
 import { HeaderAnimationRefs } from "@/types/animation";
-import { SECTIONS } from "@/lib/sections-config"
-
 
 gsap.registerPlugin(TextPlugin, ScrollTrigger);
 
@@ -17,12 +15,16 @@ export default function useHeaderAnimations({
   reloadTextRef,
   titleRef,
   setCurrentTitle,
+  sections,
+  isReady = false,
 }: HeaderAnimationRefs) {
+  const scrollTriggersRef = useRef<ScrollTrigger[]>([]);
 
-  // Initial animations
   useEffect(() => {
+    if (!isReady) return;
     if (!containerRef.current || !headerRef.current) return;
 
+    // Set initial states
     gsap.set(containerRef.current, { opacity: 0 });
     gsap.set(headerRef.current, { y: -200 });
 
@@ -30,12 +32,13 @@ export default function useHeaderAnimations({
     tl.to(containerRef.current, {
       opacity: 1,
       duration: 0.5,
+      ease: "power2.out",
     }).to(headerRef.current, {
       y: 0,
       duration: 1.5,
       ease: "bounce.out",
     });
-  }, [containerRef, headerRef]);
+  }, [containerRef, headerRef, isReady]); // ✅ Re-run when isReady changes
 
   // Hover animations
   useEffect(() => {
@@ -43,7 +46,7 @@ export default function useHeaderAnimations({
     const reloadText = reloadTextRef.current;
     const header = headerRef.current;
 
-    if (!expandElement || !reloadText || !header) return;
+    if (!expandElement || !reloadText || !header || !isReady) return;
 
     const originalText = reloadText.textContent || "";
 
@@ -76,12 +79,12 @@ export default function useHeaderAnimations({
       header.removeEventListener("mouseenter", playAnimation);
       header.removeEventListener("mouseleave", reverseAnimation);
     };
-  }, [expandRef, reloadTextRef, headerRef]);
+  }, [expandRef, reloadTextRef, headerRef, isReady]);
 
   // Scroll-based background change
   useEffect(() => {
     const header = headerRef.current;
-    if (!header) return;
+    if (!header || !isReady) return;
 
     ScrollTrigger.create({
       trigger: document.body,
@@ -91,7 +94,7 @@ export default function useHeaderAnimations({
           "bg-primary-cyan/80",
           "backdrop-blur",
           "transition-colors",
-          "duration-300"
+          "duration-300",
         );
       },
       onLeaveBack: () => {
@@ -100,77 +103,63 @@ export default function useHeaderAnimations({
     });
 
     return () => ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-  }, [headerRef]);
+  }, [headerRef, isReady]);
 
-  // Section-based title changes
+  // Section-based title changes - FIXED
   useEffect(() => {
     const titleElement = titleRef?.current;
-    if (!titleElement || !setCurrentTitle) return;
+    if (
+      !titleElement ||
+      !setCurrentTitle ||
+      !sections ||
+      sections.length === 0 ||
+      !isReady
+    )
+      return;
 
-    const setupTitleScrollTriggers = () => {
-      const scrollTriggers: ScrollTrigger[] = [];
-
-      SECTIONS.forEach((section) => {
-        const sectionElement = document.getElementById(section.id);
-        if (sectionElement) {
-          const trigger = ScrollTrigger.create({
-            trigger: sectionElement,
-            start: "top center",
-            end: "bottom center",
-            markers: true,
-            onEnter: () => {
-              gsap.to(titleElement, {
-                opacity: 0,
-                duration: 0.2,
-                onComplete: () => {
-                  setCurrentTitle(section.title);
-                  gsap.to(titleElement, {
-                    opacity: 1,
-                    duration: 0.2,
-                  });
-                },
-              });
-            },
-            onEnterBack: () => {
-              gsap.to(titleElement, {
-                opacity: 0,
-                duration: 0.2,
-                onComplete: () => {
-                  setCurrentTitle(section.title);
-                  gsap.to(titleElement, {
-                    opacity: 1,
-                    duration: 0.2,
-                  });
-                },
-              });
-            },
-          });
-          scrollTriggers.push(trigger);
-        }
-      });
-
-      return scrollTriggers;
-    };
-
-    const retryDelays = [100, 300, 600];
-    const timers: NodeJS.Timeout[] = [];
-    let scrollTriggers: ScrollTrigger[] = [];
-
-    const trySetup = () => {
-      scrollTriggers.forEach((t) => t.kill());
-      scrollTriggers = setupTitleScrollTriggers();
-    };
-
-    trySetup();
-
-    retryDelays.forEach((delay) => {
-      const timer = setTimeout(trySetup, delay);
-      timers.push(timer);
+    // Create ScrollTriggers for each section
+    sections.forEach((section) => {
+      console.log(
+        `Creating trigger for section: ${section.title}, id: ${section.id}`,
+      );
+      const sectionElement = document.getElementById(section.id);
+      console.log(`Element found:`, sectionElement);
+      if (sectionElement) {
+        const trigger = ScrollTrigger.create({
+          trigger: sectionElement,
+          markers: true,
+          start: "top center",
+          end: "bottom center",
+          onEnter: () => {
+            setCurrentTitle(section.title);
+          },
+          onEnterBack: () => {
+            setCurrentTitle(section.title);
+          },
+        });
+        scrollTriggersRef.current.push(trigger);
+      }
     });
 
+    // Handle scroll back to top - show first section title
+    const topTrigger = ScrollTrigger.create({
+      trigger: document.body,
+      start: "top top",
+      end: "top top",
+      onEnter: () => {
+        if (sections.length > 0) {
+          setCurrentTitle(sections[0].title);
+        }
+      },
+    });
+    scrollTriggersRef.current.push(topTrigger);
+
+    // Refresh ScrollTrigger after creation
+    ScrollTrigger.refresh();
+
     return () => {
-      scrollTriggers.forEach((trigger) => trigger.kill());
-      timers.forEach((timer) => clearTimeout(timer));
+      scrollTriggersRef.current.forEach((trigger) => trigger.kill());
+      scrollTriggersRef.current = [];
     };
-  }, [titleRef, setCurrentTitle]);
+  }, [titleRef, setCurrentTitle, sections, isReady]);
 }

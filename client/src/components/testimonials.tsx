@@ -48,7 +48,7 @@ const Testimonials: React.FC = () => {
     const colors = ["#337BFF", "#FF5733", "#33FF57", "#FF33A1", "#8A33FF"];
 
     return (
-        <div className={styles['testimonial-slider']}>
+        <section id="testimonial" className={styles['testimonial-slider']}>
             <Swiper
                 modules={[Autoplay]}
                 slidesPerView={3}
@@ -82,7 +82,7 @@ const Testimonials: React.FC = () => {
                     </SwiperSlide>
                 ))}
             </Swiper>
-        </div>
+        </section>
     );
 };
 

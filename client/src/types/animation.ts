@@ -1,4 +1,4 @@
-import { RefObject, Dispatch, SetStateAction } from 'react'
+import { RefObject } from 'react'
 
 
 export interface BackgroundGradientMouse {
@@ -16,13 +16,20 @@ export interface BackgroundGradientStar {
   delta: number
 }
 
+export interface HeaderSection {
+  id: string;
+  title: string;
+}
+
 export interface HeaderAnimationRefs {
   containerRef: RefObject<HTMLElement | null>
   headerRef: RefObject<HTMLElement | null>
   expandRef: RefObject<HTMLElement | null>
   reloadTextRef: RefObject<HTMLElement | null>
   titleRef?: RefObject<HTMLSpanElement | null>
-  setCurrentTitle?: Dispatch<SetStateAction<string>> | null
+  setCurrentTitle: (title: string) => void
+  sections?: HeaderSection[]
+  isReady?: boolean
 }
 
 export interface HeroAnimationRefs {

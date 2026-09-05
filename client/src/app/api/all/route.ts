@@ -30,8 +30,10 @@ export async function GET(): Promise<
       projectsData,
       projectItemsData,
       contactData,
-      footerData,
       configData,
+      headerSectionsData,
+      headerSettingsData,
+      footerData,
     ] = await Promise.all([
       db.select().from(schema.sidebar),
       db
@@ -78,8 +80,13 @@ export async function GET(): Promise<
         .from(schema.projectItems)
         .orderBy(asc(schema.projectItems.sortOrder)),
       db.select().from(schema.contactSection),
-      db.select().from(schema.footer),
       db.select().from(schema.config),
+      db
+        .select()
+        .from(schema.headerSections)
+        .orderBy(asc(schema.headerSections.sortOrder)),
+      db.select().from(schema.headerSettings),
+      db.select().from(schema.footerSection),
     ]);
 
     // Extract first records
@@ -92,8 +99,9 @@ export async function GET(): Promise<
     const testimonials = testimonialsData[0];
     const projects = projectsData[0];
     const contact = contactData[0];
-    const footerRecord = footerData[0];
     const configRecord = configData[0];
+    const headerSettings = headerSettingsData[0];
+    const footerRecord = footerData[0];
 
     // Transform social media
     const socialMediaMap = socialData.reduce<Record<string, string>>(
@@ -205,10 +213,6 @@ export async function GET(): Promise<
         phone: contact?.phone ?? null,
         email: contact?.email ?? null,
       },
-      footer: {
-        terms_policies: footerRecord?.termsPolicies ?? null,
-        disclaimer: footerRecord?.disclaimer ?? null,
-      },
       config: {
         api_base_url: configRecord?.apiBaseUrl ?? null,
         smtp: {
@@ -218,6 +222,21 @@ export async function GET(): Promise<
           password: configRecord?.smtpPassword ?? null,
         },
         recaptcha_site_key: configRecord?.recaptchaSiteKey ?? null,
+      },
+      header: {
+        sections: headerSectionsData.map((section) => ({
+          id: section.id,
+          sectionId: section.sectionId,
+          title: section.title,
+          sortOrder: section.sortOrder || 0,
+        })),
+        defaultTitle: headerSettings?.defaultTitle || "Welcome",
+      },
+      footer: {
+        companyName: footerRecord?.companyName || "Your Company",
+        privacyPolicy: footerRecord?.privacyPolicy || null,
+        termsOfService: footerRecord?.termsOfService || null,
+        copyrightText: footerRecord?.copyrightText || null,
       },
     };
 

@@ -112,11 +112,6 @@ export interface ContactResponse {
   email: string | null;
 }
 
-export interface FooterResponse {
-  terms_policies: string | null;
-  disclaimer: string | null;
-}
-
 export interface ConfigResponse {
   api_base_url: string | null;
   smtp: {
@@ -126,6 +121,25 @@ export interface ConfigResponse {
     password: string | null;
   };
   recaptcha_site_key: string | null;
+}
+
+export interface HeaderSection {
+  id: number
+  sectionId: string // hero, about, experience, etc.
+  title: string
+  sortOrder: number
+}
+
+export interface HeaderResponse {
+  sections: HeaderSection[]
+  defaultTitle: string
+}
+
+export interface FooterResponse {
+  companyName: string
+  privacyPolicy: string | null
+  termsOfService: string | null
+  copyrightText: string | null
 }
 
 // =============================================
@@ -141,8 +155,9 @@ export interface AllDataResponse {
   testimonials: TestimonialsResponse;
   projects: ProjectsResponse;
   contact: ContactResponse;
-  footer: FooterResponse;
   config: ConfigResponse;
+  header: HeaderResponse
+  footer: FooterResponse
 }
 
 // =============================================

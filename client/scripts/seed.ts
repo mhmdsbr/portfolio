@@ -18,10 +18,12 @@ interface SeedConfig {
   testimonials: schema.NewTestimonialsSection;
   testimonialItems: Omit<schema.NewTestimonialItem, "id">[];
   contact: schema.NewContactSection;
-  footer: schema.NewFooter;
   config: schema.NewConfig;
   projects: schema.NewProjectsSection;
   projectItems: Omit<schema.NewProjectItem, "id">[];
+  headerSections: Omit<schema.NewHeaderSection, 'id'>[]
+  headerSettings: schema.NewHeaderSettings
+  footer: schema.NewFooterSection;
 }
 
 const seedData: SeedConfig = {
@@ -176,54 +178,6 @@ const seedData: SeedConfig = {
   projectItems: [
     {
       projectsId: 0,
-      title: "E-commerce Store",
-      category: "React",
-      description:
-        "A fast and responsive online store built with React, Redux, and Stripe integration.",
-      image: "/images/ecommerce.png",
-      link: "https://ecommerce-demo.com",
-      github: "https://github.com/yourusername/ecommerce",
-      tech: ["React", "Redux", "Stripe", "Tailwind"],
-      sortOrder: 0,
-    },
-    {
-      projectsId: 0,
-      title: "Corporate Website",
-      category: "WordPress",
-      description:
-        "A professional business website using custom WordPress theme with ACF and custom post types.",
-      image: "/images/company.png",
-      link: "https://company-site.com",
-      github: "https://github.com/yourusername/wordpress-theme",
-      tech: ["WordPress", "PHP", "ACF", "SCSS"],
-      sortOrder: 1,
-    },
-    {
-      projectsId: 0,
-      title: "Portfolio Website",
-      category: "Next.js",
-      description:
-        "Modern portfolio site made with Next.js 15, TypeScript, and Tailwind CSS.",
-      image: "/images/portfolio.png",
-      link: "https://portfolio.com",
-      github: "https://github.com/yourusername/portfolio",
-      tech: ["Next.js", "TypeScript", "Tailwind", "GSAP"],
-      sortOrder: 2,
-    },
-    {
-      projectsId: 0,
-      title: "Blog Platform",
-      category: "WordPress",
-      description:
-        "Full-featured blog platform with SEO optimization, custom Gutenberg blocks, and AMP support.",
-      image: "/images/blog.png",
-      link: "https://blog-platform.com",
-      github: "https://github.com/yourusername/blog-platform",
-      tech: ["WordPress", "Gutenberg", "AMP", "Yoast SEO"],
-      sortOrder: 3,
-    },
-    {
-      projectsId: 0,
       title: "Admin Dashboard",
       category: "React",
       description:
@@ -294,10 +248,6 @@ const seedData: SeedConfig = {
     phone: "+1 234 567 890",
     email: "john@example.com",
   },
-  footer: {
-    termsPolicies: "© 2024 John Doe. All rights reserved.",
-    disclaimer: "Built with Next.js 15 and PostgreSQL",
-  },
   config: {
     apiBaseUrl: "https://api.example.com",
     smtpHost: "smtp.gmail.com",
@@ -305,6 +255,26 @@ const seedData: SeedConfig = {
     smtpUsername: "john@example.com",
     smtpPassword: "your-password-here",
     recaptchaSiteKey: "your-recaptcha-key",
+  },
+  headerSections: [
+    { sectionId: 'hero', title: 'Welcome', sortOrder: 0 },
+    { sectionId: 'about', title: 'Know me more.', sortOrder: 1 },
+    { sectionId: 'experience', title: "What I've done so far!", sortOrder: 2 },
+    { sectionId: 'services', title: 'I can help you with:', sortOrder: 3 },
+    { sectionId: 'projects', title: 'Here is my portfolio', sortOrder: 4 },
+    { sectionId: 'testimonial', title: 'What people say', sortOrder: 5 },
+    { sectionId: 'contact', title: "Let's talk more", sortOrder: 6 },
+  ],
+  headerSettings: {
+    defaultTitle: 'Welcome',
+  },
+  footer: {
+    companyName: "Your Company",
+    privacyPolicy:
+      "This is your privacy policy content. You can replace this with real content explaining how you handle user data, cookies, etc.",
+    termsOfService:
+      "These are your terms of service. Replace this with the details of how users may use your service, restrictions, liabilities, etc.",
+    copyrightText: "All rights reserved.",
   },
 };
 
@@ -432,6 +402,15 @@ async function seed() {
 
     // 11. Insert config
     await db.insert(schema.config).values(seedData.config);
+
+    // 11. Insert header sections
+    await db.insert(schema.headerSections).values(seedData.headerSections)
+
+    // 12. Insert header settings
+    await db.insert(schema.headerSettings).values(seedData.headerSettings)
+
+    // 12. Insert footer section
+    await db.insert(schema.footerSection).values(seedData.footer);
 
     console.log("✅ Database seeded successfully!");
     console.log(`📊 Inserted:`, {

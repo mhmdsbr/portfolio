@@ -33,6 +33,8 @@ export default function Projects() {
   // Get projects from API
   const allProjects = allData?.projects?.items || [];
 
+  console.log(allProjects)
+
   // Extract unique categories
   const categories = [
     'All',
