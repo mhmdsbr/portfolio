@@ -15,7 +15,7 @@ export default function About() {
   const about = allData?.about;
 
   const titleWords = about?.title?.split(" ") || [];
-  const content = about?.description;
+  const description = about?.description;
 
   useEffect(() => {
     if (
@@ -29,12 +29,23 @@ export default function About() {
     }
   }, [isLoading, about]);
 
+  // ✅ Animation hook - UNCHANGED
   useAboutScrollAnimation({
     titleRef,
     textRef,
     containerRef,
     isReady: animationReady,
   });
+
+  if (isLoading) {
+    return (
+      <section id="about" className="block w-full overflow-hidden mx-auto text-center py-20">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -60,7 +71,7 @@ export default function About() {
             ref={textRef}
             className="flex flex-col justify-start h-[400px] gap-4 w-8/12 mx-auto text-2xl text-justify"
           >
-            <p>{content}</p>
+            <p>{description}</p>
           </div>
         </div>
       </div>

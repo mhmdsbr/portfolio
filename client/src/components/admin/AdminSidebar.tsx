@@ -2,26 +2,28 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { 
-  FiHome, 
-  FiBriefcase, 
-  FiUser, 
-  FiTool, 
-  FiMessageSquare, 
-  FiStar,
+import {
+  FiHome,
+  FiBriefcase,
+  FiUser,
+  FiTool,
+  FiMessageSquare,
+  FiAward,
   FiLogOut,
   FiMenu,
-  FiFileText
+  FiFileText,
+  FiLayout,
 } from 'react-icons/fi'
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: FiHome },
   { href: '/admin/header', label: 'Header', icon: FiMenu },
   { href: '/admin/footer', label: 'Footer', icon: FiFileText },
+  { href: '/admin/hero', label: 'Hero', icon: FiLayout },
   { href: '/admin/projects', label: 'Projects', icon: FiBriefcase },
   { href: '/admin/about', label: 'About', icon: FiUser },
   { href: '/admin/experience', label: 'Experience', icon: FiTool },
-  { href: '/admin/services', label: 'Services', icon: FiStar },
+  { href: '/admin/services', label: 'Services', icon: FiAward },
   { href: '/admin/testimonials', label: 'Testimonials', icon: FiMessageSquare },
 ]
 

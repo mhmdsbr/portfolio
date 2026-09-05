@@ -18,6 +18,8 @@ export default function Hero() {
 
       const hero = allData?.hero;
 
+      console.log("hero", hero)
+
 
   const [animationReady, setAnimationReady] = useState(false);
 
