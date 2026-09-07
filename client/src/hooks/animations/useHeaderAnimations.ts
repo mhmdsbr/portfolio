@@ -127,7 +127,6 @@ export default function useHeaderAnimations({
       if (sectionElement) {
         const trigger = ScrollTrigger.create({
           trigger: sectionElement,
-          markers: true,
           start: "top center",
           end: "bottom center",
           onEnter: () => {

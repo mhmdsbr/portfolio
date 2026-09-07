@@ -33,9 +33,12 @@ export interface HeaderAnimationRefs {
 }
 
 export interface HeroAnimationRefs {
-  containerRef: RefObject<HTMLDivElement | null>
   line1Ref: RefObject<HTMLSpanElement | null>
   line2Ref: RefObject<HTMLSpanElement | null>
   line3Ref: RefObject<HTMLSpanElement | null>
+}
+
+export interface BadgeAnimationRefs extends HeaderAnimationRefs {
+  containerRef: RefObject<HTMLDivElement | null>
   descriptionRef?: RefObject<HTMLParagraphElement | null>
 }
