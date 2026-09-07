@@ -1,46 +1,70 @@
-import { useEffect } from "react";
+"use client";
+
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface Props {
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  panelRefs: React.RefObject<HTMLDivElement | null >[];
+interface UseExperienceScrollAnimationProps {
+  containerRef: React.RefObject<HTMLElement | null>;
+  isReady: boolean;
+  itemsLength: number;
 }
 
-export default function useExperienceScrollAnimation({ containerRef, panelRefs }: Props) {
+export default function useExperienceScrollAnimation({
+  containerRef,
+  isReady,
+  itemsLength,
+}: UseExperienceScrollAnimationProps) {
+  const animationTriggered = useRef(false);
+
   useEffect(() => {
-    const container = containerRef.current;
-    const panels = panelRefs.map(ref => ref.current).filter(Boolean);
+    if (!isReady || !containerRef.current || itemsLength === 0) return;
+    if (animationTriggered.current) return;
 
-    if (!container || panels.length === 0) return;
+    const elements = containerRef.current.querySelectorAll<HTMLElement>(".experience-item");
+    if (elements.length === 0) return;
 
-    // Panel animation timeline
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: container,
-        start: "top top",
-        end: () => `+=${container.scrollHeight}`,
-        scrub: true,
-        pin: true,
-        snap: {
-          snapTo: 1 / (panels.length - 1),
-          duration: 0.5,
-          ease: "power1.inOut"
-        },
-      },
+    // Mark as triggered to prevent re-running
+    animationTriggered.current = true;
+
+    // Kill any existing ScrollTriggers on these elements
+    elements.forEach((el) => {
+      ScrollTrigger.getById(el.id || `trigger-${Math.random()}`)?.kill();
     });
 
-    // Animate panels in sequence
-    panels.forEach((_, i) => {
-      if (i === panels.length - 1) return;
-      tl.to(panels[i], { yPercent: -100 }, "+=0");
+    // Animate each item with scroll trigger
+    elements.forEach((el, index) => {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 80%",
+            toggleActions: "play reverse play reverse",
+            id: `experience-${index}`,
+          },
+          delay: index * 0.1,
+        }
+      );
     });
+
+    // Refresh ScrollTrigger after setup
+    ScrollTrigger.refresh();
 
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-      tl.kill();
+      // Cleanup ScrollTriggers on unmount
+      ScrollTrigger.getAll().forEach((trigger) => {
+        if (trigger.vars?.id?.toString().startsWith("experience-")) {
+          trigger.kill();
+        }
+      });
     };
-  }, [containerRef, panelRefs]);
+  }, [containerRef, isReady, itemsLength]);
 }

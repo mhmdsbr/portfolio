@@ -29,7 +29,6 @@ export default function About() {
     }
   }, [isLoading, about]);
 
-  // ✅ Animation hook - UNCHANGED
   useAboutScrollAnimation({
     titleRef,
     textRef,

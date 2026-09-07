@@ -119,11 +119,7 @@ export default function useHeaderAnimations({
 
     // Create ScrollTriggers for each section
     sections.forEach((section) => {
-      console.log(
-        `Creating trigger for section: ${section.title}, id: ${section.id}`,
-      );
       const sectionElement = document.getElementById(section.id);
-      console.log(`Element found:`, sectionElement);
       if (sectionElement) {
         const trigger = ScrollTrigger.create({
           trigger: sectionElement,

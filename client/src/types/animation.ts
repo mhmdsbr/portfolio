@@ -42,3 +42,12 @@ export interface BadgeAnimationRefs extends HeaderAnimationRefs {
   containerRef: RefObject<HTMLDivElement | null>
   descriptionRef?: RefObject<HTMLParagraphElement | null>
 }
+
+export interface UseProjectsAnimation<T> {
+  projects: T[];
+  setProjects: (items: T[]) => void;
+  activeCategory: string;
+  setActiveCategory: (category: string) => void;
+  filterProjects: (category: string) => T[];
+}
+

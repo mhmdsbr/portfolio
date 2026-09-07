@@ -40,16 +40,10 @@ export default function useAboutScrollAnimation({
         if (text.length > 0) hasContent = true;
       });
 
-      // If no content yet, don't initialize
-      if (!hasContent) {
-        console.log("No content found yet, waiting...");
-        return;
-      }
 
       originalTextsRef.current = textsToCapture;
       hasInitialized.current = true;
 
-      console.log("Captured original texts:", originalTextsRef.current);
     }
 
     const triggerId = "about-section-trigger";

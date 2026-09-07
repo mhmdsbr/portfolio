@@ -11,10 +11,9 @@ export default function Services() {
   const { data: allData, isLoading } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
 
-  const services = allData?.services
+  const services = allData?.services;
   const title = services?.title;
   const content = services?.items;
-
 
   useEffect(() => {
     if (!isLoading && services) {
@@ -69,15 +68,11 @@ export default function Services() {
             content.map((item, i) => (
               <div
                 key={i}
-                className="service-card p-5 rounded-xl border-1 border-gray-700"
+                className="service-card flex-1 p-5 rounded-xl border-1 border-gray-700 flex flex-col text-center"
               >
                 <span>Icon</span>
-                <h3 className="text-left font-bold text-2xl mb-4">
-                  {item.title}
-                </h3>
-                <p className="text-gray-400 text-left">
-                  {item.content}
-                </p>
+                <h3 className="font-bold text-2xl mb-4">{item.title}</h3>
+                <p className="text-gray-400 flex-1">{item.content}</p>
               </div>
             ))}
         </div>
