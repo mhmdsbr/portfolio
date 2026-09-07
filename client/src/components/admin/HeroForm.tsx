@@ -124,7 +124,7 @@ export default function HeroForm({ initialData }: HeroFormProps) {
           Logo URL
         </label>
         <input
-          type="url"
+          type="text"
           value={logoUrl}
           onChange={(e) => setLogoUrl(e.target.value)}
           placeholder="https://example.com/logo.png"
