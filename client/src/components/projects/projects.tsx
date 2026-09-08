@@ -20,7 +20,7 @@ export default function Projects() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [projects, setProjects] = useState<Project[]>([]);
 
-  const { data: allData, isLoading } = useAllData();
+  const { data: allData } = useAllData();
 
   const allProjects: Project[] = useMemo(() => {
     return allData?.projects?.items || [];
@@ -37,10 +37,10 @@ export default function Projects() {
   };
 
   useEffect(() => {
-    if (!isLoading && allProjects.length > 0) {
+    if (allProjects.length > 0) {
       setProjects(allProjects);
     }
-  }, [isLoading, allProjects]);
+  }, [allProjects]);
 
   const { containerRef, animating, handleTabClick } = useProjectsAnimation({
     projects,
@@ -50,17 +50,7 @@ export default function Projects() {
     filterProjects,
   });
 
-  if (isLoading) {
-    return (
-      <section id="projects" className="px-6 py-16 text-white">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!isLoading && projects.length === 0) {
+  if (projects.length === 0) {
     return (
       <section id="projects" className="px-6 py-16 text-white">
         <div className="max-w-6xl mx-auto text-center">

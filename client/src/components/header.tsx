@@ -11,7 +11,7 @@ export default function Header() {
   const reloadTextRef = useRef<HTMLSpanElement>(null);
   const titleRef = useRef<HTMLSpanElement>(null);
 
-  const { data: allData, isLoading } = useAllData();
+  const { data: allData } = useAllData();
   const headerData = allData?.header;
 
   const sections = useMemo(
@@ -29,7 +29,6 @@ export default function Header() {
 
   useEffect(() => {
     if (
-      !isLoading &&
       headerData &&
       headerData.sections &&
       headerData.sections.length > 0
@@ -37,7 +36,7 @@ export default function Header() {
       setIsReady(true);
       setCurrentTitle(headerData.sections[0].title);
     }
-  }, [isLoading, headerData]);
+  }, [headerData]);
 
   useHeaderAnimations({
     containerRef,
@@ -50,7 +49,7 @@ export default function Header() {
     isReady,
   });
 
-  if (isLoading || !isReady) {
+  if (!isReady) {
     return (
       <header className="flex justify-center w-full z-50">
         <div className="flex justify-center w-full py-5 text-2xl fixed lg:text-3xl font-semibold px-10 top-0 z-50">

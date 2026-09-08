@@ -15,14 +15,13 @@ export default function Hero() {
   const line3Ref = useRef<HTMLSpanElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
-  const { data: allData, isLoading } = useAllData();
+  const { data: allData } = useAllData();
   const hero = allData?.hero;
 
   const [animationReady, setAnimationReady] = useState(false);
 
   useEffect(() => {
     if (
-      !isLoading &&
       hero &&
       line1Ref.current &&
       line2Ref.current &&
@@ -32,7 +31,7 @@ export default function Hero() {
     ) {
       setAnimationReady(true);
     }
-  }, [isLoading, hero]);
+  }, [hero]);
 
   useHeroAnimations(
     {
@@ -53,7 +52,6 @@ export default function Hero() {
     animationReady,
   )
 
-  if (isLoading) return <div>Loading projects...</div>;
   if (!hero) return <div>No hero data found</div>;
 
   return (

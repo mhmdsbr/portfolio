@@ -8,7 +8,7 @@ import { useAllData } from "@/hooks/useAllData";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Services() {
-  const { data: allData, isLoading } = useAllData();
+  const { data: allData } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
 
   const services = allData?.services;
@@ -16,10 +16,10 @@ export default function Services() {
   const content = services?.items;
 
   useEffect(() => {
-    if (!isLoading && services) {
+    if (services) {
       setAnimationReady(true);
     }
-  }, [services, isLoading]);
+  }, [services]);
 
   useEffect(() => {
     if (!animationReady) return;

@@ -6,7 +6,7 @@ import useExperienceScrollAnimation from "@/hooks/animations/useExperienceScroll
 
 export default function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { data: allData, isLoading } = useAllData();
+  const { data: allData } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
 
   const experience = allData?.summary;
@@ -14,10 +14,10 @@ export default function Experience() {
   const experienceItems = experience?.jobs || [];
 
   useEffect(() => {
-    if (!isLoading && experience) {
+    if (experience && containerRef.current) {
       setAnimationReady(true);
     }
-  }, [experience, isLoading]);
+  }, [experience]);
 
   useExperienceScrollAnimation({
     containerRef,
@@ -25,7 +25,7 @@ export default function Experience() {
     itemsLength: experienceItems.length,
   });
 
-  if (isLoading || !animationReady) {
+  if (!animationReady) {
     return (
       <section id="experience" className="px-6 py-16 text-white">
         <div className="flex justify-center items-center h-64">

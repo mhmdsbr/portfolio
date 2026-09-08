@@ -3,6 +3,7 @@
 import React, { createContext, useMemo } from 'react';
 import useApiFetcher from '@/hooks/useApiFetcher';
 import { EndpointMap, EndpointKeys } from '@/types/api';
+import Loading from '@/components/loading';
 
 type ApiDataContextType = {
   data: Partial<EndpointMap>;
@@ -33,7 +34,7 @@ export const ApiDataProvider = ({ endpoints, children }: ApiDataProviderProps) =
 
   return (
     <ApiDataContext.Provider value={value}>
-      {children}
+      {isLoading ? <Loading /> : children}
     </ApiDataContext.Provider>
   );
 };

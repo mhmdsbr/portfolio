@@ -4,21 +4,11 @@ import { useState } from 'react'
 import { useAllData } from '@/hooks/useAllData'
 
 const Footer = () => {
-  const { data: allData, isLoading } = useAllData()
+  const { data: allData } = useAllData()
   const footerData = allData?.footer
 
   const [showTerms, setShowTerms] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
-
-  if (isLoading) {
-    return (
-      <footer className="bg-gray-900 text-white py-8">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-sm">Loading...</p>
-        </div>
-      </footer>
-    )
-  }
 
   return (
     <>

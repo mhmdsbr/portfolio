@@ -9,7 +9,7 @@ export default function About() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
 
-  const { data: allData, isLoading } = useAllData();
+  const { data: allData } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
 
   const about = allData?.about;
@@ -19,7 +19,6 @@ export default function About() {
 
   useEffect(() => {
     if (
-      !isLoading &&
       about &&
       containerRef.current &&
       titleRef.current &&
@@ -27,7 +26,7 @@ export default function About() {
     ) {
       setAnimationReady(true);
     }
-  }, [isLoading, about]);
+  }, [about]);
 
   useAboutScrollAnimation({
     titleRef,
@@ -35,16 +34,6 @@ export default function About() {
     containerRef,
     isReady: animationReady,
   });
-
-  if (isLoading) {
-    return (
-      <section id="about" className="block w-full overflow-hidden mx-auto text-center py-20">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section
