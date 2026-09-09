@@ -90,7 +90,7 @@ export default function Projects() {
               key={cat}
               onClick={() => handleTabClick(cat)}
               disabled={animating}
-              className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+              className={`px-6 py-2.5 cursor-pointer rounded-full text-sm font-semibold transition-all duration-300 ${
                 activeCategory === cat
                   ? 'bg-white text-black shadow-lg shadow-white/20 scale-105'
                   : 'bg-gray-800 hover:bg-gray-700 hover:scale-105'

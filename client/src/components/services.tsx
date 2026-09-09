@@ -1,80 +1,99 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useAllData } from "@/hooks/useAllData";
+import useServicesScrollAnimation from "@/hooks/animations/useServicesScrollAnimation";
+import {
+  FiMonitor,
+  FiPenTool,
+  FiPieChart,
+} from "react-icons/fi";
 
-gsap.registerPlugin(ScrollTrigger);
+const iconMap: Record<string, React.ReactNode> = {
+  palette: <FiMonitor className="w-12 h-12 mx-auto text-cyan-400" />,
+  desktop: <FiMonitor className="w-12 h-12 mx-auto text-cyan-400" />,
+  "pen-ruler": <FiPenTool className="w-12 h-12 mx-auto text-cyan-400" />,
+  paintbrush: <FiPenTool className="w-12 h-12 mx-auto text-cyan-400" />,
+  "chart-area": <FiPieChart className="w-12 h-12 mx-auto text-cyan-400" />,
+  bullhorn: <FiPieChart className="w-12 h-12 mx-auto text-cyan-400" />,
+};
+
+const getIcon = (iconName: string) => {
+  return iconMap[iconName];
+};
 
 export default function Services() {
-  const { data: allData } = useAllData();
+  const { data: allData, isLoading } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
 
   const services = allData?.services;
   const title = services?.title;
-  const content = services?.items;
+  const overlayTitle = services?.overlay_title;
+  const content = services?.items || [];
 
   useEffect(() => {
-    if (services) {
+    if (!isLoading && services) {
       setAnimationReady(true);
     }
-  }, [services]);
+  }, [services, isLoading]);
 
-  useEffect(() => {
-    if (!animationReady) return;
+  useServicesScrollAnimation({
+    isReady: animationReady,
+    itemsLength: content.length,
+  });
 
-    const cards = gsap.utils.toArray(".service-card");
+  if (isLoading || !animationReady) {
+    return (
+      <section id="services" className="px-6 py-16 text-white">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+        </div>
+      </section>
+    );
+  }
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: ".services-container",
-        start: "20% bottom",
-        end: "200px 70%",
-        scrub: 1,
-        toggleActions: "play none none none",
-      },
-    });
-
-    // Initial state
-    gsap.set(cards, { y: 50, opacity: 0 });
-
-    // Add staggered animation to timeline
-    tl.to(cards, {
-      y: 0,
-      opacity: 1,
-      duration: 0.8,
-      stagger: 1,
-      ease: "power2.out",
-    });
-
-    return () => {
-      tl.kill();
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
-  }, [animationReady]);
+  if (!services || content.length === 0) {
+    return (
+      <section id="services" className="px-6 py-16 text-white">
+        <div className="max-w-6xl mx-auto text-center">
+          <span className="text-sm uppercase tracking-wider text-gray-400">
+            {overlayTitle || 'Services'}
+          </span>
+          <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
+            {title || 'Services'}
+          </h2>
+          <p className="text-gray-400 mt-8">No services available yet.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section
-      id="services"
-      className="block w-full overflow-hidden mx-auto my-10 text-center"
-    >
+    <section id="services" className="block w-full overflow-hidden mx-auto my-10 text-center">
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto">
-        <h2 className="flex justify-center text-8xl font-bold text-center font-mono">
-          {title}
-        </h2>
-        <div className="services-container container w-8/12 flex gap-10 mx-auto">
-          {Array.isArray(content) &&
-            content.map((item, i) => (
-              <div
-                key={i}
-                className="service-card flex-1 p-5 rounded-xl border-1 border-gray-700 flex flex-col text-center"
-              >
-                <span>Icon</span>
-                <h3 className="font-bold text-2xl mb-4">{item.title}</h3>
-                <p className="text-gray-400 flex-1">{item.content}</p>
+        <div className="relative">
+          {overlayTitle && (
+            <span className="absolute inset-0 text-9xl font-bold text-gray-800/20 -z-10 flex items-center justify-center select-none">
+              {overlayTitle}
+            </span>
+          )}
+          <h2 className="flex justify-center text-5xl md:text-8xl font-bold text-center font-mono relative z-10">
+            {title}
+          </h2>
+        </div>
+        <div className="services-container container w-full md:w-10/12 lg:w-8/12 flex flex-col md:flex-row gap-6 md:gap-10 mx-auto px-4">
+          {content.map((item, i) => (
+            <div
+              key={i}
+              className="service-card flex-1 p-6 rounded-xl border border-gray-700 bg-gray-800/50 backdrop-blur-sm flex flex-col text-center hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/10"
+            >
+              <div className="mb-4">
+                {item.icon && getIcon(item.icon)}
               </div>
-            ))}
+              <h3 className="font-bold text-2xl mb-4 text-white">{item.title}</h3>
+              <p className="text-gray-400 flex-1">{item.content}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
