@@ -59,11 +59,11 @@ export default function Services() {
       id="services"
       className="block w-full overflow-hidden mx-auto my-10 text-center"
     >
-      <div className="flex w-full max-w-6xl flex-col gap-6 h-full my-12 justify-center mx-auto px-6">
+      <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto">
         <h2 className="flex justify-center text-8xl font-bold text-center font-mono">
           {title}
         </h2>
-        <div className="services-container w-full flex gap-10 mx-auto">
+        <div className="services-container container w-8/12 flex gap-10 mx-auto">
           {Array.isArray(content) &&
             content.map((item, i) => (
               <div

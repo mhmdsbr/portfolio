@@ -68,7 +68,7 @@ export default function Projects() {
 
   return (
     <section id="projects" className="px-6 py-16 text-white">
-      <div className="w-full max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <span className="text-sm uppercase tracking-wider text-gray-400">
             Portfolio
