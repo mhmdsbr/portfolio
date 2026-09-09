@@ -8,8 +8,13 @@ export default async function HeaderPage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Header Settings</h1>
       <HeaderForm 
-        initialSettings={settings} 
-        initialSections={sections}
+        initialSettings={{
+          defaultTitle: settings.defaultTitle ?? 'Welcome',
+        }}
+        initialSections={sections.map((section) => ({
+          ...section,
+          sortOrder: section.sortOrder ?? 0,
+        }))}
       />
     </div>
   )

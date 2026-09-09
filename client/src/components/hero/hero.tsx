@@ -35,11 +35,9 @@ export default function Hero() {
 
   useHeroAnimations(
     {
-      containerRef,
       line1Ref,
       line2Ref,
       line3Ref,
-      descriptionRef,
     },
     animationReady,
   );

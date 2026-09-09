@@ -76,11 +76,11 @@ export interface Project {
   id: number;
   title: string;
   category: string;
-  description: string;
-  image: string;
-  link?: string;
-  github?: string;
-  tech?: string[];
+  description: string | null;
+  image: string | null;
+  link: string | null;
+  github: string | null;
+  tech: string[] | null;
 }
 
 export interface ProjectsResponse {
@@ -124,22 +124,22 @@ export interface ConfigResponse {
 }
 
 export interface HeaderSection {
-  id: number
-  sectionId: string // hero, about, experience, etc.
-  title: string
-  sortOrder: number
+  id: number;
+  sectionId: string;
+  title: string;
+  sortOrder: number | null;
 }
 
 export interface HeaderResponse {
-  sections: HeaderSection[]
-  defaultTitle: string
+  sections: HeaderSection[];
+  defaultTitle: string | null;
 }
 
 export interface FooterResponse {
-  companyName: string
-  privacyPolicy: string | null
-  termsOfService: string | null
-  copyrightText: string | null
+  companyName: string | null;
+  privacyPolicy: string | null;
+  termsOfService: string | null;
+  copyrightText: string | null;
 }
 
 // =============================================
@@ -165,10 +165,12 @@ export interface AllDataResponse {
 // =============================================
 
 export interface ApiResponseWrapper<T = any> {
-  data: T;
+  data?: T;
   timestamp?: string;
   error?: string;
 }
+
+export type ApiResponse<T> = ApiResponseWrapper<T>;
 
 // =============================================
 // Endpoint Map for Type Safety

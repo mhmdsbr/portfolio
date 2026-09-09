@@ -7,7 +7,12 @@ export default async function FooterPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Footer Settings</h1>
-      <FooterForm initialData={footer} />
+      <FooterForm
+        initialData={{
+          ...footer,
+          companyName: footer.companyName ?? 'Your Company',
+        }}
+      />
     </div>
   )
 }

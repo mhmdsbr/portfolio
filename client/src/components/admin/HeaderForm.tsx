@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateHeaderSection, updateHeaderSettings } from '@/actions/header'
+import { reorderHeaderSections, updateHeaderSection, updateHeaderSettings } from '@/actions/header'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 interface HeaderSection {

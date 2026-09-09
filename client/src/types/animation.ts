@@ -38,7 +38,7 @@ export interface HeroAnimationRefs {
   line3Ref: RefObject<HTMLSpanElement | null>
 }
 
-export interface BadgeAnimationRefs extends HeaderAnimationRefs {
+export interface BadgeAnimationRefs {
   containerRef: RefObject<HTMLDivElement | null>
   descriptionRef?: RefObject<HTMLParagraphElement | null>
 }
@@ -50,4 +50,3 @@ export interface UseProjectsAnimation<T> {
   setActiveCategory: (category: string) => void;
   filterProjects: (category: string) => T[];
 }
-

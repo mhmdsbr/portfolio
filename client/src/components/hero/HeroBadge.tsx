@@ -21,13 +21,15 @@ export default function HeroBadge({
   return (
     <div className="flex justify-center items-center h-16 text-white uppercase font-medium absolute left-auto lg:left-4 bottom-20 z-10">
       <div className="flex items-center bg-primary-cyan h-full border-r-1 rounded-l-xs border-white p-3 z-20">
-        <Image
-          src={logo}
-          width={40}
-          height={40}
-          alt="Author's logo"
-          style={{ width: "40px", height: "40px" }}
-        />
+        {logo ? (
+          <Image
+            src={logo}
+            width={40}
+            height={40}
+            alt="Author's logo"
+            style={{ width: "40px", height: "40px" }}
+          />
+        ) : null}
       </div>
       <div className="flex items-center bg-primary-orange h-full border-r-1 border-white p-2 z-20">
         <p>{location}</p>

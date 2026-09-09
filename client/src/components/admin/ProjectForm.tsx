@@ -14,7 +14,7 @@ interface ProjectFormProps {
     github: string | null
     tech: string[] | null
   }
-  onSubmit: (formData: FormData) => Promise<void>
+  onSubmit: (formData: FormData) => Promise<unknown>
   submitLabel: string
 }
 
