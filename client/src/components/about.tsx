@@ -42,7 +42,7 @@ export default function About() {
     >
       <div
         ref={containerRef}
-        className="flex flex-col gap-6 h-full my-12 justify-center mx-auto"
+        className="flex w-full max-w-6xl flex-col gap-6 h-full my-12 justify-center mx-auto px-6"
       >
         <h2
           ref={titleRef}
