@@ -17,8 +17,8 @@ export default function useTitleScrollAnimation(titleRef: React.RefObject<HTMLEl
     const words = titleRef.current.querySelectorAll(".word");
     const [wordOne, wordTwo] = words;
 
-    gsap.set(wordOne, { scale: 1.5, z: 400, x: -100 });
-    gsap.set(wordTwo, { scale: 1.5, z: 400, x: 100 });
+    gsap.set(wordOne, { scale: .5, z: 400, x: -100, opacity: 0 });
+    gsap.set(wordTwo, { scale: .5, z: 400, x: 100, opacity: 0 });
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -37,6 +37,7 @@ export default function useTitleScrollAnimation(titleRef: React.RefObject<HTMLEl
           scale: 1,
           z: 0,
           x: 0,
+          opacity: 1,
           rotationX: 0,
           ease: "power2.out",
           duration: 0.5,

@@ -30,7 +30,6 @@ export default function useAboutScrollAnimation({
     if (!hasInitialized.current) {
       const paragraphs = textRef.current.querySelectorAll("p");
 
-      // Check if paragraphs have content
       const textsToCapture: string[] = [];
       let hasContent = false;
 
@@ -53,12 +52,11 @@ export default function useAboutScrollAnimation({
     const words = titleRef.current.querySelectorAll(".word");
     const [wordOne, wordTwo] = words;
 
-    gsap.set(wordOne, { scale: 2, z: 400, x: -100 });
-    gsap.set(wordTwo, { scale: 2, z: 400, x: 100 });
+    gsap.set(wordOne, { scale: .5, z: 400, x: -100, opacity: 0 });
+    gsap.set(wordTwo, { scale: .5, z: 400, x: 100, opacity: 0 });
 
     const paragraphs = textRef.current.querySelectorAll("p");
 
-    // Clear paragraphs for animation
     paragraphs.forEach((p) => {
       p.innerHTML = "";
     });
@@ -82,6 +80,7 @@ export default function useAboutScrollAnimation({
           scale: 1,
           z: 0,
           x: 0,
+          opacity: 1,
           rotationX: 0,
           ease: "power2.out",
           duration: 0.5,

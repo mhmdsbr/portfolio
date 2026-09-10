@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLinkedin, faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons';
 import useTitleScrollAnimation from '@/hooks/animations/useTitleScrollAnimation';
 import { useAllData } from '@/hooks/useAllData';
 
@@ -12,6 +12,8 @@ export default function Contact() {
 
   const { data: allData, isLoading } = useAllData();
   const contact = allData?.contact;
+
+  console.log(contact)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -85,13 +87,10 @@ export default function Contact() {
             <div className="pt-4">
               <p className="font-semibold mb-2">Follow me</p>
               <div className="flex gap-4 text-primary">
-                <a href="https://linkedin.com" className="text-white" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <a href="https://www.linkedin.com/in/mohammad-saber-20b9551a3/" className="text-white" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                   <FontAwesomeIcon icon={faLinkedin} />
                 </a>
-                <a href="https://twitter.com" className="text-white"  target="_blank" rel="noopener noreferrer" aria-label="Google">
-                  <FontAwesomeIcon icon={faGoogle} />
-                </a>
-                <a href="https://instagram.com" className="text-white"  target="_blank" rel="noopener noreferrer" aria-label="Github">
+                <a href="https://github.com/mhmdsbr" className="text-white"  target="_blank" rel="noopener noreferrer" aria-label="Github">
                   <FontAwesomeIcon icon={faGithub} />
                 </a>
               </div>
@@ -150,7 +149,7 @@ export default function Contact() {
               type="submit"
               className="w-5/12 cursor-pointer py-2 px-4 bg-primary text-white text-left border rounded-md hover:bg-primary-dark transition"
             >
-              {contact?.buttonText || 'Send Message'}
+              {contact?.button.text}
             </button>
           </form>
         </div>

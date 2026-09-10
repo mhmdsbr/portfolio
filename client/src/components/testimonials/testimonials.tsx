@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
+import "swiper/css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import "swiper/css";
 import Image from "next/image";
 import { useAllData } from "@/hooks/useAllData";
 
 import styles from "./testimonials.module.css";
+import Link from "next/link";
 
 const Testimonials: React.FC = () => {
   const { data: allData } = useAllData();
@@ -58,14 +59,22 @@ const Testimonials: React.FC = () => {
               }}
             >
               <div className={styles["testimonial-content"]}>
-                {/* Render content if available */}
                 {item.content && (
-                  <p
-                    className={styles["testimonial-quote"]}
-                    title={item.content.length > 220 ? item.content : undefined}
-                  >
-                    {item.content}
-                  </p>
+                  <>
+                    <p
+                      className={`${styles["testimonial-quote"]} line-clamp-4`}
+                    >
+                      {item.content}
+                    </p>
+                    <Link
+                      href="https://www.linkedin.com/in/mohammad-saber-20b9551a3/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mb-3 inline-block text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300"
+                    >
+                      Read more
+                    </Link>
+                  </>
                 )}
 
                 <div className={styles["testimonial-author"]}>
@@ -81,8 +90,8 @@ const Testimonials: React.FC = () => {
                         {"⭐".repeat(
                           Math.max(
                             0,
-                            Math.min(5, Math.round(Number(item.rating) || 0))
-                          )
+                            Math.min(5, Math.round(Number(item.rating) || 0)),
+                          ),
                         )}
                       </div>
                     )}
