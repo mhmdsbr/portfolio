@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { RefObject } from "react";
 
 interface HeroBadgeProps {
@@ -16,7 +17,7 @@ export default function HeroBadge({
   location,
   subtitleOne,
   subtitleTwo,
-  descriptionRef
+  descriptionRef,
 }: HeroBadgeProps) {
   return (
     <div className="flex justify-center items-center h-16 text-white uppercase font-medium absolute left-auto lg:left-4 bottom-20 z-10">
@@ -41,7 +42,7 @@ export default function HeroBadge({
         ref={descriptionRef}
         className="items-center bg-white text-black h-full border-r-6 rounded-r-md border-primary-cyan p-2 z-0 opacity-0 flex"
       >
-        <p>{subtitleTwo}</p>
+        <Link href="/cv.pdf">{subtitleTwo}</Link>
       </div>
     </div>
   );

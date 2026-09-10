@@ -13,6 +13,7 @@ import {
   FiMenu,
   FiFileText,
   FiLayout,
+  FiMail
 } from 'react-icons/fi'
 
 const navItems = [
@@ -25,7 +26,7 @@ const navItems = [
   { href: '/admin/experience', label: 'Experience', icon: FiTool },
   { href: '/admin/services', label: 'Services', icon: FiAward },
   { href: '/admin/testimonials', label: 'Testimonials', icon: FiMessageSquare },
-]
+  { href: '/admin/contact', label: 'Contact', icon: FiMail }, ]
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -40,7 +41,7 @@ export default function AdminSidebar() {
       <div className="p-4 border-b border-gray-700">
         <h1 className="text-xl font-bold text-cyan-400">Portfolio CMS</h1>
       </div>
-      
+
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map(({ href, label, icon: Icon }) => (
           <Link
@@ -57,7 +58,7 @@ export default function AdminSidebar() {
           </Link>
         ))}
       </nav>
-      
+
       <div className="p-4 border-t border-gray-700">
         <button
           onClick={handleLogout}

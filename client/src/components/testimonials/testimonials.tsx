@@ -4,6 +4,7 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
+import Image from "next/image";
 import { useAllData } from "@/hooks/useAllData";
 
 import styles from "./testimonials.module.css";
@@ -15,28 +16,22 @@ const Testimonials: React.FC = () => {
   const colors = ["#337BFF", "#FF5733", "#33FF57", "#FF33A1", "#8A33FF"];
 
   // Return early if no testimonials data
-  if (!testimonialsData || !testimonialsData.items || testimonialsData.items.length === 0) {
+  if (
+    !testimonialsData ||
+    !testimonialsData.items ||
+    testimonialsData.items.length === 0
+  ) {
     return null;
   }
 
-  const { title, overlay_title, items } = testimonialsData;
+  const { title, items } = testimonialsData;
 
   return (
     <section id="testimonial" className={styles["testimonial-slider"]}>
-      {/* Optional: Add title section */}
-      {(title || overlay_title) && (
-        <div className={styles["testimonial-header"]}>
-          {overlay_title && (
-            <span className={styles["testimonial-overlay-title"]}>
-              {overlay_title}
-            </span>
-          )}
-          {title && (
-            <h2 className={styles["testimonial-title"]}>
-              {title}
-            </h2>
-          )}
-        </div>
+      {title && (
+        <h2 className="text-5xl md:text-8xl font-bold text-center font-mono mb-12">
+          {title}
+        </h2>
       )}
 
       <Swiper
@@ -65,30 +60,41 @@ const Testimonials: React.FC = () => {
               <div className={styles["testimonial-content"]}>
                 {/* Render content if available */}
                 {item.content && (
-                  <p className={styles["testimonial-quote"]}>
+                  <p
+                    className={styles["testimonial-quote"]}
+                    title={item.content.length > 220 ? item.content : undefined}
+                  >
                     {item.content}
                   </p>
                 )}
-                
+
                 <div className={styles["testimonial-author"]}>
                   <div className={styles["author-info"]}>
                     {item.title && (
-                      <h4 className={styles["author-name"]}>
-                        {item.title}
-                      </h4>
+                      <h4 className={styles["author-name"]}>{item.title}</h4>
                     )}
                     {item.subtitle && (
                       <p className={styles["author-role"]}>{item.subtitle}</p>
                     )}
                     {item.rating && (
                       <div className={styles["author-rating"]}>
-                        {"⭐".repeat(Number(item.rating) || 0)}
+                        {"⭐".repeat(
+                          Math.max(
+                            0,
+                            Math.min(5, Math.round(Number(item.rating) || 0))
+                          )
+                        )}
                       </div>
                     )}
                   </div>
                   {item.image && (
                     <div className={styles["author-avatar"]}>
-                      <img src={item.image} alt={item.title || "Testimonial"} />
+                      <Image
+                        src={item.image}
+                        alt={item.title || "Testimonial"}
+                        fill
+                        sizes="50px"
+                      />
                     </div>
                   )}
                 </div>

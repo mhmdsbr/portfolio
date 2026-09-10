@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { useAllData } from '@/hooks/useAllData';
-import { useProjectsAnimation } from '@/hooks/animations/useProjectsAnimation';
-import ProjectCard from './ProjectCard';
+import { useState, useEffect, useMemo } from "react";
+import { useAllData } from "@/hooks/useAllData";
+import { useProjectsAnimation } from "@/hooks/animations/useProjectsAnimation";
+import ProjectCard from "./ProjectCard";
 
 interface Project {
   id: number;
@@ -17,7 +17,7 @@ interface Project {
 }
 
 export default function Projects() {
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategory, setActiveCategory] = useState("All");
   const [projects, setProjects] = useState<Project[]>([]);
 
   const { data: allData } = useAllData();
@@ -27,11 +27,11 @@ export default function Projects() {
   }, [allData?.projects?.items]);
 
   const categories = useMemo(() => {
-    return ['All', ...new Set(allProjects.map((p) => p.category))];
+    return ["All", ...new Set(allProjects.map((p) => p.category))];
   }, [allProjects]);
 
   const filterProjects = (category: string) => {
-    return category === 'All'
+    return category === "All"
       ? allProjects
       : allProjects.filter((p) => p.category === category);
   };
@@ -70,17 +70,9 @@ export default function Projects() {
     <section id="projects" className="px-6 py-16 text-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <span className="text-sm uppercase tracking-wider text-gray-400">
-            Portfolio
-          </span>
           <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
-            {allData?.projects?.title || 'Projects'}
+            {allData?.projects?.title || "Projects"}
           </h2>
-          {allData?.projects?.overlay_title && (
-            <p className="text-gray-400 mt-2">
-              {allData.projects.overlay_title}
-            </p>
-          )}
         </div>
 
         {/* Tabs */}
@@ -92,8 +84,8 @@ export default function Projects() {
               disabled={animating}
               className={`px-6 py-2.5 cursor-pointer rounded-full text-sm font-semibold transition-all duration-300 ${
                 activeCategory === cat
-                  ? 'bg-white text-black shadow-lg shadow-white/20 scale-105'
-                  : 'bg-gray-800 hover:bg-gray-700 hover:scale-105'
+                  ? "bg-white text-black shadow-lg shadow-white/20 scale-105"
+                  : "bg-gray-800 hover:bg-gray-700 hover:scale-105"
               }`}
             >
               {cat}

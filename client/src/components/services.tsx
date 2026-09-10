@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAllData } from "@/hooks/useAllData";
 import useServicesScrollAnimation from "@/hooks/animations/useServicesScrollAnimation";
-import {
-  FiMonitor,
-  FiPenTool,
-  FiPieChart,
-} from "react-icons/fi";
+import { FiMonitor, FiPenTool, FiPieChart } from "react-icons/fi";
 
 const iconMap: Record<string, React.ReactNode> = {
   palette: <FiMonitor className="w-12 h-12 mx-auto text-cyan-400" />,
@@ -57,10 +53,10 @@ export default function Services() {
       <section id="services" className="px-6 py-16 text-white">
         <div className="max-w-6xl mx-auto text-center">
           <span className="text-sm uppercase tracking-wider text-gray-400">
-            {overlayTitle || 'Services'}
+            {overlayTitle || "Services"}
           </span>
           <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
-            {title || 'Services'}
+            {title || "Services"}
           </h2>
           <p className="text-gray-400 mt-8">No services available yet.</p>
         </div>
@@ -69,28 +65,24 @@ export default function Services() {
   }
 
   return (
-    <section id="services" className="block w-full overflow-hidden mx-auto my-10 text-center">
+    <section
+      id="services"
+      className="block w-full overflow-hidden mx-auto my-10 text-center"
+    >
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto">
-        <div className="relative">
-          {overlayTitle && (
-            <span className="absolute inset-0 text-9xl font-bold text-gray-800/20 -z-10 flex items-center justify-center select-none">
-              {overlayTitle}
-            </span>
-          )}
-          <h2 className="flex justify-center text-5xl md:text-8xl font-bold text-center font-mono relative z-10">
-            {title}
-          </h2>
-        </div>
+        <h2 className="flex justify-center text-5xl md:text-8xl font-bold text-center font-mono relative z-10">
+          {title}
+        </h2>
         <div className="services-container container w-full md:w-10/12 lg:w-8/12 flex flex-col md:flex-row gap-6 md:gap-10 mx-auto px-4">
           {content.map((item, i) => (
             <div
               key={i}
               className="service-card flex-1 p-6 rounded-xl border border-gray-700 bg-gray-800/50 backdrop-blur-sm flex flex-col text-center hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/10"
             >
-              <div className="mb-4">
-                {item.icon && getIcon(item.icon)}
-              </div>
-              <h3 className="font-bold text-2xl mb-4 text-white">{item.title}</h3>
+              <div className="mb-4">{item.icon && getIcon(item.icon)}</div>
+              <h3 className="font-bold text-2xl mb-4 text-white">
+                {item.title}
+              </h3>
               <p className="text-gray-400 flex-1">{item.content}</p>
             </div>
           ))}
