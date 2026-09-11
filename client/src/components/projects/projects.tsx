@@ -70,7 +70,7 @@ export default function Projects() {
     <section id="projects" className="px-6 py-16 text-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
+          <h2 className="text-4xl md:text-6xl font-bold font-mono mt-2">
             {allData?.projects?.title || "Projects"}
           </h2>
         </div>

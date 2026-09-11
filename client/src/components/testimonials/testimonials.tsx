@@ -30,7 +30,7 @@ const Testimonials: React.FC = () => {
   return (
     <section id="testimonial" className={styles["testimonial-slider"]}>
       {title && (
-        <h2 className="text-5xl md:text-8xl font-bold text-center font-mono mb-12">
+        <h2 className="text-4xl md:text-6xl font-bold text-center font-mono mb-12">
           {title}
         </h2>
       )}

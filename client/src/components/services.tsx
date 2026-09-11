@@ -70,7 +70,7 @@ export default function Services() {
       className="block w-full overflow-hidden mx-auto my-10 text-center"
     >
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto">
-        <h2 className="flex justify-center text-5xl md:text-8xl font-bold text-center font-mono relative z-10">
+        <h2 className="flex justify-center text-4xl md:text-6xl font-bold text-center font-mono relative z-10">
           {title}
         </h2>
         <div className="services-container container w-full md:w-10/12 lg:w-8/12 flex flex-col md:flex-row gap-6 md:gap-10 mx-auto px-4">

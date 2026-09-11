@@ -37,7 +37,7 @@ export default function Experience() {
         </div>
       ) : (
         <>
-          <h2 className="text-5xl md:text-8xl font-bold text-center font-mono mb-12">
+          <h2 className="text-4xl md:text-6xl font-bold text-center font-mono mb-12">
             {title}
           </h2>
           <div className="space-y-10 max-w-3xl mx-auto">

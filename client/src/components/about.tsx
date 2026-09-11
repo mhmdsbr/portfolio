@@ -46,7 +46,7 @@ export default function About() {
       >
         <h2
           ref={titleRef}
-          className="flex justify-center text-8xl font-bold text-center font-mono"
+          className="flex justify-center text-6xl font-bold text-center font-mono"
         >
           {titleWords.map((word, i) => (
             <span key={i} className="word inline-block mx-3">

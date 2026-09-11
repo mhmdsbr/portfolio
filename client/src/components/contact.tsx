@@ -46,7 +46,7 @@ export default function Contact() {
   return (
     <section id="contact" className="block w-full overflow-hidden mx-auto text-center">
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto max-w-5xl px-4">
-        <h2 ref={titleRef} className="text-5xl md:text-8xl font-bold text-center font-mono mb-12">
+        <h2 ref={titleRef} className="text-4xl md:text-6xl font-bold text-center font-mono mb-12">
           {titleWords.map((word, i) => (
             <span key={i} className="word inline-block mx-2">
               {word}
