@@ -12,14 +12,14 @@ const useApiFetcher = <T extends EndpointKeys>(endpoints: T[]) => {
         endpoints.map(async (endpoint) => {
           // Build URL - if apiBaseUrl is empty, use relative path
           const url = apiBaseUrl ? `${apiBaseUrl}/${endpoint}` : `/${endpoint}`;
-          
+
           const response = await fetch(url);
-          
+
           if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Failed to fetch ${endpoint}: ${response.status} ${errorText}`);
           }
-          
+
           const json = await response.json();
           return json as EndpointMap[T];
         })
