@@ -1,24 +1,22 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import dotenv from "dotenv";
 import * as schema from "./schema";
 
-dotenv.config();
-
-const connectionString =
-  process.env.NODE_ENV === "production"
-    ? process.env.DB_URL_PROD
-    : process.env.DB_URL_LOCAL;
+const isProduction = process.env.NODE_ENV === "production";
+const connectionVariable = isProduction ? "DB_URL_PROD" : "DB_URL_LOCAL";
+const connectionString = process.env[connectionVariable];
 
 if (!connectionString) {
-  throw new Error("❌ DB_URL environment variable is not set");
+  throw new Error(
+    `❌ ${connectionVariable} environment variable is not set`,
+  );
 }
 
 // Parse the URL to log useful info
 try {
   const url = new URL(connectionString);
   console.log(
-    `📊 Connecting to PostgreSQL at ${url.hostname}:${url.port || 5432}`,
+    `📊 Connecting to PostgreSQL at ${url.hostname}:${url.port}`,
   );
   console.log(`📋 Database: ${url.pathname.slice(1)}`);
   console.log(`👤 User: ${url.username}`);
@@ -29,7 +27,7 @@ try {
 
 // Create PostgreSQL client
 const client = postgres(connectionString, {
-  max: 10,
+  max: isProduction ? 1 : 10,
   idle_timeout: 20,
   connect_timeout: 10,
   onnotice: (notice) => {
@@ -40,7 +38,7 @@ const client = postgres(connectionString, {
 // Create Drizzle instance
 export const db = drizzle(client, {
   schema,
-  logger: process.env.NODE_ENV === "development",
+  logger: !isProduction,
 });
 
 // Test connection helper
