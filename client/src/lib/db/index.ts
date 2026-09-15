@@ -18,7 +18,7 @@ if (!connectionString) {
 try {
   const url = new URL(connectionString);
   console.log(
-    `📊 Connecting to PostgreSQL at ${url.hostname}:${url.port || 5432}`,
+    `📊 Connecting to PostgreSQL at ${url.hostname}:${url.port}`,
   );
   console.log(`📋 Database: ${url.pathname.slice(1)}`);
   console.log(`👤 User: ${url.username}`);
