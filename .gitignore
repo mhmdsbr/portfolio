@@ -18,3 +18,4 @@
 # Docker Config
 /server/docker/mysql
 !/server/docker/mysql/my.cnf
+node_modules
