@@ -1,0 +1,49 @@
+{
+  "node": {
+    "00fd56ce7131233a3ccefb2521d705367b47c212cd": {
+      "workers": {
+        "app/admin/header/page": {
+          "moduleId": 41985,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "getHeader",
+      "filename": "src/actions/header.ts"
+    },
+    "4002879d9a2a010cbb25b72ca8c615e6d12a1d3f6d": {
+      "workers": {
+        "app/admin/header/page": {
+          "moduleId": 41985,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "reorderHeaderSections",
+      "filename": "src/actions/header.ts"
+    },
+    "40c08b88f13ca7533114c746997f58f383807728c1": {
+      "workers": {
+        "app/admin/header/page": {
+          "moduleId": 41985,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateHeaderSettings",
+      "filename": "src/actions/header.ts"
+    },
+    "60647558b5909d1cb1bb7186010427ff5d700ef3f3": {
+      "workers": {
+        "app/admin/header/page": {
+          "moduleId": 41985,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateHeaderSection",
+      "filename": "src/actions/header.ts"
+    }
+  },
+  "edge": {}
+}

@@ -1,0 +1,115 @@
+{
+  "node": {
+    "0017c26f9bf90aff770fe6c1aff8652659a6c3fceb": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "getAbout",
+      "filename": "src/actions/about.ts"
+    },
+    "4018f8378ebf001c75fea5d2a61dd957af4840a364": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "deleteContactInfo",
+      "filename": "src/actions/about.ts"
+    },
+    "4046f61123d09d7390c6bc445b3c986ddca041ca75": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "reorderContactInfo",
+      "filename": "src/actions/about.ts"
+    },
+    "4059bedd3d589c7a16326117ea623dde55a9ea8ae4": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "deleteDetail",
+      "filename": "src/actions/about.ts"
+    },
+    "40823c85e75fb334ebafaf74833594beafd0143b4f": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "reorderDetails",
+      "filename": "src/actions/about.ts"
+    },
+    "40a8b48ff8cf9c45931e13f6d3593e56af51ba386a": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateAbout",
+      "filename": "src/actions/about.ts"
+    },
+    "40b5c585bfd3dbaa0d4561c606195aed13fa5dfe81": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "createDetail",
+      "filename": "src/actions/about.ts"
+    },
+    "40e7aae8442441fbc7d207d994422f696b6ca26fa3": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "createContactInfo",
+      "filename": "src/actions/about.ts"
+    },
+    "606813d46122273377821c74bb647fa1c1cee09655": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateContactInfo",
+      "filename": "src/actions/about.ts"
+    },
+    "60f375d3f7298a4ebc5642533f801754a5a80fa0ff": {
+      "workers": {
+        "app/admin/about/page": {
+          "moduleId": 74846,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateDetail",
+      "filename": "src/actions/about.ts"
+    }
+  },
+  "edge": {}
+}

@@ -1,0 +1,38 @@
+{
+  "node": {
+    "00333deac04bc59c16e5085f9fe201497dcb08ec38": {
+      "workers": {
+        "app/admin/hero/page": {
+          "moduleId": 217,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "getHero",
+      "filename": "src/actions/hero.ts"
+    },
+    "4018c2721b6e2533ba87aa80fc41e953722ea2e134": {
+      "workers": {
+        "app/admin/hero/page": {
+          "moduleId": 217,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateHero",
+      "filename": "src/actions/hero.ts"
+    },
+    "407e1e502c2d970c62d6e22b5f6906901adf34164b": {
+      "workers": {
+        "app/admin/hero/page": {
+          "moduleId": 217,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateHeroTitles",
+      "filename": "src/actions/hero.ts"
+    }
+  },
+  "edge": {}
+}
