@@ -5,13 +5,11 @@ const isDev = process.env.NODE_ENV !== "production";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      // Production image source — your actual domain/CDN/Hetzner host
       {
         protocol: 'https',
-        hostname: 'yourdomain.com', // <-- replace with your real domain
+        hostname: 'sabermohamad.de',
         pathname: '/**',
       },
-      // Local dev only — never active in production
       ...(isDev
         ? [
             {
