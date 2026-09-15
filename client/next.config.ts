@@ -1,16 +1,27 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '3000',
-        pathname: '/*',
+        protocol: 'https',
+        hostname: 'sabermohamad.de',
+        pathname: '/**',
       },
-      ],
-  }
+      ...(isDev
+        ? [
+            {
+              protocol: 'http' as const,
+              hostname: 'localhost',
+              port: '3000',
+              pathname: '/**',
+            },
+          ]
+        : []),
+    ],
+  },
 };
 
 export default nextConfig;
