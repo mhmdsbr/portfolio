@@ -1,0 +1,181 @@
+{
+  "node": {
+    "000a49be4f939aa9f4cf1a696da972da1d3ef03087": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "getProjects",
+      "filename": "src/actions/projects.ts"
+    },
+    "4014468d4cd52670c12d4ff6aea04017837685019b": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "deleteProject",
+      "filename": "src/actions/projects.ts"
+    },
+    "40490ecd4b169335a91841f9e7d878a5800b6de79c": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "reorderProjects",
+      "filename": "src/actions/projects.ts"
+    },
+    "409925ee0a2c9f55b135f8c2bd1f568967c5dbbfb3": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "createProject",
+      "filename": "src/actions/projects.ts"
+    },
+    "40f2b1fc6f483eb8d1e993ea581b24aa6583b559ea": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "getProject",
+      "filename": "src/actions/projects.ts"
+    },
+    "60b985829dcd9715d406fe55893e930b44c68d33e4": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateProject",
+      "filename": "src/actions/projects.ts"
+    },
+    "0017c26f9bf90aff770fe6c1aff8652659a6c3fceb": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "getAbout",
+      "filename": "src/actions/about.ts"
+    },
+    "4018f8378ebf001c75fea5d2a61dd957af4840a364": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "deleteContactInfo",
+      "filename": "src/actions/about.ts"
+    },
+    "4046f61123d09d7390c6bc445b3c986ddca041ca75": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "reorderContactInfo",
+      "filename": "src/actions/about.ts"
+    },
+    "4059bedd3d589c7a16326117ea623dde55a9ea8ae4": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "deleteDetail",
+      "filename": "src/actions/about.ts"
+    },
+    "40823c85e75fb334ebafaf74833594beafd0143b4f": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "reorderDetails",
+      "filename": "src/actions/about.ts"
+    },
+    "40a8b48ff8cf9c45931e13f6d3593e56af51ba386a": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateAbout",
+      "filename": "src/actions/about.ts"
+    },
+    "40b5c585bfd3dbaa0d4561c606195aed13fa5dfe81": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "createDetail",
+      "filename": "src/actions/about.ts"
+    },
+    "40e7aae8442441fbc7d207d994422f696b6ca26fa3": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "createContactInfo",
+      "filename": "src/actions/about.ts"
+    },
+    "606813d46122273377821c74bb647fa1c1cee09655": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateContactInfo",
+      "filename": "src/actions/about.ts"
+    },
+    "60f375d3f7298a4ebc5642533f801754a5a80fa0ff": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 78732,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "updateDetail",
+      "filename": "src/actions/about.ts"
+    }
+  },
+  "edge": {}
+}
