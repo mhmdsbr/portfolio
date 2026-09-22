@@ -3,10 +3,9 @@
 .vscode
 
 # React
-/client/node_modules/
-/client/build/
-/client/package-lock.json
-/client/drizzle
+build
+drizzle
+.next
 
 # Dotenv
 .env
@@ -15,7 +14,4 @@
 !.env.j2
 !.env.vars.*
 
-# Docker Config
-/server/docker/mysql
-!/server/docker/mysql/my.cnf
 node_modules
