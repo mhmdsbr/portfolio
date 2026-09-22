@@ -5,7 +5,7 @@
 # React
 build
 drizzle
-.next
+.next/
 
 # Dotenv
 .env
