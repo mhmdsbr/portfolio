@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { eq, asc } from 'drizzle-orm'
+import { eq, asc, desc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 
@@ -34,6 +34,35 @@ export async function updateHeaderSection(id: number, title: string) {
   revalidatePath('/admin/header')
   revalidatePath('/api/all')
   
+  return section
+}
+
+export async function addHeaderSection(sectionId: string, title: string) {
+  await requireAuth()
+
+  const normalizedSectionId = sectionId.trim()
+  const normalizedTitle = title.trim()
+
+  if (!normalizedSectionId || !normalizedTitle) {
+    throw new Error('Section ID and title are required')
+  }
+
+  const [lastSection] = await db.select({ sortOrder: schema.headerSections.sortOrder })
+    .from(schema.headerSections)
+    .orderBy(desc(schema.headerSections.sortOrder))
+    .limit(1)
+
+  const [section] = await db.insert(schema.headerSections)
+    .values({
+      sectionId: normalizedSectionId,
+      title: normalizedTitle,
+      sortOrder: (lastSection?.sortOrder ?? -1) + 1,
+    })
+    .returning()
+
+  revalidatePath('/admin/header')
+  revalidatePath('/api/all')
+
   return section
 }
 

@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { reorderHeaderSections, updateHeaderSection, updateHeaderSettings } from '@/actions/header'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { addHeaderSection, reorderHeaderSections, updateHeaderSection, updateHeaderSettings } from '@/actions/header'
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 
 interface HeaderSection {
   id: number
@@ -22,7 +22,10 @@ interface HeaderFormProps {
 export default function HeaderForm({ initialSettings, initialSections }: HeaderFormProps) {
   const [sections, setSections] = useState(initialSections)
   const [defaultTitle, setDefaultTitle] = useState(initialSettings.defaultTitle)
+  const [newSectionId, setNewSectionId] = useState('')
+  const [newSectionTitle, setNewSectionTitle] = useState('')
   const [loading, setLoading] = useState(false)
+  const [addError, setAddError] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const router = useRouter()
 
@@ -59,7 +62,25 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
     }
   }
 
-  const onDragEnd = async (result: any) => {
+  const handleAddSection = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setAddError('')
+
+    try {
+      const section = await addHeaderSection(newSectionId, newSectionTitle)
+      setSections(prev => [...prev, { ...section, sortOrder: section.sortOrder ?? 0 }])
+      setNewSectionId('')
+      setNewSectionTitle('')
+      router.refresh()
+    } catch (error) {
+      setAddError(error instanceof Error ? error.message : 'Unable to add header title')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return
 
     const items = Array.from(sections)
@@ -85,20 +106,21 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
 
   return (
     <div className="space-y-8">
-      {/* Default Title */}
+      {/* Header Title */}
       <form onSubmit={handleDefaultTitleChange} className="space-y-4 max-w-md">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">
-            Default Title
+            Header Title
           </label>
           <input
             type="text"
             value={defaultTitle}
             onChange={(e) => setDefaultTitle(e.target.value)}
+            placeholder="Welcome"
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <p className="text-xs text-gray-400 mt-1">
-            This is the default title shown before scrolling
+            This title is shown in the header before the active section text starts scrolling.
           </p>
         </div>
         <button
@@ -106,7 +128,43 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
           disabled={loading}
           className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-6 rounded-md transition disabled:opacity-50"
         >
-          {loading ? 'Saving...' : 'Save Default Title'}
+          {loading ? 'Saving...' : 'Save Header Title'}
+        </button>
+      </form>
+
+      {/* Add Section Title */}
+      <form onSubmit={handleAddSection} className="space-y-4 max-w-2xl">
+        <div>
+          <h3 className="text-lg font-semibold mb-1">Add Header Title</h3>
+          <p className="text-sm text-gray-400">
+            Add a title for a new section. The section ID must be unique and match the page section anchor.
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <input
+            type="text"
+            value={newSectionId}
+            onChange={(e) => setNewSectionId(e.target.value)}
+            placeholder="Section ID (e.g. testimonials)"
+            required
+            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          <input
+            type="text"
+            value={newSectionTitle}
+            onChange={(e) => setNewSectionTitle(e.target.value)}
+            placeholder="Header title"
+            required
+            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+        </div>
+        {addError && <p className="text-sm text-red-400">{addError}</p>}
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-6 rounded-md transition disabled:opacity-50"
+        >
+          {loading ? 'Adding...' : 'Add Header Title'}
         </button>
       </form>
 

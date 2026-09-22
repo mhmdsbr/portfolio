@@ -1,4 +1,4 @@
-import { getHeader, updateHeaderSection, updateHeaderSettings, reorderHeaderSections } from '@/actions/header'
+import { getHeader } from '@/actions/header'
 import HeaderForm from '@/components/admin/HeaderForm'
 
 export default async function HeaderPage() {
