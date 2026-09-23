@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import Link from 'next/link';
+import { projectSlug } from '@/lib/project-slug';
 
 interface Project {
   id: number;
@@ -16,6 +18,8 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
+  const detailHref = `/projects/${projectSlug(project.title)}`;
+
   return (
     <div className="group bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 opacity-0">
       <div className="transition-transform duration-300 group-hover:-translate-y-2">
@@ -36,17 +40,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </div>
           )}
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-            {project.link && (
-              <a
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
+            <Link
+                href={detailHref}
                 className="bg-white text-black px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-200 transition"
               >
-                Live Demo
-              </a>
-            )}
-            {project.github && (
+                View Project
+            </Link>
+            {project.github && project.github !== "#" && (
               <a
                 href={project.github}
                 target="_blank"
@@ -81,9 +81,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               </div>
             )}
           </div>
-          <h3 className="text-xl font-bold mb-2 group-hover:text-cyan-400 transition-colors">
-            {project.title}
-          </h3>
+          <Link href={detailHref}>
+            <h3 className="text-xl font-bold mb-2 group-hover:text-cyan-400 transition-colors">
+              {project.title}
+            </h3>
+          </Link>
           <p className="text-sm text-gray-400 line-clamp-2">
             {project.description}
           </p>

@@ -5,6 +5,7 @@
 # React
 build
 drizzle
+*.tsbuildinfo
 .next/
 
 # Dotenv
