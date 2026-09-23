@@ -14,3 +14,10 @@ export async function getProjectBySlug(slug: string) {
   const projects = await getProjects();
   return projects.find((project) => projectSlug(project.title) === slug);
 }
+
+export async function getProjectsByCategory(category: string) {
+  const projects = await getProjects();
+  return projects.filter(
+    (project) => projectSlug(project.category) === category,
+  );
+}
