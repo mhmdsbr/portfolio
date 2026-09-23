@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/lib/projects";
+import Header from "@/components/header";
+import { ApiDataProvider } from "@/providers/ApiDataProvider";
 
 interface ProjectPageProps {
   params: Promise<{
@@ -18,14 +20,16 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 px-6 py-16 text-white">
-      <article className="mx-auto max-w-5xl">
-        <Link
-          href="/#projects"
-          className="mb-10 inline-flex text-sm text-cyan-400 transition hover:text-cyan-300"
-        >
-          ← Back to projects
-        </Link>
+    <ApiDataProvider endpoints={["api/all"]}>
+      <main className="min-h-screen bg-gray-950 px-6 py-16 text-white">
+        <Header singleTitle={project.title} />
+        <article className="mx-auto max-w-5xl">
+          <Link
+            href="/#projects"
+            className="mb-10 inline-flex text-sm text-cyan-400 transition hover:text-cyan-300"
+          >
+            ← Back to projects
+          </Link>
 
         <div className="grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-start">
           <div className="relative aspect-video overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">
@@ -94,7 +98,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </div>
           </div>
         </div>
-      </article>
-    </main>
+        </article>
+      </main>
+    </ApiDataProvider>
   );
 }

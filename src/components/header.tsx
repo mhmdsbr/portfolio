@@ -4,7 +4,11 @@ import { useRef, useState, useEffect, useMemo } from "react";
 import useHeaderAnimations from "@/hooks/animations/useHeaderAnimations";
 import { useAllData } from "@/hooks/useAllData";
 
-export default function Header() {
+interface HeaderProps {
+  singleTitle?: string;
+}
+
+export default function Header({ singleTitle }: HeaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const expandRef = useRef<HTMLDivElement>(null);
@@ -28,6 +32,12 @@ export default function Header() {
   const [currentTitle, setCurrentTitle] = useState("");
 
   useEffect(() => {
+    if (singleTitle) {
+      setIsReady(true);
+      setCurrentTitle(singleTitle);
+      return;
+    }
+
     if (
       headerData &&
       headerData.sections &&
@@ -36,7 +46,7 @@ export default function Header() {
       setIsReady(true);
       setCurrentTitle(headerData.sections[0].title);
     }
-  }, [headerData]);
+  }, [headerData, singleTitle]);
 
   useHeaderAnimations({
     containerRef,
