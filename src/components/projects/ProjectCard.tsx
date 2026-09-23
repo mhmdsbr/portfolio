@@ -60,9 +60,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
         <div className="p-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs uppercase text-cyan-400 font-semibold tracking-wider">
+            <Link
+              href={`/projects/category/${projectSlug(project.category)}`}
+              className="text-xs uppercase text-cyan-400 font-semibold tracking-wider hover:text-cyan-300"
+            >
               {project.category}
-            </span>
+            </Link>
             {project.tech && project.tech.length > 0 && (
               <div className="flex gap-1">
                 {project.tech.slice(0, 3).map((tech, i) => (

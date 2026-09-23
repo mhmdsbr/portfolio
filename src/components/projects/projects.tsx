@@ -89,7 +89,7 @@ export default function Projects() {
                   : "bg-gray-800 hover:bg-gray-700 hover:scale-105"
               }`}
             >
-              {cat}
+                {cat}
             </button>
           ))}
         </div>
