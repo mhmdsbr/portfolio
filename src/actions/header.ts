@@ -71,12 +71,11 @@ export async function updateHeaderSettings(formData: FormData) {
   
   const defaultTitle = formData.get('defaultTitle') as string
 
-  const [settings] = await db.update(schema.headerSettings)
-    .set({
-      defaultTitle: defaultTitle || 'Welcome',
-    })
-    .where(eq(schema.headerSettings.id, 1))
-    .returning()
+  const values = { defaultTitle: defaultTitle || 'Welcome' }
+  const [existingSettings] = await db.select().from(schema.headerSettings).limit(1)
+  const [settings] = existingSettings
+    ? await db.update(schema.headerSettings).set(values).where(eq(schema.headerSettings.id, existingSettings.id)).returning()
+    : await db.insert(schema.headerSettings).values(values).returning()
   
   revalidatePath('/admin/header')
   revalidatePath('/api/all')

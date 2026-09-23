@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateHero, updateHeroTitles } from '@/actions/hero'
+import Image from 'next/image'
 
 interface HeroFormProps {
   initialData: {
@@ -39,11 +40,11 @@ export default function HeroForm({ initialData }: HeroFormProps) {
     try {
       // Update hero section
       await updateHero(formData)
-      
+
       // Update hero titles
       const titlesArray = titles.split(',').map(t => t.trim()).filter(Boolean)
       await updateHeroTitles(titlesArray)
-      
+
       setMessage('✅ Hero section updated successfully!')
       router.refresh()
     } catch (error) {
@@ -132,7 +133,7 @@ export default function HeroForm({ initialData }: HeroFormProps) {
         />
         {logoUrl && (
           <div className="mt-2 p-2 bg-gray-800 rounded inline-block">
-            <img src={logoUrl} alt="Logo preview" className="h-12 w-auto" />
+            <Image src={logoUrl} alt="Logo preview" className="h-12 w-auto" />
           </div>
         )}
       </div>

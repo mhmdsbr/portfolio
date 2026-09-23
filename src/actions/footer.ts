@@ -29,15 +29,16 @@ export async function updateFooter(formData: FormData) {
   const termsOfService = formData.get('termsOfService') as string
   const copyrightText = formData.get('copyrightText') as string
 
-  const [footer] = await db.update(schema.footerSection)
-    .set({
+  const values = {
       companyName: companyName || 'Your Company',
       privacyPolicy: privacyPolicy || null,
       termsOfService: termsOfService || null,
       copyrightText: copyrightText || null,
-    })
-    .where(eq(schema.footerSection.id, 1))
-    .returning()
+  }
+  const [existingFooter] = await db.select().from(schema.footerSection).limit(1)
+  const [footer] = existingFooter
+    ? await db.update(schema.footerSection).set(values).where(eq(schema.footerSection.id, existingFooter.id)).returning()
+    : await db.insert(schema.footerSection).values(values).returning()
   
   revalidatePath('/admin/footer')
   revalidatePath('/api/all')

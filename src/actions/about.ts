@@ -47,8 +47,7 @@ export async function updateAbout(formData: FormData) {
   const buttonText = formData.get('buttonText') as string
   const buttonUrl = formData.get('buttonUrl') as string
   
-  const [about] = await db.update(schema.aboutSection)
-    .set({
+  const values = {
       title: title || null,
       overlayTitle: overlayTitle || null,
       name: name || null,
@@ -56,9 +55,11 @@ export async function updateAbout(formData: FormData) {
       description: description || null,
       buttonText: buttonText || null,
       buttonUrl: buttonUrl || null,
-    })
-    .where(eq(schema.aboutSection.id, 1))
-    .returning()
+  }
+  const [existingAbout] = await db.select().from(schema.aboutSection).limit(1)
+  const [about] = existingAbout
+    ? await db.update(schema.aboutSection).set(values).where(eq(schema.aboutSection.id, existingAbout.id)).returning()
+    : await db.insert(schema.aboutSection).values(values).returning()
   
   revalidatePath('/admin/about')
   revalidatePath('/api/all')
@@ -81,21 +82,19 @@ export async function createContactInfo(formData: FormData) {
     .from(schema.aboutSection)
     .limit(1)
   
-  if (!about) {
-    throw new Error('About section not found')
-  }
+  const aboutRecord = about ?? (await db.insert(schema.aboutSection).values({}).returning())[0]
   
   // Get current max sort order
   const existing = await db.select()
     .from(schema.aboutContactInfo)
-    .where(eq(schema.aboutContactInfo.aboutId, about.id))
+    .where(eq(schema.aboutContactInfo.aboutId, aboutRecord.id))
     .orderBy(asc(schema.aboutContactInfo.sortOrder))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   
   const [contactInfo] = await db.insert(schema.aboutContactInfo)
     .values({
-      aboutId: about.id,
+      aboutId: aboutRecord.id,
       title,
       content,
       sortOrder,
@@ -152,21 +151,19 @@ export async function createDetail(formData: FormData) {
     .from(schema.aboutSection)
     .limit(1)
   
-  if (!about) {
-    throw new Error('About section not found')
-  }
+  const aboutRecord = about ?? (await db.insert(schema.aboutSection).values({}).returning())[0]
   
   // Get current max sort order
   const existing = await db.select()
     .from(schema.aboutDetails)
-    .where(eq(schema.aboutDetails.aboutId, about.id))
+    .where(eq(schema.aboutDetails.aboutId, aboutRecord.id))
     .orderBy(asc(schema.aboutDetails.sortOrder))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   
   const [detail] = await db.insert(schema.aboutDetails)
     .values({
-      aboutId: about.id,
+      aboutId: aboutRecord.id,
       number,
       title,
       sortOrder,

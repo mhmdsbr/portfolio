@@ -44,15 +44,16 @@ export async function updateSummary(formData: FormData) {
   const buttonText = formData.get('buttonText') as string
   const buttonUrl = formData.get('buttonUrl') as string
   
-  const [summary] = await db.update(schema.summarySection)
-    .set({
+  const values = {
       title: title || null,
       overlayTitle: overlayTitle || null,
       buttonText: buttonText || null,
       buttonUrl: buttonUrl || null,
-    })
-    .where(eq(schema.summarySection.id, 1))
-    .returning()
+  }
+  const [existingSummary] = await db.select().from(schema.summarySection).limit(1)
+  const [summary] = existingSummary
+    ? await db.update(schema.summarySection).set(values).where(eq(schema.summarySection.id, existingSummary.id)).returning()
+    : await db.insert(schema.summarySection).values(values).returning()
   
   revalidatePath('/admin/experience')
   revalidatePath('/api/all')
@@ -77,21 +78,19 @@ export async function createJob(formData: FormData) {
     .from(schema.summarySection)
     .limit(1)
   
-  if (!summary) {
-    throw new Error('Summary section not found')
-  }
+  const summaryRecord = summary ?? (await db.insert(schema.summarySection).values({}).returning())[0]
   
   // Get current max sort order
   const existing = await db.select()
     .from(schema.summaryJobs)
-    .where(eq(schema.summaryJobs.summaryId, summary.id))
+    .where(eq(schema.summaryJobs.summaryId, summaryRecord.id))
     .orderBy(asc(schema.summaryJobs.sortOrder))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   
   const [job] = await db.insert(schema.summaryJobs)
     .values({
-      summaryId: summary.id,
+      summaryId: summaryRecord.id,
       fromYear: fromYear || null,
       toYear: toYear || null,
       jobTitle,
@@ -172,21 +171,19 @@ export async function createExperience(formData: FormData) {
     .from(schema.summarySection)
     .limit(1)
   
-  if (!summary) {
-    throw new Error('Summary section not found')
-  }
+  const summaryRecord = summary ?? (await db.insert(schema.summarySection).values({}).returning())[0]
   
   // Get current max sort order
   const existing = await db.select()
     .from(schema.summaryExperiences)
-    .where(eq(schema.summaryExperiences.summaryId, summary.id))
+    .where(eq(schema.summaryExperiences.summaryId, summaryRecord.id))
     .orderBy(asc(schema.summaryExperiences.sortOrder))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   
   const [experience] = await db.insert(schema.summaryExperiences)
     .values({
-      summaryId: summary.id,
+      summaryId: summaryRecord.id,
       skill,
       level: level || null,
       sortOrder,

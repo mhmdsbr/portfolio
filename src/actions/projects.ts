@@ -44,10 +44,11 @@ export async function createProject(formData: FormData) {
   const [section] = await db.select()
     .from(schema.projectsSection)
     .limit(1)
-  
+  const projectsSection = section ?? (await db.insert(schema.projectsSection).values({}).returning())[0]
+
   const [project] = await db.insert(schema.projectItems)
     .values({
-      projectsId: section.id,
+      projectsId: projectsSection.id,
       title,
       category,
       description: description || null,

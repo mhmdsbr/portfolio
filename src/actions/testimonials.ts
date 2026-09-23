@@ -37,13 +37,14 @@ export async function updateTestimonials(formData: FormData) {
   const title = formData.get('title') as string
   const overlayTitle = formData.get('overlayTitle') as string
   
-  const [testimonials] = await db.update(schema.testimonialsSection)
-    .set({
+  const values = {
       title: title || null,
       overlayTitle: overlayTitle || null,
-    })
-    .where(eq(schema.testimonialsSection.id, 1))
-    .returning()
+  }
+  const [existingTestimonials] = await db.select().from(schema.testimonialsSection).limit(1)
+  const [testimonials] = existingTestimonials
+    ? await db.update(schema.testimonialsSection).set(values).where(eq(schema.testimonialsSection.id, existingTestimonials.id)).returning()
+    : await db.insert(schema.testimonialsSection).values(values).returning()
   
   revalidatePath('/admin/testimonials')
   revalidatePath('/api/all')
@@ -68,25 +69,23 @@ export async function createTestimonialItem(formData: FormData) {
     .from(schema.testimonialsSection)
     .limit(1)
   
-  if (!testimonials) {
-    throw new Error('Testimonials section not found')
-  }
+  const testimonialsRecord = testimonials ?? (await db.insert(schema.testimonialsSection).values({}).returning())[0]
   
   // Get current max sort order
   const existing = await db.select()
     .from(schema.testimonialItems)
-    .where(eq(schema.testimonialItems.testimonialsId, testimonials.id))
+    .where(eq(schema.testimonialItems.testimonialsId, testimonialsRecord.id))
     .orderBy(asc(schema.testimonialItems.sortOrder))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   
   const [item] = await db.insert(schema.testimonialItems)
     .values({
-      testimonialsId: testimonials.id,
+      testimonialsId: testimonialsRecord.id,
       imageUrl: imageUrl || null,
       title,
       subtitle: subtitle || null,
-      rating: rating as any || null,
+      rating: (rating || null) as schema.NewTestimonialItem['rating'],
       content: content || null,
       sortOrder,
     })
@@ -112,7 +111,7 @@ export async function updateTestimonialItem(id: number, formData: FormData) {
       imageUrl: imageUrl || null,
       title,
       subtitle: subtitle || null,
-      rating: rating as any || null,
+      rating: (rating || null) as schema.NewTestimonialItem['rating'],
       content: content || null,
     })
     .where(eq(schema.testimonialItems.id, id))

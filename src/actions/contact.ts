@@ -48,8 +48,7 @@ export async function updateContact(formData: FormData) {
   const phone = formData.get('phone') as string
   const email = formData.get('email') as string
 
-  const [contact] = await db.update(schema.contactSection)
-    .set({
+  const values = {
       title: title || null,
       overlayTitle: overlayTitle || null,
       formTitle: formTitle || null,
@@ -59,9 +58,11 @@ export async function updateContact(formData: FormData) {
       address: address || null,
       phone: phone || null,
       email: email || null,
-    })
-    .where(eq(schema.contactSection.id, 1))
-    .returning()
+  }
+  const [existingContact] = await db.select().from(schema.contactSection).limit(1)
+  const [contact] = existingContact
+    ? await db.update(schema.contactSection).set(values).where(eq(schema.contactSection.id, existingContact.id)).returning()
+    : await db.insert(schema.contactSection).values(values).returning()
 
   revalidatePath('/admin/contact')
   revalidatePath('/api/all')

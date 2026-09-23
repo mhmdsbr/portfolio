@@ -37,13 +37,14 @@ export async function updateServices(formData: FormData) {
   const title = formData.get('title') as string
   const overlayTitle = formData.get('overlayTitle') as string
   
-  const [services] = await db.update(schema.servicesSection)
-    .set({
+  const values = {
       title: title || null,
       overlayTitle: overlayTitle || null,
-    })
-    .where(eq(schema.servicesSection.id, 1))
-    .returning()
+  }
+  const [existingServices] = await db.select().from(schema.servicesSection).limit(1)
+  const [services] = existingServices
+    ? await db.update(schema.servicesSection).set(values).where(eq(schema.servicesSection.id, existingServices.id)).returning()
+    : await db.insert(schema.servicesSection).values(values).returning()
   
   revalidatePath('/admin/services')
   revalidatePath('/api/all')
@@ -66,24 +67,22 @@ export async function createServiceItem(formData: FormData) {
     .from(schema.servicesSection)
     .limit(1)
   
-  if (!services) {
-    throw new Error('Services section not found')
-  }
+  const servicesRecord = services ?? (await db.insert(schema.servicesSection).values({}).returning())[0]
   
   // Get current max sort order
   const existing = await db.select()
     .from(schema.serviceItems)
-    .where(eq(schema.serviceItems.servicesId, services.id))
+    .where(eq(schema.serviceItems.servicesId, servicesRecord.id))
     .orderBy(asc(schema.serviceItems.sortOrder))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   
   const [item] = await db.insert(schema.serviceItems)
     .values({
-      servicesId: services.id,
+      servicesId: servicesRecord.id,
       title,
       content: content || null,
-      icon: icon as any || null,
+      icon: (icon || null) as schema.NewServiceItem['icon'],
       sortOrder,
     })
     .returning()
@@ -105,7 +104,7 @@ export async function updateServiceItem(id: number, formData: FormData) {
     .set({
       title,
       content: content || null,
-      icon: icon as any || null,
+      icon: (icon || null) as schema.NewServiceItem['icon'],
     })
     .where(eq(schema.serviceItems.id, id))
     .returning()
