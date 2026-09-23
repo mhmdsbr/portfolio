@@ -13,7 +13,7 @@ export default function HeroTitles({ titles, line1Ref, line2Ref, line3Ref }: Her
   return (
     <div>
       <h1 className="px-10" ref={line1Ref}>
-        <span className="block text-lg sm:text-xl md:text-3xl lg:text-4xl xl:text-6xl pink-gradient-text font-extrabold">
+        <span className="block text-lg sm:text-xl md:text-3xl lg:text-4xl xl:text-5xl pink-gradient-text font-extrabold">
           {titles[0]}
         </span>
       </h1>

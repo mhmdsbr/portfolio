@@ -1,4 +1,3 @@
-// app/hero/page.tsx (or wherever Hero is located)
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -58,11 +57,11 @@ export default function Hero() {
       ref={containerRef}
       className="relative overflow-x-hidden h-screen min-h-[700px] flex flex-col items-center gap-4 justify-evenly text-center"
     >
-      <HeroTitles 
-        titles={hero.titles} 
-        line1Ref={line1Ref} 
-        line2Ref={line2Ref} 
-        line3Ref={line3Ref} 
+      <HeroTitles
+        titles={hero.titles}
+        line1Ref={line1Ref}
+        line2Ref={line2Ref}
+        line3Ref={line3Ref}
       />
 
       <HeroBadge

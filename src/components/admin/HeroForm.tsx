@@ -133,7 +133,7 @@ export default function HeroForm({ initialData }: HeroFormProps) {
         />
         {logoUrl && (
           <div className="mt-2 p-2 bg-gray-800 rounded inline-block">
-            <Image src={logoUrl} alt="Logo preview" className="h-12 w-auto" />
+            <Image src={logoUrl} alt="Logo preview" width="12" height="12" className="h-12 w-auto" />
           </div>
         )}
       </div>

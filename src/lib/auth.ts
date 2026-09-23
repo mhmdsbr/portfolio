@@ -1,13 +1,11 @@
 import { cookies } from 'next/headers'
 
-// Simple auth - in production, use a proper auth solution
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin'
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password123'
 
 export async function login(username: string, password: string) {
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
     const cookieStore = await cookies()
-    // Simple session token - in production, use JWT
     cookieStore.set('admin_session', 'authenticated', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
