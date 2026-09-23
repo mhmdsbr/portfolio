@@ -37,12 +37,12 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
+    <aside className="w-64 shrink-0 bg-gray-800 border-r border-gray-700 flex flex-col">
       <div className="p-4 border-b border-gray-700">
         <h1 className="text-xl font-bold text-cyan-400">Portfolio CMS</h1>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="min-h-0 flex-1 overflow-y-auto p-4 space-y-1">
         {navItems.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
