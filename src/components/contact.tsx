@@ -12,8 +12,9 @@ export default function Contact() {
 
   const { data: allData, isLoading } = useAllData();
   const contact = allData?.contact;
-
-  console.log(contact)
+  const sectionId =
+    allData?.header?.sections.find((section) => section.sortOrder === 6)
+      ?.sectionId ?? "contact";
 
   const [formData, setFormData] = useState({
     name: '',
@@ -28,12 +29,11 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
   };
 
   if (isLoading) {
     return (
-      <section id="contact" className="px-6 py-16 text-white">
+      <section id={sectionId} className="px-6 py-16 text-white">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
         </div>
@@ -41,10 +41,10 @@ export default function Contact() {
     );
   }
 
-  const titleWords = contact?.title?.split(' ') || ['Contact'];
+  const titleWords = contact?.title?.split(' ') || [];
 
   return (
-    <section id="contact" className="block w-full overflow-hidden mx-auto text-center">
+    <section id={sectionId} className="block w-full overflow-hidden mx-auto text-center">
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto max-w-5xl px-4">
         <h2 ref={titleRef} className="text-4xl md:text-6xl font-bold text-center font-mono mb-12">
           {titleWords.map((word, i) => (

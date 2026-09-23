@@ -12,6 +12,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx scripts/seed.ts",
+    "db:clear": "tsx scripts/clear.ts --confirm",
     "db:reset": "drizzle-kit drop && drizzle-kit generate && drizzle-kit migrate"
   },
   "dependencies": {

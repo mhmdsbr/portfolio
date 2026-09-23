@@ -23,6 +23,9 @@ export default function Services() {
   const [animationReady, setAnimationReady] = useState(false);
 
   const services = allData?.services;
+  const sectionId =
+    allData?.header?.sections.find((section) => section.sortOrder === 3)
+      ?.sectionId ?? "services";
   const title = services?.title;
   const overlayTitle = services?.overlay_title;
   const content = services?.items || [];
@@ -40,7 +43,7 @@ export default function Services() {
 
   if (isLoading || !animationReady) {
     return (
-      <section id="services" className="px-6 py-16 text-white">
+      <section id={sectionId} className="px-6 py-16 text-white">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
         </div>
@@ -50,13 +53,10 @@ export default function Services() {
 
   if (!services || content.length === 0) {
     return (
-      <section id="services" className="px-6 py-16 text-white">
+      <section id={sectionId} className="px-6 py-16 text-white">
         <div className="max-w-6xl mx-auto text-center">
-          <span className="text-sm uppercase tracking-wider text-gray-400">
-            {overlayTitle || "Services"}
-          </span>
           <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
-            {title || "Services"}
+            {title}
           </h2>
           <p className="text-gray-400 mt-8">No services available yet.</p>
         </div>
@@ -66,7 +66,7 @@ export default function Services() {
 
   return (
     <section
-      id="services"
+      id={sectionId}
       className="block w-full overflow-hidden mx-auto my-10 text-center"
     >
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto">

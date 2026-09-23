@@ -13,6 +13,9 @@ import Link from "next/link";
 const Testimonials: React.FC = () => {
   const { data: allData } = useAllData();
   const testimonialsData = allData?.testimonials;
+  const sectionId =
+    allData?.header?.sections.find((section) => section.sortOrder === 5)
+      ?.sectionId ?? "testimonial";
 
   const colors = ["#337BFF", "#FF5733", "#33FF57", "#FF33A1", "#8A33FF"];
 
@@ -28,7 +31,7 @@ const Testimonials: React.FC = () => {
   const { title, items } = testimonialsData;
 
   return (
-    <section id="testimonial" className={styles["testimonial-slider"]}>
+    <section id={sectionId} className={styles["testimonial-slider"]}>
       {title && (
         <h2 className="text-4xl md:text-6xl font-bold text-center font-mono mb-12">
           {title}

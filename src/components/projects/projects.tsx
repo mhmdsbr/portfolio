@@ -21,6 +21,9 @@ export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
 
   const { data: allData } = useAllData();
+  const sectionId =
+    allData?.header?.sections.find((section) => section.sortOrder === 4)
+      ?.sectionId ?? "projects";
 
   const allProjects: Project[] = useMemo(() => {
     return allData?.projects?.items || [];
@@ -52,13 +55,11 @@ export default function Projects() {
 
   if (projects.length === 0) {
     return (
-      <section id="projects" className="px-6 py-16 text-white">
+      <section id={sectionId} className="px-6 py-16 text-white">
         <div className="max-w-6xl mx-auto text-center">
           <span className="text-sm uppercase tracking-wider text-gray-400">
-            Portfolio
           </span>
           <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
-            Projects
           </h2>
           <p className="text-gray-400 mt-8">No projects available yet.</p>
         </div>
@@ -67,11 +68,11 @@ export default function Projects() {
   }
 
   return (
-    <section id="projects" className="px-6 py-16 text-white">
+    <section id={sectionId} className="px-6 py-16 text-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-6xl font-bold font-mono mt-2">
-            {allData?.projects?.title || "Projects"}
+            {allData?.projects?.title}
           </h2>
         </div>
 

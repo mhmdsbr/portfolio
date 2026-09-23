@@ -16,6 +16,9 @@ export default function Hero() {
 
   const { data: allData } = useAllData();
   const hero = allData?.hero;
+  const sectionId =
+    allData?.header?.sections.find((section) => section.sortOrder === 0)
+      ?.sectionId ?? "hero";
 
   const [animationReady, setAnimationReady] = useState(false);
 
@@ -53,7 +56,7 @@ export default function Hero() {
 
   return (
     <section
-      id="hero"
+      id={sectionId}
       ref={containerRef}
       className="relative overflow-x-hidden h-screen min-h-[700px] flex flex-col items-center gap-4 justify-evenly text-center"
     >

@@ -10,6 +10,9 @@ export default function Experience() {
   const [animationReady, setAnimationReady] = useState(false);
 
   const experience = allData?.summary;
+  const sectionId =
+    allData?.header?.sections.find((section) => section.sortOrder === 2)
+      ?.sectionId ?? "experience";
   const title = experience?.title;
   const experienceItems = experience?.jobs || [];
 
@@ -27,7 +30,7 @@ export default function Experience() {
 
   return (
     <section
-      id="experience"
+      id={sectionId}
       ref={containerRef}
       className="px-6 py-16 text-white"
     >
