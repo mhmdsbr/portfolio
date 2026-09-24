@@ -9,6 +9,7 @@ interface ProjectFormProps {
     title: string
     category: string
     description: string | null
+    roles: string[] | null
     image: string | null
     link: string | null
     github: string | null
@@ -92,6 +93,21 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel }: Proj
           defaultValue={initialData?.description || ''}
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
+      </div>
+
+      <div>
+        <label htmlFor="roles" className="block text-sm font-medium text-gray-300 mb-1">
+          Roles and responsibilities
+        </label>
+        <textarea
+          id="roles"
+          name="roles"
+          rows={5}
+          defaultValue={initialData?.roles?.join('\n') || ''}
+          placeholder="Build reusable components&#10;Improve page performance&#10;Collaborate with designers"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+        <p className="text-xs text-gray-400 mt-1">Add one role or responsibility per line</p>
       </div>
 
       <div>

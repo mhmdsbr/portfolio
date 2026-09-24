@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useLenis } from 'lenis/react'
 
 interface ModalProps {
   isOpen: boolean
@@ -14,6 +15,7 @@ const ANIMATION_DURATION = 250
 const Modal = ({ isOpen, onClose, title, htmlContent }: ModalProps) => {
   const [shouldRender, setShouldRender] = useState(isOpen)
   const [isVisible, setIsVisible] = useState(false)
+  const lenis = useLenis()
 
   useEffect(() => {
     let visibleTimeout: ReturnType<typeof setTimeout>
@@ -51,14 +53,16 @@ const Modal = ({ isOpen, onClose, title, htmlContent }: ModalProps) => {
       document.documentElement.style.overflow = 'hidden'
       document.body.style.overflow = 'hidden'
       document.body.style.overscrollBehavior = 'none'
+      lenis?.stop()
 
       return () => {
         document.documentElement.style.overflow = originalDocumentOverflow
         document.body.style.overflow = originalBodyOverflow
         document.body.style.overscrollBehavior = originalBodyOverscrollBehavior
+        lenis?.start()
       }
     }
-  }, [shouldRender])
+  }, [lenis, shouldRender])
 
   if (!shouldRender) return null
 
@@ -98,6 +102,7 @@ const Modal = ({ isOpen, onClose, title, htmlContent }: ModalProps) => {
         </div>
 
         <div
+          data-lenis-prevent
           className="prose prose-sm min-h-0 max-w-none overflow-y-auto px-6 py-5 text-gray-700"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />

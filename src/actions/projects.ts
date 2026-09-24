@@ -35,6 +35,7 @@ export async function createProject(formData: FormData) {
   const title = formData.get('title') as string
   const category = formData.get('category') as string
   const description = formData.get('description') as string
+  const roles = (formData.get('roles') as string)?.split('\n').map(role => role.trim()).filter(Boolean) || []
   const image = formData.get('image') as string
   const link = formData.get('link') as string
   const github = formData.get('github') as string
@@ -52,6 +53,7 @@ export async function createProject(formData: FormData) {
       title,
       category,
       description: description || null,
+      roles: roles.length > 0 ? roles : null,
       image: image || null,
       link: link || null,
       github: github || null,
@@ -72,6 +74,7 @@ export async function updateProject(id: number, formData: FormData) {
   const title = formData.get('title') as string
   const category = formData.get('category') as string
   const description = formData.get('description') as string
+  const roles = (formData.get('roles') as string)?.split('\n').map(role => role.trim()).filter(Boolean) || []
   const image = formData.get('image') as string
   const link = formData.get('link') as string
   const github = formData.get('github') as string
@@ -82,6 +85,7 @@ export async function updateProject(id: number, formData: FormData) {
       title,
       category,
       description: description || null,
+      roles: roles.length > 0 ? roles : null,
       image: image || null,
       link: link || null,
       github: github || null,

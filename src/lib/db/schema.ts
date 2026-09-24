@@ -278,6 +278,7 @@ export const projectItems = pgTable('project_items', {
   title: text('title').notNull(),
   category: text('category').notNull(),
   description: text('description'),
+  roles: text('roles').array(),
   image: text('image'),
   link: text('link'),
   github: text('github'),
