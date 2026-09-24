@@ -19,11 +19,13 @@ export default function FooterForm({ initialData }: FooterFormProps) {
   const [termsOfService, setTermsOfService] = useState(initialData.termsOfService || '')
   const [copyrightText, setCopyrightText] = useState(initialData.copyrightText || '')
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
+    setMessage('')
 
     const formData = new FormData()
     formData.set('companyName', companyName)
@@ -33,8 +35,10 @@ export default function FooterForm({ initialData }: FooterFormProps) {
 
     try {
       await updateFooter(formData)
+      setMessage('✅ Footer settings updated successfully!')
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to update footer settings')
       console.error('Error updating footer:', error)
     } finally {
       setLoading(false)
@@ -43,6 +47,11 @@ export default function FooterForm({ initialData }: FooterFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+      {message && (
+        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+          {message}
+        </div>
+      )}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1">
           Company Name

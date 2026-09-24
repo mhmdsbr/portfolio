@@ -20,15 +20,19 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
   const [items, setItems] = useState(experiences)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const router = useRouter()
 
   const handleCreate = async (formData: FormData) => {
     setLoading(true)
+    setMessage('')
     try {
       await createExperience(formData)
+      setMessage('✅ Skill added successfully!')
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to add skill')
       console.error('Error creating experience:', error)
     } finally {
       setLoading(false)
@@ -37,11 +41,14 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
 
   const handleUpdate = async (id: number, formData: FormData) => {
     setLoading(true)
+    setMessage('')
     try {
       await updateExperience(id, formData)
+      setMessage('✅ Skill updated successfully!')
       setEditingId(null)
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to update skill')
       console.error('Error updating experience:', error)
     } finally {
       setLoading(false)
@@ -83,6 +90,11 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
 
   return (
     <div className="space-y-4">
+      {message && (
+        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+          {message}
+        </div>
+      )}
       {/* Create New Experience */}
       <form action={handleCreate} className="flex gap-3 items-end">
         <div className="flex-1">

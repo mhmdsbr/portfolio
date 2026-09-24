@@ -11,6 +11,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:setup": "tsx scripts/setup-db.ts && drizzle-kit push",
     "db:seed": "tsx scripts/seed.ts",
     "db:clear": "tsx scripts/clear.ts --confirm",
     "db:sync:prod": "tsx scripts/sync-production.ts --confirm",

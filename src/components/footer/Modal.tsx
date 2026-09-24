@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useLenis } from 'lenis/react'
 
 interface ModalProps {
   isOpen: boolean
@@ -14,6 +15,7 @@ const ANIMATION_DURATION = 250
 const Modal = ({ isOpen, onClose, title, htmlContent }: ModalProps) => {
   const [shouldRender, setShouldRender] = useState(isOpen)
   const [isVisible, setIsVisible] = useState(false)
+  const lenis = useLenis()
 
   useEffect(() => {
     let visibleTimeout: ReturnType<typeof setTimeout>
@@ -44,26 +46,36 @@ const Modal = ({ isOpen, onClose, title, htmlContent }: ModalProps) => {
 
   useEffect(() => {
     if (shouldRender) {
-      const original = document.body.style.overflow
+      const originalBodyOverflow = document.body.style.overflow
+      const originalDocumentOverflow = document.documentElement.style.overflow
+      const originalBodyOverscrollBehavior = document.body.style.overscrollBehavior
+
+      document.documentElement.style.overflow = 'hidden'
       document.body.style.overflow = 'hidden'
+      document.body.style.overscrollBehavior = 'none'
+      lenis?.stop()
+
       return () => {
-        document.body.style.overflow = original
+        document.documentElement.style.overflow = originalDocumentOverflow
+        document.body.style.overflow = originalBodyOverflow
+        document.body.style.overscrollBehavior = originalBodyOverscrollBehavior
+        lenis?.start()
       }
     }
-  }, [shouldRender])
+  }, [lenis, shouldRender])
 
   if (!shouldRender) return null
 
   return (
     <div
       onClick={onClose}
-      className={`fixed inset-0 z-50 flex items-center justify-center px-4 backdrop-blur-md bg-white/10 transition-all duration-250 ease-out ${
+      className={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden px-4 backdrop-blur-md bg-white/10 transition-all duration-250 ease-out ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-xl max-h-[80vh] overflow-y-auto rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 transition-all duration-250 ease-out ${
+        className={`relative flex max-h-[80vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 transition-all duration-250 ease-out ${
           isVisible
             ? 'opacity-100 scale-100 translate-y-0'
             : 'opacity-0 scale-95 translate-y-4'
@@ -90,7 +102,8 @@ const Modal = ({ isOpen, onClose, title, htmlContent }: ModalProps) => {
         </div>
 
         <div
-          className="prose prose-sm max-w-none px-6 py-5 text-gray-700"
+          data-lenis-prevent
+          className="prose prose-sm min-h-0 max-w-none overflow-y-auto px-6 py-5 text-gray-700"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
       </div>

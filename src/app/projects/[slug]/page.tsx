@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/lib/projects";
 import Header from "@/components/header";
 import { ApiDataProvider } from "@/providers/ApiDataProvider";
+import BackgroundGradient from "@/components/backgroundGradient";
 
 interface ProjectPageProps {
   params: Promise<{
@@ -21,9 +22,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <ApiDataProvider endpoints={["api/all"]}>
-      <main className="min-h-screen bg-gray-950 px-6 py-16 text-white">
+      <main className="relative min-h-screen overflow-x-hidden px-6 py-16 text-white">
+        <BackgroundGradient />
         <Header singleTitle={project.title} />
-        <article className="mx-auto max-w-5xl">
+        <article className="relative z-10 mx-auto max-w-7xl">
           <Link
             href="/#projects"
             className="mb-10 inline-flex text-sm text-cyan-400 transition hover:text-cyan-300"
@@ -31,8 +33,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             ← Back to projects
           </Link>
 
-        <div className="grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-start">
-          <div className="relative aspect-video overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">
+        <div className="grid gap-12 lg:grid-cols-[1.35fr_1fr] lg:gap-16 lg:items-start">
+          <div className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-white/10 bg-gray-900/80 shadow-2xl shadow-cyan-950/20">
             {project.image ? (
               <Image
                 src={project.image}
@@ -50,7 +52,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             )}
           </div>
 
-          <div>
+          <div className="rounded-3xl border border-white/10 bg-gray-950/60 p-7 backdrop-blur-sm md:p-10">
             <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-cyan-400">
               {project.category}
             </p>
@@ -60,6 +62,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <p className="text-lg leading-8 text-gray-300">
               {project.description || "Project details coming soon."}
             </p>
+
+            {project.roles && project.roles.length > 0 && (
+              <div className="mt-10 border-t border-white/10 pt-8">
+                <h2 className="mb-4 text-xl font-semibold">My role</h2>
+                <ul className="space-y-3 text-gray-300">
+                  {project.roles.map((role) => (
+                    <li key={role} className="flex gap-3 leading-7">
+                      <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" />
+                      <span>{role}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {project.tech && project.tech.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">

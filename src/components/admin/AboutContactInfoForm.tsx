@@ -22,14 +22,18 @@ export default function AboutContactInfoForm({ contactInfo }: AboutContactInfoFo
   const [editTitle, setEditTitle] = useState('')
   const [editContent, setEditContent] = useState('')
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
   const router = useRouter()
 
   const handleCreate = async (formData: FormData) => {
     setLoading(true)
+    setMessage('')
     try {
       await createContactInfo(formData)
+      setMessage('✅ Contact information added successfully!')
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to add contact information')
       console.error('Error creating contact info:', error)
     } finally {
       setLoading(false)
@@ -38,15 +42,18 @@ export default function AboutContactInfoForm({ contactInfo }: AboutContactInfoFo
 
   const handleUpdate = async (id: number) => {
     setLoading(true)
+    setMessage('')
     const formData = new FormData()
     formData.set('title', editTitle)
     formData.set('content', editContent)
     
     try {
       await updateContactInfo(id, formData)
+      setMessage('✅ Contact information updated successfully!')
       setEditingId(null)
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to update contact information')
       console.error('Error updating contact info:', error)
     } finally {
       setLoading(false)
@@ -83,6 +90,11 @@ export default function AboutContactInfoForm({ contactInfo }: AboutContactInfoFo
 
   return (
     <div className="space-y-4">
+      {message && (
+        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+          {message}
+        </div>
+      )}
       {/* Create New */}
       <form action={handleCreate} className="flex gap-2 items-end">
         <div className="flex-1">
