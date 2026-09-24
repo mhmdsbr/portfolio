@@ -23,15 +23,19 @@ export default function JobsForm({ jobs }: JobsFormProps) {
   const [items, setItems] = useState(jobs)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const router = useRouter()
 
   const handleCreate = async (formData: FormData) => {
     setLoading(true)
+    setMessage('')
     try {
       await createJob(formData)
+      setMessage('✅ Experience added successfully!')
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to add experience')
       console.error('Error creating job:', error)
     } finally {
       setLoading(false)
@@ -40,11 +44,14 @@ export default function JobsForm({ jobs }: JobsFormProps) {
 
   const handleUpdate = async (id: number, formData: FormData) => {
     setLoading(true)
+    setMessage('')
     try {
       await updateJob(id, formData)
+      setMessage('✅ Experience updated successfully!')
       setEditingId(null)
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to update experience')
       console.error('Error updating job:', error)
     } finally {
       setLoading(false)
@@ -81,6 +88,11 @@ export default function JobsForm({ jobs }: JobsFormProps) {
 
   return (
     <div className="space-y-4">
+      {message && (
+        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+          {message}
+        </div>
+      )}
       {/* Create New Job */}
       <form action={handleCreate} className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
         <div>

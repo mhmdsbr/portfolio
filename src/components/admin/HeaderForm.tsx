@@ -25,6 +25,7 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
   const [newSectionId, setNewSectionId] = useState('')
   const [newSectionTitle, setNewSectionTitle] = useState('')
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
   const [addError, setAddError] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const router = useRouter()
@@ -36,8 +37,10 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
       setSections(prev => 
         prev.map(s => s.id === id ? { ...s, title: newTitle } : s)
       )
+      setMessage('✅ Header section updated successfully!')
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to update header section')
       console.error('Error updating section:', error)
     } finally {
       setLoading(false)
@@ -48,14 +51,17 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
   const handleDefaultTitleChange = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
+    setMessage('')
 
     const formData = new FormData()
     formData.set('defaultTitle', defaultTitle)
 
     try {
       await updateHeaderSettings(formData)
+      setMessage('✅ Header settings updated successfully!')
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to update header settings')
       console.error('Error updating default title:', error)
     } finally {
       setLoading(false)
@@ -72,9 +78,11 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
       setSections(prev => [...prev, { ...section, sortOrder: section.sortOrder ?? 0 }])
       setNewSectionId('')
       setNewSectionTitle('')
+      setMessage('✅ Header section added successfully!')
       router.refresh()
     } catch (error) {
       setAddError(error instanceof Error ? error.message : 'Unable to add header title')
+      setMessage('❌ Failed to add header section')
     } finally {
       setLoading(false)
     }
@@ -106,6 +114,11 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
 
   return (
     <div className="space-y-8">
+      {message && (
+        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+          {message}
+        </div>
+      )}
       {/* Header Title */}
       <form onSubmit={handleDefaultTitleChange} className="space-y-4 max-w-md">
         <div>

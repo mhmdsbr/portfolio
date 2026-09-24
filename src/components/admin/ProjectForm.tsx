@@ -21,15 +21,20 @@ interface ProjectFormProps {
 export default function ProjectForm({ initialData, onSubmit, submitLabel }: ProjectFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
   const [techInput, setTechInput] = useState(initialData?.tech?.join(', ') || '')
 
   async function handleSubmit(formData: FormData) {
     setLoading(true)
+    setMessage('')
     try {
       await onSubmit(formData)
+      setMessage('✅ Project saved successfully!')
+      await new Promise((resolve) => setTimeout(resolve, 800))
       router.push('/admin/projects')
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to save project')
       console.error('Error submitting form:', error)
       setLoading(false)
     }
@@ -37,6 +42,11 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel }: Proj
 
   return (
     <form action={handleSubmit} className="space-y-6 max-w-3xl">
+      {message && (
+        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+          {message}
+        </div>
+      )}
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-1">
           Title *

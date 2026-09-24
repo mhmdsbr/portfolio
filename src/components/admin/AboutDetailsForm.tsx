@@ -22,14 +22,18 @@ export default function AboutDetailsForm({ details }: AboutDetailsFormProps) {
   const [editNumber, setEditNumber] = useState(0)
   const [editTitle, setEditTitle] = useState('')
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
   const router = useRouter()
 
   const handleCreate = async (formData: FormData) => {
     setLoading(true)
+    setMessage('')
     try {
       await createDetail(formData)
+      setMessage('✅ About detail added successfully!')
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to add about detail')
       console.error('Error creating detail:', error)
     } finally {
       setLoading(false)
@@ -38,15 +42,18 @@ export default function AboutDetailsForm({ details }: AboutDetailsFormProps) {
 
   const handleUpdate = async (id: number) => {
     setLoading(true)
+    setMessage('')
     const formData = new FormData()
     formData.set('number', String(editNumber))
     formData.set('title', editTitle)
     
     try {
       await updateDetail(id, formData)
+      setMessage('✅ About detail updated successfully!')
       setEditingId(null)
       router.refresh()
     } catch (error) {
+      setMessage('❌ Failed to update about detail')
       console.error('Error updating detail:', error)
     } finally {
       setLoading(false)
@@ -83,6 +90,11 @@ export default function AboutDetailsForm({ details }: AboutDetailsFormProps) {
 
   return (
     <div className="space-y-4">
+      {message && (
+        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+          {message}
+        </div>
+      )}
       {/* Create New */}
       <form action={handleCreate} className="flex gap-2 items-end">
         <div>

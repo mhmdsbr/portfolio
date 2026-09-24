@@ -32,6 +32,7 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
   const [testimonialItems, setTestimonialItems] = useState(items || [])
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const router = useRouter()
 
@@ -48,10 +49,13 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
 
   const handleCreate = async (formData: FormData) => {
     setLoading(true)
+    setMessage('')
     try {
       await createTestimonialItem(formData)
+      setMessage('✅ Testimonial added successfully!')
       await refreshData()
     } catch (error) {
+      setMessage('❌ Failed to add testimonial')
       console.error('Error creating testimonial:', error)
     } finally {
       setLoading(false)
@@ -60,11 +64,14 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
 
   const handleUpdate = async (id: number, formData: FormData) => {
     setLoading(true)
+    setMessage('')
     try {
       await updateTestimonialItem(id, formData)
+      setMessage('✅ Testimonial updated successfully!')
       setEditingId(null)
       await refreshData()
     } catch (error) {
+      setMessage('❌ Failed to update testimonial')
       console.error('Error updating testimonial:', error)
     } finally {
       setLoading(false)
@@ -112,6 +119,11 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
 
   return (
     <div className="space-y-4">
+      {message && (
+        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+          {message}
+        </div>
+      )}
       {/* Create New Testimonial */}
       <form action={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="md:col-span-2">
