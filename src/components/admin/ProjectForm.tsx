@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 interface ProjectFormProps {
   initialData?: {
@@ -33,6 +34,7 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel }: Proj
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [techInput, setTechInput] = useState(initialData?.tech?.join(', ') || '')
+  const [imageUrl, setImageUrl] = useState(initialData?.image || '')
 
   async function handleSubmit(formData: FormData) {
     setLoading(true)
@@ -130,10 +132,23 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel }: Proj
           type="url"
           id="image"
           name="image"
-          defaultValue={initialData?.image || ''}
+          value={imageUrl}
+          onChange={(event) => setImageUrl(event.target.value)}
           placeholder="/images/project.png"
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
+        {imageUrl && (
+          <div className="mt-2 inline-block rounded bg-gray-800 p-2">
+            <Image
+              src={imageUrl}
+              alt="Project image preview"
+              width={240}
+              height={144}
+              unoptimized
+              className="h-36 w-60 rounded object-cover"
+            />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
