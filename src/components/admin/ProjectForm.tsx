@@ -19,6 +19,15 @@ interface ProjectFormProps {
   submitLabel: string
 }
 
+function hasProjectId(result: unknown): result is { id: number } {
+  return (
+    typeof result === 'object' &&
+    result !== null &&
+    'id' in result &&
+    typeof result.id === 'number'
+  )
+}
+
 export default function ProjectForm({ initialData, onSubmit, submitLabel }: ProjectFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -29,14 +38,17 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel }: Proj
     setLoading(true)
     setMessage('')
     try {
-      await onSubmit(formData)
+      const savedProject = await onSubmit(formData)
       setMessage('✅ Project saved successfully!')
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      router.push('/admin/projects')
       router.refresh()
+
+      if (!initialData?.id && hasProjectId(savedProject)) {
+        router.replace(`/admin/projects/${savedProject.id}`)
+      }
     } catch (error) {
       setMessage('❌ Failed to save project')
       console.error('Error submitting form:', error)
+    } finally {
       setLoading(false)
     }
   }
