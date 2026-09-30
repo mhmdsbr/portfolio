@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { deleteProject, reorderProjects, updateProjectCategories } from '@/actions/projects'
+import { deleteProject, reorderProjects, updateProjectCategoriesAndTech } from '@/actions/projects'
 import { useEffect, useState } from 'react'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 
@@ -27,14 +27,18 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
   const [items, setItems] = useState(projects)
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [message, setMessage] = useState('')
-  const [isEditingCategories, setIsEditingCategories] = useState(false)
+  const [isEditingProjectDetails, setIsEditingProjectDetails] = useState(false)
   const [categoryDrafts, setCategoryDrafts] = useState<Record<number, string>>({})
+  const [techDrafts, setTechDrafts] = useState<Record<number, string>>({})
   const [savingCategories, setSavingCategories] = useState(false)
 
   useEffect(() => {
     setItems(projects)
     setCategoryDrafts(
       Object.fromEntries(projects.map((project) => [project.id, project.category])),
+    )
+    setTechDrafts(
+      Object.fromEntries(projects.map((project) => [project.id, project.tech?.join(', ') ?? ''])),
     )
   }, [projects])
 
@@ -79,22 +83,32 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
     setCategoryDrafts(
       Object.fromEntries(items.map((project) => [project.id, project.category])),
     )
+    setTechDrafts(
+      Object.fromEntries(items.map((project) => [project.id, project.tech?.join(', ') ?? ''])),
+    )
     setMessage('')
-    setIsEditingCategories(true)
+    setIsEditingProjectDetails(true)
   }
 
   const handleCategoryCancel = () => {
     setCategoryDrafts(
       Object.fromEntries(items.map((project) => [project.id, project.category])),
     )
+    setTechDrafts(
+      Object.fromEntries(items.map((project) => [project.id, project.tech?.join(', ') ?? ''])),
+    )
     setMessage('')
-    setIsEditingCategories(false)
+    setIsEditingProjectDetails(false)
   }
 
   const handleCategorySave = async () => {
     const updates = items.map((project) => ({
       id: project.id,
       category: (categoryDrafts[project.id] ?? '').trim(),
+      tech: (techDrafts[project.id] ?? '')
+        .split(',')
+        .map((technology) => technology.trim())
+        .filter(Boolean),
     }))
 
     if (updates.some(({ category }) => !category)) {
@@ -106,19 +120,20 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
     setMessage('')
 
     try {
-      await updateProjectCategories(updates)
+      await updateProjectCategoriesAndTech(updates)
       setItems((currentItems) =>
         currentItems.map((project) => ({
           ...project,
           category: categoryDrafts[project.id].trim(),
+          tech: updates.find((update) => update.id === project.id)?.tech ?? [],
         })),
       )
-      setIsEditingCategories(false)
-      setMessage('✅ Project categories saved successfully!')
+      setIsEditingProjectDetails(false)
+      setMessage('✅ Project categories and technologies saved successfully!')
       router.refresh()
     } catch (error) {
-      setMessage('❌ Failed to save project categories.')
-      console.error('Error updating project categories:', error)
+      setMessage('❌ Failed to save project categories and technologies.')
+      console.error('Error updating project details:', error)
     } finally {
       setSavingCategories(false)
     }
@@ -134,11 +149,11 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
       {items.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-700 p-4">
           <p className="text-sm text-gray-400">
-            {isEditingCategories
-              ? 'Edit categories for the projects shown below.'
-              : 'Change categories for multiple projects at once.'}
+            {isEditingProjectDetails
+              ? 'Edit categories and technologies for the projects shown below.'
+              : 'Change categories and technologies for multiple projects at once.'}
           </p>
-          {isEditingCategories ? (
+          {isEditingProjectDetails ? (
             <div className="flex gap-2">
               <button
                 type="button"
@@ -154,7 +169,7 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
                 disabled={savingCategories}
                 className="rounded-md bg-cyan-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-600 disabled:opacity-50"
               >
-                {savingCategories ? 'Saving...' : 'Save categories'}
+                {savingCategories ? 'Saving...' : 'Save changes'}
               </button>
             </div>
           ) : (
@@ -163,7 +178,7 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
               onClick={handleCategoryEditToggle}
               className="rounded-md bg-gray-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-600"
             >
-              Edit all categories
+              Edit categories & techs
             </button>
           )}
         </div>
@@ -174,19 +189,26 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
         </div>
       ) : (
         <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="projects">
+          <Droppable droppableId="projects">
               {(provided) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                   className="space-y-3 p-3"
                 >
+                  <div className="hidden grid-cols-[auto_minmax(0,1fr)_minmax(10rem,0.7fr)_minmax(10rem,1fr)_auto] gap-4 px-4 text-xs font-semibold uppercase tracking-wide text-gray-400 sm:grid">
+                    <span />
+                    <span>Name</span>
+                    <span>Category</span>
+                    <span>Techs</span>
+                    <span>Actions</span>
+                  </div>
                   {items.map((project, index) => (
                     <Draggable
                       key={project.id}
                       draggableId={String(project.id)}
                       index={index}
-                      isDragDisabled={isEditingCategories}
+                      isDragDisabled={isEditingProjectDetails}
                     >
                       {(provided, snapshot) => (
                         <article
@@ -206,15 +228,23 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
                             </span>
                           </div>
                           <div className="min-w-0">
+                            <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500 sm:hidden">
+                              Name
+                            </span>
                             <h2 className="truncate font-semibold text-white">{project.title}</h2>
-                            {!isEditingCategories && (
-                              <span className="mt-1 inline-block rounded-full bg-cyan-500/20 px-2 py-1 text-xs text-cyan-400 sm:hidden">
-                                {project.category}
-                              </span>
+                            {!isEditingProjectDetails && (
+                              <div className="mt-2 sm:hidden">
+                                <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+                                  Category
+                                </span>
+                                <span className="inline-block rounded-full bg-cyan-500/20 px-2 py-1 text-xs text-cyan-400">
+                                  {project.category}
+                                </span>
+                              </div>
                             )}
                           </div>
                           <div className="hidden sm:block">
-                            {isEditingCategories ? (
+                            {isEditingProjectDetails ? (
                               <input
                                 aria-label={`${project.title} category`}
                                 value={categoryDrafts[project.id] ?? ''}
@@ -232,9 +262,16 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
                               </span>
                             )}
                           </div>
-                          {isEditingCategories && (
+                          {isEditingProjectDetails && (
                             <div className="col-start-2 sm:hidden">
+                              <label
+                                htmlFor={`project-category-${project.id}`}
+                                className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500"
+                              >
+                                Category
+                              </label>
                               <input
+                                id={`project-category-${project.id}`}
                                 aria-label={`${project.title} category`}
                                 value={categoryDrafts[project.id] ?? ''}
                                 onChange={(event) =>
@@ -248,21 +285,44 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
                             </div>
                           )}
                           <div className="col-start-2 flex flex-wrap gap-1 sm:col-auto">
-                            {project.tech?.slice(0, 3).map((tech, i) => (
-                              <span
-                                key={i}
-                                className="rounded bg-gray-800 px-2 py-0.5 text-xs"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                            {project.tech && project.tech.length > 3 && (
-                              <span className="rounded bg-gray-800 px-2 py-0.5 text-xs">
-                                +{project.tech.length - 3}
-                              </span>
+                            <span className="w-full text-xs font-medium uppercase tracking-wide text-gray-500 sm:hidden">
+                              Techs
+                            </span>
+                            {isEditingProjectDetails ? (
+                              <input
+                                aria-label={`${project.title} technologies`}
+                                value={techDrafts[project.id] ?? ''}
+                                onChange={(event) =>
+                                  setTechDrafts((current) => ({
+                                    ...current,
+                                    [project.id]: event.target.value,
+                                  }))
+                                }
+                                placeholder="React, TypeScript, Tailwind"
+                                className="w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                              />
+                            ) : (
+                              <>
+                                {project.tech?.slice(0, 3).map((tech, i) => (
+                                  <span
+                                    key={i}
+                                    className="rounded bg-gray-800 px-2 py-0.5 text-xs"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+                                {project.tech && project.tech.length > 3 && (
+                                  <span className="rounded bg-gray-800 px-2 py-0.5 text-xs">
+                                    +{project.tech.length - 3}
+                                  </span>
+                                )}
+                              </>
                             )}
                           </div>
                           <div className="col-start-2 flex gap-3 sm:col-auto">
+                            <span className="text-xs font-medium uppercase tracking-wide text-gray-500 sm:hidden">
+                              Actions
+                            </span>
                             <Link
                               href={`/admin/projects/${project.id}`}
                               className="text-cyan-400 transition hover:text-cyan-300"
