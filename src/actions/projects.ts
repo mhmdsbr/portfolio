@@ -127,27 +127,34 @@ export async function reorderProjects(ids: number[]) {
   revalidatePath('/api/all')
 }
 
-export async function updateProjectCategories(
-  updates: { id: number; category: string }[],
+export async function updateProjectCategoriesAndTech(
+  updates: { id: number; category: string; tech: string[] }[],
 ) {
   await requireAuth()
 
   if (
     updates.length === 0 ||
     updates.some(
-      ({ id, category }) =>
-        !Number.isSafeInteger(id) || id <= 0 || !category.trim(),
+      ({ id, category, tech }) =>
+        !Number.isSafeInteger(id) ||
+        id <= 0 ||
+        !category.trim() ||
+        !Array.isArray(tech) ||
+        tech.some((item) => typeof item !== 'string' || !item.trim()),
     ) ||
     new Set(updates.map(({ id }) => id)).size !== updates.length
   ) {
-    throw new Error('Invalid project category updates')
+    throw new Error('Invalid project category or technology updates')
   }
 
   await db.transaction(async (transaction) => {
-    for (const { id, category } of updates) {
+    for (const { id, category, tech } of updates) {
       const [updatedProject] = await transaction
         .update(schema.projectItems)
-        .set({ category: category.trim() })
+        .set({
+          category: category.trim(),
+          tech: tech.length > 0 ? tech.map((item) => item.trim()) : null,
+        })
         .where(eq(schema.projectItems.id, id))
         .returning({ id: schema.projectItems.id })
 
