@@ -57,6 +57,19 @@ export default function useAboutScrollAnimation({
 
     const paragraphs = textRef.current.querySelectorAll("p");
 
+    const measureDescription = () => {
+      const currentParagraphs = Array.from(paragraphs, (paragraph) => paragraph.innerHTML);
+
+      paragraphs.forEach((paragraph, index) => {
+        paragraph.innerHTML = originalTextsRef.current[index] ?? "";
+      });
+      textRef.current!.style.minHeight = `${textRef.current!.scrollHeight}px`;
+      paragraphs.forEach((paragraph, index) => {
+        paragraph.innerHTML = currentParagraphs[index] ?? "";
+      });
+    };
+
+    measureDescription();
     paragraphs.forEach((p) => {
       p.innerHTML = "";
     });
@@ -67,7 +80,7 @@ export default function useAboutScrollAnimation({
         trigger: containerRef.current,
         start: "top center",
         end: "+=100",
-        pinSpacing: false,
+        pinSpacing: true,
         pin: true,
         scrub: 0.5,
       },
@@ -106,7 +119,10 @@ export default function useAboutScrollAnimation({
       }
     });
 
-    const resizeHandler = () => ScrollTrigger.refresh();
+    const resizeHandler = () => {
+      measureDescription();
+      ScrollTrigger.refresh();
+    };
     window.addEventListener("resize", resizeHandler);
 
     return () => {

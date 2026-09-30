@@ -20,29 +20,29 @@ export default function HeroBadge({
   descriptionRef,
 }: HeroBadgeProps) {
   return (
-    <div className="flex justify-center items-center h-16 text-white uppercase font-medium absolute left-auto lg:left-4 bottom-20 z-10">
-      <div className="flex items-center bg-primary-cyan h-full border-r-1 rounded-l-xs border-white p-3 z-20">
+    <div className="absolute bottom-8 left-0 z-10 flex h-14 w-full max-w-full items-center justify-start overflow-hidden text-[10px] font-medium uppercase text-white sm:bottom-20 sm:h-16 sm:w-fit sm:text-xs md:text-sm lg:left-4">
+      <div className="z-20 flex h-full shrink-0 items-center rounded-l-xs border-r-1 border-white bg-primary-cyan p-2 sm:p-3">
         {logo ? (
           <Image
             src={logo}
             width={40}
             height={40}
             alt="Author's logo"
-            style={{ width: "40px", height: "40px" }}
+            className="h-8 w-8 object-contain sm:h-10 sm:w-10"
           />
         ) : null}
       </div>
-      <div className="flex items-center bg-primary-orange h-full border-r-1 border-white p-2 z-20">
-        <p>{location}</p>
+      <div className="z-20 flex h-full min-w-0 max-w-[22vw] items-center border-r-1 border-white bg-primary-orange px-2 sm:max-w-none sm:px-3">
+        <p className="truncate">{location}</p>
       </div>
-      <div className="flex items-center bg-primary-purple h-full border-white p-2 z-20">
-        <p>{subtitleOne}</p>
+      <div className="z-20 flex h-full min-w-0 max-w-[24vw] items-center border-white bg-primary-purple px-2 sm:max-w-none sm:px-3">
+        <p className="truncate">{subtitleOne}</p>
       </div>
       <div
         ref={descriptionRef}
-        className="items-center bg-white text-black h-full border-r-6 rounded-r-md border-primary-cyan p-2 z-0 opacity-0 flex"
+        className="z-0 flex h-full min-w-0 max-w-[30vw] items-center rounded-r-md border-r-6 border-primary-cyan bg-white px-2 text-black opacity-100 sm:max-w-none sm:px-3 lg:opacity-0"
       >
-        <Link href="/cv.pdf">{subtitleTwo}</Link>
+        <Link href="/cv.pdf" className="truncate">{subtitleTwo}</Link>
       </div>
     </div>
   );
