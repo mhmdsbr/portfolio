@@ -73,17 +73,21 @@ export default function Services() {
         <h2 className="flex justify-center text-4xl md:text-6xl font-bold text-center font-mono relative z-10">
           {title}
         </h2>
-        <div className="services-container container w-full md:w-10/12 lg:w-8/12 flex flex-col md:flex-row gap-6 md:gap-10 mx-auto px-4">
+        <div className="services-container container mx-auto grid w-full grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:w-10/12 md:gap-8 lg:w-10/12 xl:grid-cols-3">
           {content.map((item, i) => (
             <div
               key={i}
-              className="service-card flex-1 p-6 rounded-xl border border-gray-700 bg-gray-800/50 backdrop-blur-sm flex flex-col text-center hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/10"
+              className="service-card flex h-56 min-w-0 flex-col rounded-xl border border-gray-700 bg-gray-800/50 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/10 md:h-auto md:p-6"
             >
-              <div className="mb-4">{item.icon && getIcon(item.icon)}</div>
-              <h3 className="font-bold text-2xl mb-4 text-white">
+              <div className="mb-4 flex h-10 shrink-0 items-center justify-center md:h-12">
+                {item.icon && getIcon(item.icon)}
+              </div>
+              <h3 className="mb-4 shrink-0 text-lg font-bold text-white md:text-2xl">
                 {item.title}
               </h3>
-              <p className="text-gray-400 flex-1">{item.content}</p>
+              <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto md:items-start md:justify-start">
+                <p className="text-gray-400">{item.content}</p>
+              </div>
             </div>
           ))}
         </div>

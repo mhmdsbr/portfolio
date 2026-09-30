@@ -40,8 +40,22 @@ const Testimonials: React.FC = () => {
 
       <Swiper
         modules={[Autoplay]}
-        slidesPerView={3}
-        spaceBetween={30}
+        slidesPerView={1}
+        spaceBetween={16}
+        breakpoints={{
+          640: {
+            slidesPerView: 1,
+            spaceBetween: 20,
+          },
+          768: {
+            slidesPerView: 2,
+            spaceBetween: 24,
+          },
+          1200: {
+            slidesPerView: 3,
+            spaceBetween: 30,
+          },
+        }}
         loop={true}
         freeMode={true}
         speed={15000}
