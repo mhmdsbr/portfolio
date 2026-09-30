@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { deleteProject, reorderProjects } from '@/actions/projects'
+import { deleteProject, reorderProjects, updateProjectCategories } from '@/actions/projects'
 import { useEffect, useState } from 'react'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 
@@ -27,9 +27,15 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
   const [items, setItems] = useState(projects)
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [message, setMessage] = useState('')
+  const [isEditingCategories, setIsEditingCategories] = useState(false)
+  const [categoryDrafts, setCategoryDrafts] = useState<Record<number, string>>({})
+  const [savingCategories, setSavingCategories] = useState(false)
 
   useEffect(() => {
     setItems(projects)
+    setCategoryDrafts(
+      Object.fromEntries(projects.map((project) => [project.id, project.category])),
+    )
   }, [projects])
 
   const handleDelete = async (id: number) => {
@@ -69,11 +75,97 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
     }
   }
 
+  const handleCategoryEditToggle = () => {
+    setCategoryDrafts(
+      Object.fromEntries(items.map((project) => [project.id, project.category])),
+    )
+    setMessage('')
+    setIsEditingCategories(true)
+  }
+
+  const handleCategoryCancel = () => {
+    setCategoryDrafts(
+      Object.fromEntries(items.map((project) => [project.id, project.category])),
+    )
+    setMessage('')
+    setIsEditingCategories(false)
+  }
+
+  const handleCategorySave = async () => {
+    const updates = items.map((project) => ({
+      id: project.id,
+      category: (categoryDrafts[project.id] ?? '').trim(),
+    }))
+
+    if (updates.some(({ category }) => !category)) {
+      setMessage('❌ Every project must have a category.')
+      return
+    }
+
+    setSavingCategories(true)
+    setMessage('')
+
+    try {
+      await updateProjectCategories(updates)
+      setItems((currentItems) =>
+        currentItems.map((project) => ({
+          ...project,
+          category: categoryDrafts[project.id].trim(),
+        })),
+      )
+      setIsEditingCategories(false)
+      setMessage('✅ Project categories saved successfully!')
+      router.refresh()
+    } catch (error) {
+      setMessage('❌ Failed to save project categories.')
+      console.error('Error updating project categories:', error)
+    } finally {
+      setSavingCategories(false)
+    }
+  }
+
   return (
     <div className="rounded-lg bg-gray-800">
       {message && (
-        <div className={`p-3 ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+        <div className={`p-3 ${message.includes('❌') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
           {message}
+        </div>
+      )}
+      {items.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-700 p-4">
+          <p className="text-sm text-gray-400">
+            {isEditingCategories
+              ? 'Edit categories for the projects shown below.'
+              : 'Change categories for multiple projects at once.'}
+          </p>
+          {isEditingCategories ? (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleCategoryCancel}
+                disabled={savingCategories}
+                className="rounded-md bg-gray-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-600 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCategorySave}
+                disabled={savingCategories}
+                className="rounded-md bg-cyan-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-600 disabled:opacity-50"
+              >
+                {savingCategories ? 'Saving...' : 'Save categories'}
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={handleCategoryEditToggle}
+              className="rounded-md bg-gray-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-600"
+            >
+              Edit all categories
+            </button>
+          )}
         </div>
       )}
       {items.length === 0 ? (
@@ -94,6 +186,7 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
                       key={project.id}
                       draggableId={String(project.id)}
                       index={index}
+                      isDragDisabled={isEditingCategories}
                     >
                       {(provided, snapshot) => (
                         <article
@@ -114,15 +207,46 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
                           </div>
                           <div className="min-w-0">
                             <h2 className="truncate font-semibold text-white">{project.title}</h2>
-                            <span className="mt-1 inline-block rounded-full bg-cyan-500/20 px-2 py-1 text-xs text-cyan-400 sm:hidden">
-                              {project.category}
-                            </span>
+                            {!isEditingCategories && (
+                              <span className="mt-1 inline-block rounded-full bg-cyan-500/20 px-2 py-1 text-xs text-cyan-400 sm:hidden">
+                                {project.category}
+                              </span>
+                            )}
                           </div>
                           <div className="hidden sm:block">
-                            <span className="rounded-full bg-cyan-500/20 px-2 py-1 text-xs text-cyan-400">
-                              {project.category}
-                            </span>
+                            {isEditingCategories ? (
+                              <input
+                                aria-label={`${project.title} category`}
+                                value={categoryDrafts[project.id] ?? ''}
+                                onChange={(event) =>
+                                  setCategoryDrafts((current) => ({
+                                    ...current,
+                                    [project.id]: event.target.value,
+                                  }))
+                                }
+                                className="w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                              />
+                            ) : (
+                              <span className="rounded-full bg-cyan-500/20 px-2 py-1 text-xs text-cyan-400">
+                                {project.category}
+                              </span>
+                            )}
                           </div>
+                          {isEditingCategories && (
+                            <div className="col-start-2 sm:hidden">
+                              <input
+                                aria-label={`${project.title} category`}
+                                value={categoryDrafts[project.id] ?? ''}
+                                onChange={(event) =>
+                                  setCategoryDrafts((current) => ({
+                                    ...current,
+                                    [project.id]: event.target.value,
+                                  }))
+                                }
+                                className="w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                              />
+                            </div>
+                          )}
                           <div className="col-start-2 flex flex-wrap gap-1 sm:col-auto">
                             {project.tech?.slice(0, 3).map((tech, i) => (
                               <span

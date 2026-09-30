@@ -126,3 +126,39 @@ export async function reorderProjects(ids: number[]) {
   revalidatePath('/admin/projects')
   revalidatePath('/api/all')
 }
+
+export async function updateProjectCategories(
+  updates: { id: number; category: string }[],
+) {
+  await requireAuth()
+
+  if (
+    updates.length === 0 ||
+    updates.some(
+      ({ id, category }) =>
+        !Number.isSafeInteger(id) || id <= 0 || !category.trim(),
+    ) ||
+    new Set(updates.map(({ id }) => id)).size !== updates.length
+  ) {
+    throw new Error('Invalid project category updates')
+  }
+
+  await db.transaction(async (transaction) => {
+    for (const { id, category } of updates) {
+      const [updatedProject] = await transaction
+        .update(schema.projectItems)
+        .set({ category: category.trim() })
+        .where(eq(schema.projectItems.id, id))
+        .returning({ id: schema.projectItems.id })
+
+      if (!updatedProject) {
+        throw new Error(`Project ${id} was not found`)
+      }
+    }
+  })
+
+  revalidatePath('/admin/projects')
+  revalidatePath('/')
+  revalidatePath('/projects/category/[slug]', 'page')
+  revalidatePath('/api/all')
+}
