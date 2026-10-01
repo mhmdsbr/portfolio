@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" fill="none">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10172A"/>
+      <stop offset=".55" stop-color="#172554"/>
+      <stop offset="1" stop-color="#164E63"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(0 440 -650 0 950 130)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <path fill="url(#background)" d="M0 0h1280v720H0z"/>
+  <path fill="url(#glow)" d="M0 0h1280v720H0z"/>
+  <circle cx="1040" cy="360" r="215" stroke="#A5F3FC" stroke-opacity=".22" stroke-width="2"/>
+  <circle cx="1040" cy="360" r="165" stroke="#A5F3FC" stroke-opacity=".18" stroke-width="2"/>
+  <path d="M920 480c72-190 168-260 300-270" stroke="#67E8F9" stroke-opacity=".4" stroke-width="3"/>
+  <path d="M880 525c112-133 225-188 362-195" stroke="#A5F3FC" stroke-opacity=".24" stroke-width="2"/>
+  <text x="96" y="300" fill="#67E8F9" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="8">VIDEO INTRODUCTION</text>
+  <text x="92" y="392" fill="#fff" font-family="Arial,sans-serif" font-size="64" font-weight="700">Tomorrow University</text>
+  <text x="96" y="444" fill="#CBD5E1" font-family="Arial,sans-serif" font-size="28">A short introduction</text>
+</svg>
