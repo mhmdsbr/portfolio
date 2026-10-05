@@ -5,6 +5,12 @@
 # React
 build
 drizzle
+!drizzle/
+drizzle/*
+!drizzle/*.sql
+!drizzle/meta/
+drizzle/meta/*
+!drizzle/meta/*.json
 *.tsbuildinfo
 .next/
 

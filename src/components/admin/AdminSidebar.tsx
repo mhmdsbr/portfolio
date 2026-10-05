@@ -30,6 +30,7 @@ const navItems = [
   { href: '/admin/testimonials', label: 'Testimonials', icon: FiMessageSquare },
   { href: '/admin/contact', label: 'Contact', icon: FiMail },
   { href: '/admin/general-settings', label: 'General Settings', icon: FiSettings },
+  { href: '/admin/profile-settings', label: 'Profile Settings', icon: FiUser },
 ]
 
 export default function AdminSidebar() {

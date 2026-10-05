@@ -15,7 +15,6 @@ export async function GET(): Promise<NextResponse<ApiResponse<ConfigResponse>>> 
         host: configData?.smtpHost ?? null,
         port: configData?.smtpPort ?? null,
         username: configData?.smtpUsername ?? null,
-        password: configData?.smtpPassword ?? null,
       },
       recaptcha_site_key: configData?.recaptchaSiteKey ?? null,
     }

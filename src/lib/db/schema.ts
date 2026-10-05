@@ -5,8 +5,10 @@ import {
   integer,
   timestamp,
   pgEnum,
+  boolean,
+  jsonb,
+  index,
 } from 'drizzle-orm/pg-core'
-import {  } from 'drizzle-orm'
 
 // =============================================
 // ENUMS
@@ -343,6 +345,78 @@ export const config = pgTable('config', {
 export type Config = typeof config.$inferSelect
 export type NewConfig = typeof config.$inferInsert
 
+// =============================================
+// 12. ADMIN IDENTITY, PROFILES, AND SESSIONS
+// =============================================
+export const adminUsers = pgTable('admin_users', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+
+export const adminProfiles = pgTable('admin_profiles', {
+  userId: integer('user_id')
+    .primaryKey()
+    .references(() => adminUsers.id, { onDelete: 'cascade' }),
+  displayName: text('display_name').notNull(),
+  bio: text('bio'),
+  preferences: jsonb('preferences')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default({}),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+
+export const adminSessions = pgTable(
+  'admin_sessions',
+  {
+    sessionId: text('session_id').primaryKey(),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'cascade' }),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => [index('admin_sessions_user_id_idx').on(table.userId)],
+)
+
+export const adminEmailVerifications = pgTable(
+  'admin_email_verifications',
+  {
+    id: text('id').primaryKey(),
+    purpose: text('purpose').notNull(),
+    email: text('email').notNull(),
+    displayName: text('display_name').notNull(),
+    passwordHash: text('password_hash').notNull(),
+    codeSalt: text('code_salt').notNull(),
+    codeHash: text('code_hash').notNull(),
+    attempts: integer('attempts').notNull().default(0),
+    createdByUserId: integer('created_by_user_id').references(
+      () => adminUsers.id,
+      { onDelete: 'cascade' },
+    ),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => [
+    index('admin_email_verifications_email_purpose_idx').on(
+      table.email,
+      table.purpose,
+    ),
+  ],
+)
+
+export type AdminUser = typeof adminUsers.$inferSelect
+export type NewAdminUser = typeof adminUsers.$inferInsert
+export type AdminProfile = typeof adminProfiles.$inferSelect
+export type NewAdminProfile = typeof adminProfiles.$inferInsert
+export type AdminSession = typeof adminSessions.$inferSelect
+export type NewAdminSession = typeof adminSessions.$inferInsert
+export type AdminEmailVerification = typeof adminEmailVerifications.$inferSelect
 
 // =============================================
 // 13. HEADER SECTIONS (Individual records)

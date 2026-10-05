@@ -1,0 +1,1 @@
+CREATE INDEX "admin_sessions_user_id_idx" ON "admin_sessions" USING btree ("user_id");

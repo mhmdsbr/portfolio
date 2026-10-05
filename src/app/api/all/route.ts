@@ -219,7 +219,6 @@ export async function GET(): Promise<
           host: configRecord?.smtpHost ?? null,
           port: configRecord?.smtpPort ?? null,
           username: configRecord?.smtpUsername ?? null,
-          password: configRecord?.smtpPassword ?? null,
         },
         recaptcha_site_key: configRecord?.recaptchaSiteKey ?? null,
       },

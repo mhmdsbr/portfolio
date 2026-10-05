@@ -118,7 +118,6 @@ export interface ConfigResponse {
     host: string | null;
     port: string | null;
     username: string | null;
-    password: string | null;
   };
   recaptcha_site_key: string | null;
 }

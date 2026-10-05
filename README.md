@@ -44,6 +44,20 @@ To run this project locally, follow these steps:
 
 Navigate and interact with the portfolio seamlessly, experiencing the blend of React and WordPress technologies.
 
+### Admin account setup
+
+Apply the database schema before opening the admin area with `npm run db:push`
+using the database environment you intend to use. The first visit to
+`/admin/login` redirects to the one-time `/admin/signup` page while no admin
+accounts exist. Configure SMTP host, port, username, and password under
+**General Settings** before signing up. Initial and additional admin accounts
+are created only after confirming a six-digit code sent to their email address.
+Codes expire after 10 minutes, allow five attempts, and can be requested once
+per minute. Once the first account is created, public sign-up closes; signed-in
+admins can add, deactivate, reactivate, or reset other admin accounts in
+**Profile Settings**. Deactivated accounts and their profile data are retained.
+Passwords are stored as scrypt hashes, and sessions use opaque HTTP-only cookies
+backed by the database.
 
 ## Contributing
 
