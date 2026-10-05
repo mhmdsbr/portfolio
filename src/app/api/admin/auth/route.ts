@@ -1,4 +1,4 @@
-import { login } from '@/lib/auth'
+import { login, logout } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -14,4 +14,9 @@ export async function POST(request: Request) {
     { error: result.error },
     { status: 401 }
   )
+}
+
+export async function DELETE() {
+  await logout()
+  return NextResponse.json({ success: true })
 }
