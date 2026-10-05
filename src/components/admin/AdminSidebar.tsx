@@ -14,7 +14,8 @@ import {
   FiMenu,
   FiFileText,
   FiLayout,
-  FiMail
+  FiMail,
+  FiSettings,
 } from 'react-icons/fi'
 
 const navItems = [
@@ -27,7 +28,9 @@ const navItems = [
   { href: '/admin/experience', label: 'Experience', icon: FiTool },
   { href: '/admin/services', label: 'Services', icon: FiAward },
   { href: '/admin/testimonials', label: 'Testimonials', icon: FiMessageSquare },
-  { href: '/admin/contact', label: 'Contact', icon: FiMail }, ]
+  { href: '/admin/contact', label: 'Contact', icon: FiMail },
+  { href: '/admin/general-settings', label: 'General Settings', icon: FiSettings },
+]
 
 export default function AdminSidebar() {
   const pathname = usePathname()
