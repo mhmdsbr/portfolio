@@ -1,8 +1,9 @@
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import type { ApiResponse, AllDataResponse } from "@/types/api";
+import { isPortfolioSectionKey, PORTFOLIO_SECTIONS } from "@/lib/portfolio-sections";
 
 export const dynamic = "force-dynamic";
 
@@ -13,95 +14,144 @@ export async function GET(): Promise<
     // Fetch all data in parallel
     const [
       sidebarData,
+      profileData,
       socialData,
       generalData,
       heroData,
       heroTitlesData,
       aboutData,
-      aboutContactData,
-      aboutDetailsData,
+      contactMethodsData,
+      profileFactsData,
       servicesData,
-      serviceItemsData,
       summaryData,
-      summaryJobsData,
-      summaryExperiencesData,
-      testimonialsData,
-      testimonialItemsData,
+      experiencesData,
+      skillsData,
+      testimonialsItemsData,
       projectsData,
-      projectItemsData,
+      projectTechData,
+      projectRolesData,
       contactData,
       configData,
-      headerSectionsData,
+      pageSectionsData,
       headerSettingsData,
       footerData,
     ] = await Promise.all([
-      db.select().from(schema.sidebar),
+      db.select().from(schema.sidebar).limit(1),
+      db.select().from(schema.portfolioProfile).limit(1),
       db
         .select()
-        .from(schema.socialMedia)
-        .orderBy(asc(schema.socialMedia.sortOrder)),
-      db.select().from(schema.generalSettings),
-      db.select().from(schema.heroSection),
+        .from(schema.socialLinks)
+        .orderBy(asc(schema.socialLinks.sortOrder)),
+      db.select().from(schema.siteSettings).limit(1),
+      db.select().from(schema.heroSection).limit(1),
       db
-        .select()
+        .select({ title: schema.heroTitles.title })
         .from(schema.heroTitles)
+        .innerJoin(
+          schema.heroSection,
+          eq(schema.heroSection.id, schema.heroTitles.heroSectionId),
+        )
+        .where(eq(schema.heroSection.sectionKey, 'hero'))
         .orderBy(asc(schema.heroTitles.sortOrder)),
-      db.select().from(schema.aboutSection),
+      db.select().from(schema.aboutSection).limit(1),
       db
         .select()
-        .from(schema.aboutContactInfo)
-        .orderBy(asc(schema.aboutContactInfo.sortOrder)),
+        .from(schema.contactMethods)
+        .orderBy(asc(schema.contactMethods.sortOrder)),
       db
         .select()
-        .from(schema.aboutDetails)
-        .orderBy(asc(schema.aboutDetails.sortOrder)),
-      db.select().from(schema.servicesSection),
+        .from(schema.profileFacts)
+        .orderBy(asc(schema.profileFacts.sortOrder)),
       db
         .select()
-        .from(schema.serviceItems)
-        .orderBy(asc(schema.serviceItems.sortOrder)),
-      db.select().from(schema.summarySection),
+        .from(schema.services)
+        .orderBy(asc(schema.services.sortOrder)),
+      db.select().from(schema.experienceSection).limit(1),
       db
         .select()
-        .from(schema.summaryJobs)
-        .orderBy(asc(schema.summaryJobs.sortOrder)),
+        .from(schema.experiences)
+        .orderBy(asc(schema.experiences.sortOrder)),
       db
         .select()
-        .from(schema.summaryExperiences)
-        .orderBy(asc(schema.summaryExperiences.sortOrder)),
-      db.select().from(schema.testimonialsSection),
+        .from(schema.skills)
+        .orderBy(asc(schema.skills.sortOrder)),
       db
         .select()
-        .from(schema.testimonialItems)
-        .orderBy(asc(schema.testimonialItems.sortOrder)),
-      db.select().from(schema.projectsSection),
+        .from(schema.testimonials)
+        .orderBy(asc(schema.testimonials.sortOrder)),
       db
         .select()
-        .from(schema.projectItems)
-        .orderBy(asc(schema.projectItems.sortOrder)),
-      db.select().from(schema.contactSection),
-      db.select().from(schema.config),
+        .from(schema.projects)
+        .orderBy(asc(schema.projects.sortOrder)),
+      // tech links (normalized from projects.tech text[])
+      db
+        .select({
+          projectId: schema.projectTechnologies.projectId,
+          name: schema.technologies.name,
+          sortOrder: schema.projectTechnologies.sortOrder,
+        })
+        .from(schema.projectTechnologies)
+        .innerJoin(
+          schema.technologies,
+          eq(schema.technologies.id, schema.projectTechnologies.technologyId),
+        )
+        .orderBy(asc(schema.projectTechnologies.sortOrder)),
+      // role links (normalized from projects.roles text[])
+      db
+        .select({
+          projectId: schema.projectRoles.projectId,
+          role: schema.projectRoles.role,
+          sortOrder: schema.projectRoles.sortOrder,
+        })
+        .from(schema.projectRoles)
+        .orderBy(asc(schema.projectRoles.sortOrder)),
+      db.select().from(schema.contactSection).limit(1),
+      db.select().from(schema.appConfig).limit(1),
       db
         .select()
-        .from(schema.headerSections)
-        .orderBy(asc(schema.headerSections.sortOrder)),
-      db.select().from(schema.headerSettings),
-      db.select().from(schema.footerSection),
+        .from(schema.pageSections)
+        .orderBy(asc(schema.pageSections.sortOrder)),
+      db.select().from(schema.headerSettings).limit(1),
+      db.select().from(schema.footer).limit(1),
     ]);
 
     // Extract first records
     const sidebar = sidebarData[0];
+    const profile = profileData[0];
     const general = generalData[0];
     const hero = heroData[0];
     const about = aboutData[0];
-    const services = servicesData[0];
     const summary = summaryData[0];
-    const testimonials = testimonialsData[0];
-    const projects = projectsData[0];
     const contact = contactData[0];
     const configRecord = configData[0];
     const headerSettings = headerSettingsData[0];
     const footerRecord = footerData[0];
+
+    const savedSections = new Map(
+      pageSectionsData
+        .filter((section) => isPortfolioSectionKey(section.sectionKey))
+        .map((section) => [section.sectionKey, section]),
+    );
+    const sectionMetadata = new Map(
+      PORTFOLIO_SECTIONS.map((section, sortOrder) => {
+        const savedSection = savedSections.get(section.key);
+        return [
+          section.key,
+          {
+            id: savedSection?.id ?? -(sortOrder + 1),
+            sectionKey: section.key,
+            navigationTitle:
+              savedSection?.navigationTitle ?? section.navigationTitle,
+            title: savedSection ? savedSection.title : section.title,
+            overlayTitle: savedSection
+              ? savedSection.overlayTitle
+              : section.overlayTitle,
+            sortOrder: savedSection?.sortOrder ?? sortOrder,
+            isEnabled: savedSection?.isEnabled ?? true,
+          },
+        ];
+      }),
+    );
 
     // Transform social media
     const socialMediaMap = socialData.reduce<Record<string, string>>(
@@ -111,6 +161,20 @@ export async function GET(): Promise<
       },
       {},
     );
+
+    // Group normalized tech + roles by projectId
+    const techByProject = projectTechData.reduce<
+      Record<number, string[]>
+    >((acc, row) => {
+      (acc[row.projectId] ??= []).push(row.name);
+      return acc;
+    }, {});
+    const rolesByProject = projectRolesData.reduce<
+      Record<number, string[]>
+    >((acc, row) => {
+      (acc[row.projectId] ??= []).push(row.role);
+      return acc;
+    }, {});
 
     const response: AllDataResponse = {
       sidebar: {
@@ -122,113 +186,110 @@ export async function GET(): Promise<
         portfolio_overlay_title: general?.portfolioOverlayTitle ?? null,
       },
       hero: {
-        titles: heroTitlesData.map((t) => t.title),
+        titles: heroTitlesData.map(({ title }) => title),
         location: hero?.location ?? null,
         subtitle_one: hero?.subtitleOne ?? null,
         subtitle_two: hero?.subtitleTwo ?? null,
         logo: hero?.logoUrl ?? null,
       },
       about: {
-        title: about?.title ?? null,
-        overlay_title: about?.overlayTitle ?? null,
-        name: about?.name ?? null,
-        job_title: about?.jobTitle ?? null,
-        description: about?.description ?? null,
+        title: sectionMetadata.get("about")?.title ?? null,
+        overlay_title: sectionMetadata.get("about")?.overlayTitle ?? null,
+        name: profile?.name ?? null,
+        job_title: profile?.jobTitle ?? null,
+        description: profile?.biography ?? null,
         button: {
           text: about?.buttonText ?? null,
           url: about?.buttonUrl ?? null,
         },
-        contact_information: aboutContactData.map((info) => ({
+        contact_information: contactMethodsData.map((info) => ({
+          kind: info.kind,
           title: info.title,
-          content: info.content,
+          value: info.value,
         })),
-        details: aboutDetailsData.map((detail) => ({
+        details: profileFactsData.map((detail) => ({
           number: detail.number,
           title: detail.title,
         })),
       },
       services: {
-        title: services?.title ?? null,
-        overlay_title: services?.overlayTitle ?? null,
-        items: serviceItemsData.map((item) => ({
+        title: sectionMetadata.get("services")?.title ?? null,
+        overlay_title: sectionMetadata.get("services")?.overlayTitle ?? null,
+        items: servicesData.map((item) => ({
           title: item.title,
-          content: item.content ?? null,
+          description: item.description ?? null,
           icon: item.icon ?? null,
         })),
       },
       summary: {
-        title: summary?.title ?? null,
-        overlay_title: summary?.overlayTitle ?? null,
+        title: sectionMetadata.get("experience")?.title ?? null,
+        overlay_title: sectionMetadata.get("experience")?.overlayTitle ?? null,
         button: {
           text: summary?.buttonText ?? null,
           url: summary?.buttonUrl ?? null,
         },
-        jobs: summaryJobsData.map((job) => ({
+        jobs: experiencesData.map((job) => ({
           from: job.fromYear ?? null,
-          to: job.toYear ?? null,
+          to: job.toYear,
           title: job.jobTitle,
           company: job.company,
           description: job.description ?? null,
         })),
-        experiences: summaryExperiencesData.map((exp) => ({
+        experiences: skillsData.map((exp) => ({
           skill: exp.skill,
           level: exp.level ?? null,
         })),
       },
       testimonials: {
-        title: testimonials?.title ?? null,
-        overlay_title: testimonials?.overlayTitle ?? null,
-        items: testimonialItemsData.map((item) => ({
+        title: sectionMetadata.get("testimonials")?.title ?? null,
+        overlay_title: sectionMetadata.get("testimonials")?.overlayTitle ?? null,
+        items: testimonialsItemsData.map((item) => ({
           image: item.imageUrl ?? null,
           title: item.title,
           subtitle: item.subtitle ?? null,
           rating: item.rating ?? null,
-          content: item.content ?? null,
+          body: item.body ?? null,
         })),
       },
       projects: {
-        title: projects?.title ?? null,
-        overlay_title: projects?.overlayTitle ?? null,
-        items: projectItemsData.map((item) => ({
+        title: sectionMetadata.get("projects")?.title ?? null,
+        overlay_title: sectionMetadata.get("projects")?.overlayTitle ?? null,
+        items: projectsData.map((item) => ({
           id: item.id,
           title: item.title,
           category: item.category,
           description: item.description ?? null,
           image: item.image ?? null,
           link: item.link ?? null,
-          github: item.github ?? null,
-          tech: item.tech ?? null,
+          github_url: item.githubUrl ?? null,
+          // reconstructed from project_technologies + technologies
+          tech: techByProject[item.id] ?? null,
+          // reconstructed from project_roles
+          roles: rolesByProject[item.id] ?? null,
         })),
       },
       contact: {
-        title: contact?.title ?? null,
-        overlay_title: contact?.overlayTitle ?? null,
+        title: sectionMetadata.get("contact")?.title ?? null,
+        overlay_title: sectionMetadata.get("contact")?.overlayTitle ?? null,
         form_title: contact?.formTitle ?? null,
         button: {
           text: contact?.buttonText ?? null,
           url: contact?.buttonUrl ?? null,
         },
-        info_title: contact?.infoTitle ?? null,
-        address: contact?.address ?? null,
-        phone: contact?.phone ?? null,
-        email: contact?.email ?? null,
+        methods: contactMethodsData.map(({ id, kind, title, value }) => ({
+          id,
+          kind,
+          title,
+          value,
+        })),
       },
       config: {
-        api_base_url: configRecord?.apiBaseUrl ?? null,
-        smtp: {
-          host: configRecord?.smtpHost ?? null,
-          port: configRecord?.smtpPort ?? null,
-          username: configRecord?.smtpUsername ?? null,
-        },
         recaptcha_site_key: configRecord?.recaptchaSiteKey ?? null,
       },
       header: {
-        sections: headerSectionsData.map((section) => ({
-          id: section.id,
-          sectionId: section.sectionId,
-          title: section.title,
-          sortOrder: section.sortOrder || 0,
-        })),
+        sections: [...sectionMetadata.values()].sort(
+          (left, right) => left.sortOrder - right.sortOrder,
+        ),
         defaultTitle: headerSettings?.defaultTitle || "Welcome",
       },
       footer: {

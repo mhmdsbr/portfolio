@@ -20,9 +20,9 @@ export default function Header({ singleTitle }: HeaderProps) {
 
   const sections = useMemo(
     () =>
-      headerData?.sections?.map((s) => ({
-        id: s.sectionId,
-        title: s.title,
+      headerData?.sections?.filter((section) => section.isEnabled).map((s) => ({
+        id: s.sectionKey,
+        title: s.navigationTitle,
       })) || [],
     [headerData],
   );
@@ -44,7 +44,7 @@ export default function Header({ singleTitle }: HeaderProps) {
       headerData.sections.length > 0
     ) {
       setIsReady(true);
-      setCurrentTitle(headerData.sections[0].title);
+      setCurrentTitle(headerData.sections[0].navigationTitle);
     }
   }, [headerData, singleTitle]);
 

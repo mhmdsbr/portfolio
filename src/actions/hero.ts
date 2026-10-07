@@ -5,6 +5,7 @@ import * as schema from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
+import { ensurePortfolioSections } from '@/lib/db/portfolio-sections'
 
 // =============================================
 // GET
@@ -17,9 +18,12 @@ export async function getHero() {
     .from(schema.heroSection)
     .limit(1)
 
-  const titles = await db.select()
-    .from(schema.heroTitles)
-    .orderBy(asc(schema.heroTitles.sortOrder))
+  const titles = hero
+    ? await db.select()
+        .from(schema.heroTitles)
+        .where(eq(schema.heroTitles.heroSectionId, hero.id))
+        .orderBy(asc(schema.heroTitles.sortOrder))
+    : []
 
   return {
     id: hero?.id ?? 0,
@@ -37,6 +41,7 @@ export async function getHero() {
 
 export async function updateHero(formData: FormData) {
   await requireAuth()
+  await ensurePortfolioSections()
 
   const location = formData.get('location') as string
   const subtitleOne = formData.get('subtitleOne') as string
@@ -52,6 +57,7 @@ export async function updateHero(formData: FormData) {
 
   const [existingHero] = await db.select()
     .from(schema.heroSection)
+    .where(eq(schema.heroSection.sectionKey, 'hero'))
     .limit(1)
 
   const [hero] = existingHero
@@ -60,7 +66,7 @@ export async function updateHero(formData: FormData) {
         .where(eq(schema.heroSection.id, existingHero.id))
         .returning()
     : await db.insert(schema.heroSection)
-        .values(values)
+        .values({ ...values, sectionKey: 'hero' })
         .returning()
 
   revalidatePath('/admin/hero')
@@ -75,30 +81,31 @@ export async function updateHero(formData: FormData) {
 
 export async function updateHeroTitles(titles: string[]) {
   await requireAuth()
+  await ensurePortfolioSections()
 
-  const [hero] = await db.select()
-    .from(schema.heroSection)
-    .limit(1)
+  await db.transaction(async (transaction) => {
+    let [hero] = await transaction.select()
+      .from(schema.heroSection)
+      .where(eq(schema.heroSection.sectionKey, 'hero'))
+      .limit(1)
+    if (!hero) {
+      [hero] = await transaction.insert(schema.heroSection)
+        .values({ sectionKey: 'hero' })
+        .returning()
+    }
 
-  const heroRecord = hero ?? (await db.insert(schema.heroSection)
-    .values({})
-    .returning())[0]
-
-  // Delete existing titles
-  await db.delete(schema.heroTitles)
-    .where(eq(schema.heroTitles.heroId, heroRecord.id))
-
-  // Insert new titles
-  if (titles.length > 0) {
-    await db.insert(schema.heroTitles)
-      .values(
-        titles.map((title, index) => ({
-          heroId: heroRecord.id,
-          title: title.trim(),
-          sortOrder: index,
-        }))
-      )
-  }
+    await transaction.delete(schema.heroTitles)
+    if (titles.length > 0) {
+      await transaction.insert(schema.heroTitles)
+        .values(
+          titles.map((title, index) => ({
+            heroSectionId: hero.id,
+            title: title.trim(),
+            sortOrder: index,
+          }))
+        )
+    }
+  })
 
   revalidatePath('/admin/hero')
   revalidatePath('/api/all')

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createServiceItem, updateServiceItem, deleteServiceItem, reorderServiceItems } from '@/actions/services'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 import { 
   FiMonitor, 
   FiPenTool, 
@@ -14,7 +14,7 @@ import {
 interface ServiceItem {
   id: number
   title: string
-  content: string | null
+  description: string | null
   icon: string | null
   sortOrder: number | null
 }
@@ -92,7 +92,7 @@ export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
     }
   }
 
-  const onDragEnd = async (result: any) => {
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return
 
     const itemsCopy = Array.from(serviceItems)
@@ -131,10 +131,10 @@ export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Content</label>
+          <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
           <input
             type="text"
-            name="content"
+            name="description"
             placeholder="Building responsive websites..."
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
@@ -204,9 +204,9 @@ export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
                               />
                               <input
                                 type="text"
-                                name="content"
-                                defaultValue={item.content || ''}
-                                placeholder="Content"
+                                name="description"
+                                defaultValue={item.description || ''}
+                                placeholder="Description"
                                 className="px-3 py-2 bg-gray-700 border border-cyan-500 rounded-md text-white focus:outline-none"
                               />
                               <select
@@ -246,7 +246,7 @@ export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
                                 </div>
                                 <div>
                                   <h4 className="font-semibold text-white">{item.title}</h4>
-                                  <p className="text-sm text-gray-400">{item.content || 'No description'}</p>
+                                  <p className="text-sm text-gray-400">{item.description || 'No description'}</p>
                                 </div>
                               </div>
                               <button

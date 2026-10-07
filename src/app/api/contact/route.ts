@@ -1,5 +1,6 @@
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
+import { asc, eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import type { ApiResponse, ContactResponse } from '@/types/api'
 
@@ -7,20 +8,26 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<ContactResponse>>> {
   try {
-    const [contactData] = await db.select().from(schema.contactSection)
+    const [contactData, sectionData, methodsData] = await Promise.all([
+      db.select().from(schema.contactSection),
+      db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'contact')),
+      db.select().from(schema.contactMethods).orderBy(asc(schema.contactMethods.sortOrder)),
+    ])
 
     const response: ContactResponse = {
-      title: contactData?.title ?? null,
-      overlay_title: contactData?.overlayTitle ?? null,
-      form_title: contactData?.formTitle ?? null,
+      title: sectionData[0]?.title ?? null,
+      overlay_title: sectionData[0]?.overlayTitle ?? null,
+      form_title: contactData[0]?.formTitle ?? null,
       button: {
-        text: contactData?.buttonText ?? null,
-        url: contactData?.buttonUrl ?? null,
+        text: contactData[0]?.buttonText ?? null,
+        url: contactData[0]?.buttonUrl ?? null,
       },
-      info_title: contactData?.infoTitle ?? null,
-      address: contactData?.address ?? null,
-      phone: contactData?.phone ?? null,
-      email: contactData?.email ?? null,
+      methods: methodsData.map(({ id, kind, title, value }) => ({
+        id,
+        kind,
+        title,
+        value,
+      })),
     }
 
     return NextResponse.json({

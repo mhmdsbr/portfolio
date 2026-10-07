@@ -10,9 +10,7 @@ export default function Experience() {
   const [animationReady, setAnimationReady] = useState(false);
 
   const experience = allData?.summary;
-  const sectionId =
-    allData?.header?.sections.find((section) => section.sortOrder === 2)
-      ?.sectionId ?? "experience";
+  const sectionId = "experience";
   const title = experience?.title;
   const experienceItems = experience?.jobs || [];
 
@@ -53,7 +51,7 @@ export default function Experience() {
                   {exp.title} @ {exp.company}
                 </h3>
                 <p className="text-sm text-gray-400 mb-2">
-                  {exp.from} - {exp.to}
+                  {exp.from} - {exp.to ?? "Present"}
                 </p>
                 <p className="text-base">{exp.description}</p>
               </div>

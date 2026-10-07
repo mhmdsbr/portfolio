@@ -13,7 +13,7 @@ interface ProjectFormProps {
     roles: string[] | null
     image: string | null
     link: string | null
-    github: string | null
+    githubUrl: string | null
     tech: string[] | null
   }
   onSubmit: (formData: FormData) => Promise<unknown>
@@ -167,14 +167,14 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel }: Proj
         </div>
 
         <div>
-          <label htmlFor="github" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="githubUrl" className="block text-sm font-medium text-gray-300 mb-1">
             GitHub URL
           </label>
           <input
             type="url"
-            id="github"
-            name="github"
-            defaultValue={initialData?.github || ''}
+            id="githubUrl"
+            name="githubUrl"
+            defaultValue={initialData?.githubUrl || ''}
             placeholder="https://github.com/..."
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
@@ -183,7 +183,7 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel }: Proj
 
       <div>
         <label htmlFor="tech" className="block text-sm font-medium text-gray-300 mb-1">
-          Technologies (comma separated)
+        Technologies
         </label>
         <input
           type="text"
@@ -194,7 +194,9 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel }: Proj
           placeholder="React, TypeScript, Tailwind"
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
-        <p className="text-xs text-gray-400 mt-1">Separate technologies with commas</p>
+        <p className="text-xs text-gray-400 mt-1">
+          Enter one or more technologies separated by commas. Existing technologies are reused.
+        </p>
       </div>
 
       <div className="flex gap-4">

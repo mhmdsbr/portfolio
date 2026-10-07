@@ -6,7 +6,7 @@ export default async function ProfileSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Profile Settings</h1>
+      <h1 className="text-2xl font-bold">Admin account</h1>
       <ProfileSettingsForm admin={admin} admins={admins} />
     </div>
   )

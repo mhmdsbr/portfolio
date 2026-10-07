@@ -13,9 +13,7 @@ export default function About() {
   const [animationReady, setAnimationReady] = useState(false);
 
   const about = allData?.about;
-  const sectionId =
-    allData?.header?.sections.find((section) => section.sortOrder === 1)
-      ?.sectionId ?? "about";
+  const sectionId = "about";
 
   const titleWords = about?.title?.split(" ") || [];
   const description = about?.description;

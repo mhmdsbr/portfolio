@@ -1,5 +1,4 @@
 import { getTestimonials } from '@/actions/testimonials'
-import TestimonialsForm from '@/components/admin/TestimonialsForm'
 import TestimonialItemsForm from '@/components/admin/TestimonialItemsForm'
 
 export default async function TestimonialsPage() {
@@ -8,12 +7,9 @@ export default async function TestimonialsPage() {
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">Testimonials</h1>
-
-      {/* Testimonials Section */}
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Testimonials Section</h2>
-        <TestimonialsForm initialData={testimonials} />
-      </div>
+      <p className="-mt-6 text-sm text-gray-400">
+        Edit the shared section titles and visibility in Page layout.
+      </p>
 
       {/* Testimonial Items */}
       <div className="bg-gray-800 rounded-lg p-6">

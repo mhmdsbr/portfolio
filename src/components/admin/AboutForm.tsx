@@ -7,8 +7,6 @@ import { updateAbout } from '@/actions/about'
 interface AboutFormProps {
   initialData: {
     id: number
-    title: string | null
-    overlayTitle: string | null
     name: string | null
     jobTitle: string | null
     description: string | null
@@ -18,8 +16,6 @@ interface AboutFormProps {
 }
 
 export default function AboutForm({ initialData }: AboutFormProps) {
-  const [title, setTitle] = useState(initialData.title || '')
-  const [overlayTitle, setOverlayTitle] = useState(initialData.overlayTitle || '')
   const [name, setName] = useState(initialData.name || '')
   const [jobTitle, setJobTitle] = useState(initialData.jobTitle || '')
   const [description, setDescription] = useState(initialData.description || '')
@@ -35,8 +31,6 @@ export default function AboutForm({ initialData }: AboutFormProps) {
     setMessage('')
 
     const formData = new FormData()
-    formData.set('title', title)
-    formData.set('overlayTitle', overlayTitle)
     formData.set('name', name)
     formData.set('jobTitle', jobTitle)
     formData.set('description', description)
@@ -62,34 +56,6 @@ export default function AboutForm({ initialData }: AboutFormProps) {
           {message}
         </div>
       )}
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Primary Title
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="About Me"
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Overlay Title
-          </label>
-          <input
-            type="text"
-            value={overlayTitle}
-            onChange={(e) => setOverlayTitle(e.target.value)}
-            placeholder="About"
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
-        </div>
-      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>

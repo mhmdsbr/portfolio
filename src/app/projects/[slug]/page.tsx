@@ -101,9 +101,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   Visit project
                 </a>
               )}
-              {project.github?.startsWith("http") && (
+              {project.githubUrl?.startsWith("http") && (
                 <a
-                  href={project.github}
+                  href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-full border border-gray-600 px-5 py-2.5 font-semibold transition hover:border-gray-400"

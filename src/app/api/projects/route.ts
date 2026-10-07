@@ -1,23 +1,22 @@
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { asc } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import type { ApiResponse, ProjectsResponse } from '@/types/api'
+import { getProjects } from '@/lib/projects'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<ProjectsResponse>>> {
   try {
-    const [projectsData, itemsData] = await Promise.all([
-      db.select().from(schema.projectsSection),
-      db.select().from(schema.projectItems).orderBy(asc(schema.projectItems.sortOrder)),
+    const [sectionData, itemsData] = await Promise.all([
+      db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'projects')),
+      getProjects(),
     ])
 
-    const projects = projectsData[0]
-
     const response: ProjectsResponse = {
-      title: projects?.title ?? null,
-      overlay_title: projects?.overlayTitle ?? null,
+      title: sectionData[0]?.title ?? null,
+      overlay_title: sectionData[0]?.overlayTitle ?? null,
       items: itemsData.map((item) => ({
         id: item.id,
         title: item.title,
@@ -25,8 +24,9 @@ export async function GET(): Promise<NextResponse<ApiResponse<ProjectsResponse>>
         description: item.description ?? null,
         image: item.image ?? null,
         link: item.link ?? null,
-        github: item.github ?? null,
-        tech: item.tech ?? null,
+        github_url: item.githubUrl ?? null,
+        tech: item.tech.length > 0 ? item.tech : null,
+        roles: item.roles.length > 0 ? item.roles : null,
       })),
     }
 

@@ -13,7 +13,7 @@ interface Project {
   description: string | null
   image: string | null
   link: string | null
-  github: string | null
+  githubUrl: string | null
   tech: string[] | null
   sortOrder: number | null
 }

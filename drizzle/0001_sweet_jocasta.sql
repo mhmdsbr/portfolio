@@ -1,1 +1,0 @@
-ALTER TABLE "project_items" ADD COLUMN "roles" text[];

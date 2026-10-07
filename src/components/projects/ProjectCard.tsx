@@ -9,7 +9,7 @@ interface Project {
   description: string | null;
   image: string | null;
   link?: string | null;
-  github?: string | null;
+  github_url?: string | null;
   tech?: string[] | null;
 }
 
@@ -46,9 +46,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               >
                 View Project
             </Link>
-            {project.github && project.github !== "#" && (
+            {project.github_url && project.github_url !== "#" && (
               <a
-                href={project.github}
+                href={project.github_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-black/80 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-black transition"

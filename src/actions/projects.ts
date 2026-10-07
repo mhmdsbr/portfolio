@@ -2,30 +2,83 @@
 
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { eq, asc } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
+import { getProjectById, getProjects as getProjectsWithDetails } from '@/lib/projects'
+
+type ProjectTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
+function parseLines(value: FormDataEntryValue | null) {
+  if (typeof value !== 'string') return []
+  return [...new Set(value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean))]
+}
+
+function parseTechnologies(value: FormDataEntryValue | null) {
+  if (typeof value !== 'string') return []
+  return normalizeTechnologies(value.split(','))
+}
+
+function normalizeTechnologies(values: string[]) {
+  return [...new Map(
+    values.map((item) => item.trim()).filter(Boolean)
+      .map((name) => [name.toLocaleLowerCase(), name]),
+  ).values()]
+}
+
+async function replaceProjectDetails(
+  transaction: ProjectTransaction,
+  projectId: number,
+  roles: string[] | null,
+  technologyNames: string[],
+) {
+  if (roles !== null) {
+    await transaction.delete(schema.projectRoles)
+      .where(eq(schema.projectRoles.projectId, projectId))
+    if (roles.length > 0) {
+      await transaction.insert(schema.projectRoles).values(
+        roles.map((role, sortOrder) => ({ projectId, role, sortOrder })),
+      )
+    }
+  }
+
+  await transaction.delete(schema.projectTechnologies)
+    .where(eq(schema.projectTechnologies.projectId, projectId))
+
+  if (technologyNames.length === 0) return
+
+  await transaction.insert(schema.technologies)
+    .values(technologyNames.map((name) => ({ name })))
+    .onConflictDoNothing({ target: schema.technologies.name })
+
+  const technologies = await transaction.select({
+    id: schema.technologies.id,
+    name: schema.technologies.name,
+  }).from(schema.technologies)
+    .where(inArray(schema.technologies.name, technologyNames))
+  const technologyIds = new Map(technologies.map(({ id, name }) => [name, id]))
+
+  await transaction.insert(schema.projectTechnologies).values(
+    technologyNames.map((name, sortOrder) => {
+      const technologyId = technologyIds.get(name)
+      if (technologyId === undefined) {
+        throw new Error(`Unable to resolve project technology "${name}"`)
+      }
+      return { projectId, technologyId, sortOrder }
+    }),
+  )
+}
 
 // Get all projects
 export async function getProjects() {
   await requireAuth()
-  
-  const projects = await db.select()
-    .from(schema.projectItems)
-    .orderBy(asc(schema.projectItems.sortOrder))
-  
-  return projects
+  return getProjectsWithDetails()
 }
 
 // Get single project
 export async function getProject(id: number) {
   await requireAuth()
-  
-  const [project] = await db.select()
-    .from(schema.projectItems)
-    .where(eq(schema.projectItems.id, id))
-  
-  return project
+  return getProjectById(id)
 }
 
 // Create project
@@ -35,31 +88,27 @@ export async function createProject(formData: FormData) {
   const title = formData.get('title') as string
   const category = formData.get('category') as string
   const description = formData.get('description') as string
-  const roles = (formData.get('roles') as string)?.split('\n').map(role => role.trim()).filter(Boolean) || []
+  const roles = parseLines(formData.get('roles'))
   const image = formData.get('image') as string
   const link = formData.get('link') as string
-  const github = formData.get('github') as string
-  const tech = (formData.get('tech') as string)?.split(',').map(t => t.trim()).filter(Boolean) || []
-  
-  // Get the projects section ID (there should be only one)
-  const [section] = await db.select()
-    .from(schema.projectsSection)
-    .limit(1)
-  const projectsSection = section ?? (await db.insert(schema.projectsSection).values({}).returning())[0]
+  const githubUrl = formData.get('githubUrl') as string
+  const tech = parseTechnologies(formData.get('tech'))
 
-  const [project] = await db.insert(schema.projectItems)
-    .values({
-      projectsId: projectsSection.id,
-      title,
-      category,
-      description: description || null,
-      roles: roles.length > 0 ? roles : null,
-      image: image || null,
-      link: link || null,
-      github: github || null,
-      tech: tech.length > 0 ? tech : null,
-    })
-    .returning()
+  const project = await db.transaction(async (transaction) => {
+    const [createdProject] = await transaction.insert(schema.projects)
+      .values({
+        title,
+        category,
+        description: description || null,
+        image: image || null,
+        link: link || null,
+        githubUrl: githubUrl || null,
+      })
+      .returning()
+
+    await replaceProjectDetails(transaction, createdProject.id, roles, tech)
+    return createdProject
+  })
   
   revalidatePath('/admin/projects')
   revalidatePath('/api/all')
@@ -74,25 +123,31 @@ export async function updateProject(id: number, formData: FormData) {
   const title = formData.get('title') as string
   const category = formData.get('category') as string
   const description = formData.get('description') as string
-  const roles = (formData.get('roles') as string)?.split('\n').map(role => role.trim()).filter(Boolean) || []
+  const roles = parseLines(formData.get('roles'))
   const image = formData.get('image') as string
   const link = formData.get('link') as string
-  const github = formData.get('github') as string
-  const tech = (formData.get('tech') as string)?.split(',').map(t => t.trim()).filter(Boolean) || []
-  
-  const [project] = await db.update(schema.projectItems)
-    .set({
-      title,
-      category,
-      description: description || null,
-      roles: roles.length > 0 ? roles : null,
-      image: image || null,
-      link: link || null,
-      github: github || null,
-      tech: tech.length > 0 ? tech : null,
-    })
-    .where(eq(schema.projectItems.id, id))
-    .returning()
+  const githubUrl = formData.get('githubUrl') as string
+  const tech = parseTechnologies(formData.get('tech'))
+
+  const project = await db.transaction(async (transaction) => {
+    const [updatedProject] = await transaction.update(schema.projects)
+      .set({
+        title,
+        category,
+        description: description || null,
+        image: image || null,
+        link: link || null,
+        githubUrl: githubUrl || null,
+      })
+      .where(eq(schema.projects.id, id))
+      .returning()
+
+    if (!updatedProject) {
+      throw new Error(`Project ${id} was not found`)
+    }
+    await replaceProjectDetails(transaction, id, roles, tech)
+    return updatedProject
+  })
   
   revalidatePath('/admin/projects')
   revalidatePath('/api/all')
@@ -104,8 +159,8 @@ export async function updateProject(id: number, formData: FormData) {
 export async function deleteProject(id: number) {
   await requireAuth()
   
-  await db.delete(schema.projectItems)
-    .where(eq(schema.projectItems.id, id))
+  await db.delete(schema.projects)
+    .where(eq(schema.projects.id, id))
   
   revalidatePath('/admin/projects')
   revalidatePath('/api/all')
@@ -117,9 +172,9 @@ export async function reorderProjects(ids: number[]) {
   
   await Promise.all(
     ids.map((id, index) => 
-      db.update(schema.projectItems)
+      db.update(schema.projects)
         .set({ sortOrder: index })
-        .where(eq(schema.projectItems.id, id))
+        .where(eq(schema.projects.id, id))
     )
   )
   
@@ -150,17 +205,19 @@ export async function updateProjectCategoriesAndTech(
   await db.transaction(async (transaction) => {
     for (const { id, category, tech } of updates) {
       const [updatedProject] = await transaction
-        .update(schema.projectItems)
+        .update(schema.projects)
         .set({
           category: category.trim(),
-          tech: tech.length > 0 ? tech.map((item) => item.trim()) : null,
         })
-        .where(eq(schema.projectItems.id, id))
-        .returning({ id: schema.projectItems.id })
+        .where(eq(schema.projects.id, id))
+        .returning({ id: schema.projects.id })
 
       if (!updatedProject) {
         throw new Error(`Project ${id} was not found`)
       }
+
+      const normalizedTech = normalizeTechnologies(tech)
+      await replaceProjectDetails(transaction, id, null, normalizedTech)
     }
   })
 

@@ -9,14 +9,9 @@ import { requireAuth } from '@/lib/auth'
 export async function getGeneralSettings() {
   await requireAuth()
 
-  const [config] = await db.select().from(schema.config).limit(1)
+  const [config] = await db.select().from(schema.appConfig).limit(1)
 
   return {
-    apiBaseUrl: config?.apiBaseUrl ?? null,
-    smtpHost: config?.smtpHost ?? null,
-    smtpPort: config?.smtpPort ?? null,
-    smtpUsername: config?.smtpUsername ?? null,
-    hasSmtpPassword: Boolean(config?.smtpPassword),
     recaptchaSiteKey: config?.recaptchaSiteKey ?? null,
   }
 }
@@ -24,28 +19,19 @@ export async function getGeneralSettings() {
 export async function updateGeneralSettings(formData: FormData) {
   await requireAuth()
 
-  const [existingConfig] = await db.select().from(schema.config).limit(1)
-  const smtpPassword = formData.get('smtpPassword')
+  const [existingConfig] = await db.select().from(schema.appConfig).limit(1)
   const values = {
-    apiBaseUrl: String(formData.get('apiBaseUrl') ?? '').trim() || null,
-    smtpHost: String(formData.get('smtpHost') ?? '').trim() || null,
-    smtpPort: String(formData.get('smtpPort') ?? '').trim() || null,
-    smtpUsername: String(formData.get('smtpUsername') ?? '').trim() || null,
-    smtpPassword:
-      typeof smtpPassword === 'string' && smtpPassword.length > 0
-        ? smtpPassword
-        : existingConfig?.smtpPassword ?? null,
     recaptchaSiteKey:
       String(formData.get('recaptchaSiteKey') ?? '').trim() || null,
   }
 
   if (existingConfig) {
     await db
-      .update(schema.config)
+      .update(schema.appConfig)
       .set(values)
-      .where(eq(schema.config.id, existingConfig.id))
+      .where(eq(schema.appConfig.id, existingConfig.id))
   } else {
-    await db.insert(schema.config).values(values)
+    await db.insert(schema.appConfig).values(values)
   }
 
   revalidatePath('/admin/general-settings')

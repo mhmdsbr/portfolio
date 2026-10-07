@@ -6,11 +6,6 @@ import { updateGeneralSettings } from '@/actions/config'
 
 interface GeneralSettingsFormProps {
   initialData: {
-    apiBaseUrl: string | null
-    smtpHost: string | null
-    smtpPort: string | null
-    smtpUsername: string | null
-    hasSmtpPassword: boolean
     recaptchaSiteKey: string | null
   }
 }
@@ -21,13 +16,6 @@ const inputClassName =
 export default function GeneralSettingsForm({
   initialData,
 }: GeneralSettingsFormProps) {
-  const [apiBaseUrl, setApiBaseUrl] = useState(initialData.apiBaseUrl ?? '')
-  const [smtpHost, setSmtpHost] = useState(initialData.smtpHost ?? '')
-  const [smtpPort, setSmtpPort] = useState(initialData.smtpPort ?? '')
-  const [smtpUsername, setSmtpUsername] = useState(
-    initialData.smtpUsername ?? '',
-  )
-  const [smtpPassword, setSmtpPassword] = useState('')
   const [recaptchaSiteKey, setRecaptchaSiteKey] = useState(
     initialData.recaptchaSiteKey ?? '',
   )
@@ -39,18 +27,11 @@ export default function GeneralSettingsForm({
     event.preventDefault()
     setLoading(true)
     setMessage('')
-
     const formData = new FormData()
-    formData.set('apiBaseUrl', apiBaseUrl)
-    formData.set('smtpHost', smtpHost)
-    formData.set('smtpPort', smtpPort)
-    formData.set('smtpUsername', smtpUsername)
-    formData.set('smtpPassword', smtpPassword)
     formData.set('recaptchaSiteKey', recaptchaSiteKey)
 
     try {
       await updateGeneralSettings(formData)
-      setSmtpPassword('')
       setMessage('General settings updated successfully!')
       router.refresh()
     } catch (error) {
@@ -76,95 +57,12 @@ export default function GeneralSettingsForm({
         </div>
       )}
 
-      <section className="space-y-4 rounded-lg bg-gray-800 p-6">
-        <h2 className="text-lg font-semibold">API</h2>
-        <div>
-          <label
-            htmlFor="apiBaseUrl"
-            className="mb-1 block text-sm font-medium text-gray-300"
-          >
-            API Base URL
-          </label>
-          <input
-            id="apiBaseUrl"
-            type="url"
-            value={apiBaseUrl}
-            onChange={(event) => setApiBaseUrl(event.target.value)}
-            className={inputClassName}
-          />
-        </div>
-      </section>
-
-      <section className="space-y-4 rounded-lg bg-gray-800 p-6">
-        <h2 className="text-lg font-semibold">SMTP</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label
-              htmlFor="smtpHost"
-              className="mb-1 block text-sm font-medium text-gray-300"
-            >
-              Host
-            </label>
-            <input
-              id="smtpHost"
-              type="text"
-              value={smtpHost}
-              onChange={(event) => setSmtpHost(event.target.value)}
-              className={inputClassName}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="smtpPort"
-              className="mb-1 block text-sm font-medium text-gray-300"
-            >
-              Port
-            </label>
-            <input
-              id="smtpPort"
-              type="text"
-              value={smtpPort}
-              onChange={(event) => setSmtpPort(event.target.value)}
-              className={inputClassName}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="smtpUsername"
-              className="mb-1 block text-sm font-medium text-gray-300"
-            >
-              Username
-            </label>
-            <input
-              id="smtpUsername"
-              type="text"
-              value={smtpUsername}
-              onChange={(event) => setSmtpUsername(event.target.value)}
-              className={inputClassName}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="smtpPassword"
-              className="mb-1 block text-sm font-medium text-gray-300"
-            >
-              Password
-            </label>
-            <input
-              id="smtpPassword"
-              type="password"
-              autoComplete="new-password"
-              value={smtpPassword}
-              onChange={(event) => setSmtpPassword(event.target.value)}
-              placeholder={
-                initialData.hasSmtpPassword
-                  ? 'Saved — leave blank to keep current password'
-                  : 'SMTP password'
-              }
-              className={inputClassName}
-            />
-          </div>
-        </div>
+      <section className="space-y-2 rounded-lg bg-gray-800 p-6">
+        <h2 className="text-lg font-semibold">Email delivery</h2>
+        <p className="text-sm text-gray-300">
+          SMTP is configured with server-only environment variables:
+          {' '}SMTP_HOST, SMTP_PORT, SMTP_USERNAME, and SMTP_PASSWORD.
+        </p>
       </section>
 
       <section className="space-y-4 rounded-lg bg-gray-800 p-6">

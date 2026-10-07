@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createTestimonialItem, updateTestimonialItem, deleteTestimonialItem, reorderTestimonialItems } from '@/actions/testimonials'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 import Image from 'next/image'
 
 interface TestimonialItem {
@@ -11,8 +11,8 @@ interface TestimonialItem {
   imageUrl: string | null
   title: string
   subtitle: string | null
-  rating: string | null
-  content: string | null
+  rating: number | null
+  body: string | null
   sortOrder: number | null
 }
 
@@ -21,11 +21,11 @@ interface TestimonialItemsFormProps {
 }
 
 const ratingOptions = [
-  { value: '1 Star', label: '⭐ 1 Star' },
-  { value: '2 Stars', label: '⭐⭐ 2 Stars' },
-  { value: '3 Stars', label: '⭐⭐⭐ 3 Stars' },
-  { value: '4 Stars', label: '⭐⭐⭐⭐ 4 Stars' },
-  { value: '5 Stars', label: '⭐⭐⭐⭐⭐ 5 Stars' },
+  { value: '1', label: '⭐ 1 Star' },
+  { value: '2', label: '⭐⭐ 2 Stars' },
+  { value: '3', label: '⭐⭐⭐ 3 Stars' },
+  { value: '4', label: '⭐⭐⭐⭐ 4 Stars' },
+  { value: '5', label: '⭐⭐⭐⭐⭐ 5 Stars' },
 ]
 
 export default function TestimonialItemsForm({ items }: TestimonialItemsFormProps) {
@@ -93,7 +93,7 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
     }
   }
 
-  const onDragEnd = async (result: any) => {
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return
 
     const itemsCopy = Array.from(testimonialItems)
@@ -107,10 +107,10 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
     await refreshData()
   }
 
-  const getRatingDisplay = (rating: string | null) => {
-    if (!rating) return 'No rating'
-    const option = ratingOptions.find(opt => opt.value === rating)
-    return option ? option.label : rating
+  const getRatingDisplay = (rating: number | null) => {
+    if (rating === null) return 'No rating'
+    const option = ratingOptions.find(opt => Number(opt.value) === rating)
+    return option?.label ?? `${rating} Stars`
   }
 
   // ✅ Debug logging
@@ -171,7 +171,7 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-300 mb-1">Content</label>
           <textarea
-            name="content"
+            name="body"
             placeholder="John is an exceptional developer..."
             rows={3}
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
@@ -260,8 +260,8 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
                               </select>
                               <div className="md:col-span-2">
                                 <textarea
-                                  name="content"
-                                  defaultValue={item.content || ''}
+                                  name="body"
+                                  defaultValue={item.body || ''}
                                   placeholder="Content..."
                                   rows={2}
                                   className="w-full px-3 py-2 bg-gray-700 border border-cyan-500 rounded-md text-white focus:outline-none"
@@ -309,9 +309,9 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
                                       </span>
                                     )}
                                   </div>
-                                  {item.content && (
+                                  {item.body && (
                                     <p className="text-sm text-gray-300 mt-1 line-clamp-2">
-                                      {item.content}
+                                      {item.body}
                                     </p>
                                   )}
                                 </div>

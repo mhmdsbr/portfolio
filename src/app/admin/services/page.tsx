@@ -1,5 +1,4 @@
 import { getServices } from '@/actions/services'
-import ServicesForm from '@/components/admin/ServicesForm'
 import ServiceItemsForm from '@/components/admin/ServiceItemsForm'
 
 export default async function ServicesPage() {
@@ -8,12 +7,9 @@ export default async function ServicesPage() {
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">Services</h1>
-
-      {/* Services Section */}
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Services Section</h2>
-        <ServicesForm initialData={services} />
-      </div>
+      <p className="-mt-6 text-sm text-gray-400">
+        Edit the shared section titles and visibility in Page layout.
+      </p>
 
       {/* Service Items */}
       <div className="bg-gray-800 rounded-lg p-6">

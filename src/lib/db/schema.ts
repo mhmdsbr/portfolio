@@ -8,7 +8,11 @@ import {
   boolean,
   jsonb,
   index,
+  uniqueIndex,
+  primaryKey,
+  check,
 } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
 
 // =============================================
 // ENUMS
@@ -19,66 +23,114 @@ export const iconEnum = pgEnum('icon_enum', [
   'pen-ruler',
   'paintbrush',
   'chart-area',
-  'bullhorn'
+  'bullhorn',
 ])
 
-export const ratingEnum = pgEnum('rating_enum', [
-  '1 Star',
-  '2 Stars',
-  '3 Stars',
-  '4 Stars',
-  '5 Stars'
+export const contactMethodKindEnum = pgEnum('contact_method_kind_enum', [
+  'email',
+  'phone',
+  'address',
+  'other',
 ])
 
 // =============================================
-// 1. SIDEBAR (Profile)
+// 01. PAGE SECTIONS (hub — defined first so FKs resolve)
 // =============================================
-export const sidebar = pgTable('sidebar', {
+export const pageSections = pgTable('page_sections', {
   id: serial('id').primaryKey(),
-  profileImageUrl: text('profile_image_url'),
-  profileImageAlt: text('profile_image_alt'),
-  profileTitle: text('profile_title'),
+  sectionKey: text('section_key').notNull().unique(),
+  navigationTitle: text('navigation_title').notNull(),
+  title: text('title'),
+  overlayTitle: text('overlay_title'),
+  sortOrder: integer('sort_order').default(0),
+  isEnabled: boolean('is_enabled').notNull().default(true),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 })
+
+export type PageSection = typeof pageSections.$inferSelect
+export type NewPageSection = typeof pageSections.$inferInsert
+
+// =============================================
+// 02. SIDEBAR (singleton — id locked to 1)
+// =============================================
+export const sidebar = pgTable(
+  'sidebar',
+  {
+    id: integer('id').primaryKey().default(1),
+    profileImageUrl: text('profile_image_url'),
+    profileImageAlt: text('profile_image_alt'),
+    profileTitle: text('profile_title'),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+  },
+  (table) => [check('sidebar_singleton', sql`${table.id} = 1`)],
+)
 
 export type Sidebar = typeof sidebar.$inferSelect
 export type NewSidebar = typeof sidebar.$inferInsert
 
 // =============================================
-// 2. SOCIAL MEDIA
+// 03. PORTFOLIO PROFILE (singleton)
 // =============================================
-export const socialMedia = pgTable('social_media', {
+export const portfolioProfile = pgTable(
+  'portfolio_profile',
+  {
+    id: integer('id').primaryKey().default(1),
+    name: text('name'),
+    jobTitle: text('job_title'),
+    biography: text('biography'),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+  },
+  (table) => [check('portfolio_profile_singleton', sql`${table.id} = 1`)],
+)
+
+export type PortfolioProfile = typeof portfolioProfile.$inferSelect
+export type NewPortfolioProfile = typeof portfolioProfile.$inferInsert
+
+// =============================================
+// 04. SOCIAL LINKS
+// =============================================
+export const socialLinks = pgTable('social_links', {
   id: serial('id').primaryKey(),
   platform: text('platform').notNull(),
   url: text('url').notNull(),
   sortOrder: integer('sort_order').default(0),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
 })
 
-export type SocialMedia = typeof socialMedia.$inferSelect
-export type NewSocialMedia = typeof socialMedia.$inferInsert
+export type SocialLink = typeof socialLinks.$inferSelect
+export type NewSocialLink = typeof socialLinks.$inferInsert
 
 // =============================================
-// 3. GENERAL SETTINGS
+// 05. SITE SETTINGS (singleton)
 // =============================================
-export const generalSettings = pgTable('general_settings', {
-  id: serial('id').primaryKey(),
-  portfolioTitle: text('portfolio_title'),
-  portfolioOverlayTitle: text('portfolio_overlay_title'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-})
+export const siteSettings = pgTable(
+  'site_settings',
+  {
+    id: integer('id').primaryKey().default(1),
+    portfolioTitle: text('portfolio_title'),
+    portfolioOverlayTitle: text('portfolio_overlay_title'),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+  },
+  (table) => [check('general_settings_singleton', sql`${table.id} = 1`)],
+)
 
-export type GeneralSettings = typeof generalSettings.$inferSelect
-export type NewGeneralSettings = typeof generalSettings.$inferInsert
+export type SiteSettings = typeof siteSettings.$inferSelect
+export type NewSiteSettings = typeof siteSettings.$inferInsert
 
 // =============================================
-// 4. HERO SECTION
+// 06. HERO SECTION
 // =============================================
 export const heroSection = pgTable('hero_section', {
   id: serial('id').primaryKey(),
+  sectionKey: text('section_key')
+    .notNull()
+    .unique()
+    .references(() => pageSections.sectionKey, { onDelete: 'cascade' }),
   location: text('location'),
   subtitleOne: text('subtitle_one'),
   subtitleTwo: text('subtitle_two'),
@@ -90,29 +142,32 @@ export const heroSection = pgTable('hero_section', {
 export type HeroSection = typeof heroSection.$inferSelect
 export type NewHeroSection = typeof heroSection.$inferInsert
 
+// =============================================
+// 07. HERO TITLES
+// =============================================
 export const heroTitles = pgTable('hero_titles', {
   id: serial('id').primaryKey(),
-  heroId: integer('hero_id')
+  heroSectionId: integer('hero_section_id')
     .notNull()
     .references(() => heroSection.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
   sortOrder: integer('sort_order').default(0),
   createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 export type HeroTitle = typeof heroTitles.$inferSelect
 export type NewHeroTitle = typeof heroTitles.$inferInsert
 
 // =============================================
-// 5. ABOUT SECTION
+// 08. ABOUT SECTION
 // =============================================
 export const aboutSection = pgTable('about_section', {
   id: serial('id').primaryKey(),
-  title: text('title'),
-  overlayTitle: text('overlay_title'),
-  name: text('name'),
-  jobTitle: text('job_title'),
-  description: text('description'),
+  sectionKey: text('section_key')
+    .notNull()
+    .unique()
+    .references(() => pageSections.sectionKey, { onDelete: 'cascade' }),
   buttonText: text('button_text'),
   buttonUrl: text('button_url'),
   createdAt: timestamp('created_at').defaultNow(),
@@ -122,190 +177,216 @@ export const aboutSection = pgTable('about_section', {
 export type AboutSection = typeof aboutSection.$inferSelect
 export type NewAboutSection = typeof aboutSection.$inferInsert
 
-export const aboutContactInfo = pgTable('about_contact_info', {
-  id: serial('id').primaryKey(),
-  aboutId: integer('about_id')
-    .notNull()
-    .references(() => aboutSection.id, { onDelete: 'cascade' }),
-  title: text('title').notNull(),
-  content: text('content').notNull(),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-})
-
-export type AboutContactInfo = typeof aboutContactInfo.$inferSelect
-export type NewAboutContactInfo = typeof aboutContactInfo.$inferInsert
-
-export const aboutDetails = pgTable('about_details', {
-  id: serial('id').primaryKey(),
-  aboutId: integer('about_id')
-    .notNull()
-    .references(() => aboutSection.id, { onDelete: 'cascade' }),
-  number: integer('number').notNull(),
-  title: text('title').notNull(),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-})
-
-export type AboutDetail = typeof aboutDetails.$inferSelect
-export type NewAboutDetail = typeof aboutDetails.$inferInsert
-
 // =============================================
-// 6. SERVICES SECTION
+// 09. CONTACT METHODS
 // =============================================
-export const servicesSection = pgTable('services_section', {
+export const contactMethods = pgTable('contact_methods', {
   id: serial('id').primaryKey(),
-  title: text('title'),
-  overlayTitle: text('overlay_title'),
+  kind: contactMethodKindEnum('kind').notNull().default('other'),
+  title: text('title').notNull(),
+  value: text('value').notNull(),
+  sortOrder: integer('sort_order').default(0),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 })
 
-export type ServicesSection = typeof servicesSection.$inferSelect
-export type NewServicesSection = typeof servicesSection.$inferInsert
+export type ContactMethod = typeof contactMethods.$inferSelect
+export type NewContactMethod = typeof contactMethods.$inferInsert
+export type ContactMethodKind = (typeof contactMethodKindEnum.enumValues)[number]
 
-export const serviceItems = pgTable('service_items', {
+// =============================================
+// 10. PROFILE FACTS
+// =============================================
+export const profileFacts = pgTable('profile_facts', {
   id: serial('id').primaryKey(),
-  servicesId: integer('services_id')
-    .notNull()
-    .references(() => servicesSection.id, { onDelete: 'cascade' }),
+  number: integer('number').notNull(),
   title: text('title').notNull(),
-  content: text('content'),
+  sortOrder: integer('sort_order').default(0),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
+})
+
+export type ProfileFact = typeof profileFacts.$inferSelect
+export type NewProfileFact = typeof profileFacts.$inferInsert
+
+// =============================================
+// 11. SERVICES SECTION
+// =============================================
+export const services = pgTable('services', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
   icon: iconEnum('icon'),
   sortOrder: integer('sort_order').default(0),
   createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
 })
 
-export type ServiceItem = typeof serviceItems.$inferSelect
-export type NewServiceItem = typeof serviceItems.$inferInsert
+export type Service = typeof services.$inferSelect
+export type NewService = typeof services.$inferInsert
 
 // =============================================
-// 7. SUMMARY / RESUME SECTION
+// 12. EXPERIENCE SECTION SETTINGS
 // =============================================
-export const summarySection = pgTable('summary_section', {
+export const experienceSection = pgTable('experience_section', {
   id: serial('id').primaryKey(),
-  title: text('title'),
-  overlayTitle: text('overlay_title'),
+  sectionKey: text('section_key')
+    .notNull()
+    .unique()
+    .references(() => pageSections.sectionKey, { onDelete: 'cascade' }),
   buttonText: text('button_text'),
   buttonUrl: text('button_url'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 })
 
-export type SummarySection = typeof summarySection.$inferSelect
-export type NewSummarySection = typeof summarySection.$inferInsert
+export type ExperienceSection = typeof experienceSection.$inferSelect
+export type NewExperienceSection = typeof experienceSection.$inferInsert
 
-export const summaryJobs = pgTable('summary_jobs', {
+// =============================================
+// 13. EXPERIENCES
+// =============================================
+export const experiences = pgTable('experiences', {
   id: serial('id').primaryKey(),
-  summaryId: integer('summary_id')
-    .notNull()
-    .references(() => summarySection.id, { onDelete: 'cascade' }),
-  fromYear: integer('from_year'),
-  toYear: text('to_year'),
+  fromYear: integer('from_year').notNull(),
+  toYear: integer('to_year'),
   jobTitle: text('job_title').notNull(),
   company: text('company').notNull(),
   description: text('description'),
   sortOrder: integer('sort_order').default(0),
   createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
 })
 
-export type SummaryJob = typeof summaryJobs.$inferSelect
-export type NewSummaryJob = typeof summaryJobs.$inferInsert
+export type Experience = typeof experiences.$inferSelect
+export type NewExperience = typeof experiences.$inferInsert
 
-export const summaryExperiences = pgTable('summary_experiences', {
+// =============================================
+// 14. SKILLS
+// =============================================
+export const skills = pgTable('skills', {
   id: serial('id').primaryKey(),
-  summaryId: integer('summary_id')
-    .notNull()
-    .references(() => summarySection.id, { onDelete: 'cascade' }),
   skill: text('skill').notNull(),
   level: integer('level'),
   sortOrder: integer('sort_order').default(0),
   createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
 })
 
-export type SummaryExperience = typeof summaryExperiences.$inferSelect
-export type NewSummaryExperience = typeof summaryExperiences.$inferInsert
+export type Skill = typeof skills.$inferSelect
+export type NewSkill = typeof skills.$inferInsert
 
 // =============================================
-// 8. TESTIMONIALS SECTION
+// 15. TESTIMONIALS SECTION
 // =============================================
-export const testimonialsSection = pgTable('testimonials_section', {
+export const testimonials = pgTable('testimonials', {
   id: serial('id').primaryKey(),
-  title: text('title'),
-  overlayTitle: text('overlay_title'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-})
-
-export type TestimonialsSection = typeof testimonialsSection.$inferSelect
-export type NewTestimonialsSection = typeof testimonialsSection.$inferInsert
-
-export const testimonialItems = pgTable('testimonial_items', {
-  id: serial('id').primaryKey(),
-  testimonialsId: integer('testimonials_id')
-    .notNull()
-    .references(() => testimonialsSection.id, { onDelete: 'cascade' }),
   imageUrl: text('image_url'),
   title: text('title').notNull(),
   subtitle: text('subtitle'),
-  rating: ratingEnum('rating'),
-  content: text('content'),
+  rating: integer('rating'),
+  body: text('body'),
   sortOrder: integer('sort_order').default(0),
   createdAt: timestamp('created_at').defaultNow(),
-})
+  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
+}, (table) => [
+  check(
+    'testimonials_rating_range',
+    sql`${table.rating} BETWEEN 1 AND 5`,
+  ),
+])
 
-export type TestimonialItem = typeof testimonialItems.$inferSelect
-export type NewTestimonialItem = typeof testimonialItems.$inferInsert
-
+export type Testimonial = typeof testimonials.$inferSelect
+export type NewTestimonial = typeof testimonials.$inferInsert
 
 // =============================================
-// 12. PROJECTS SECTION
+// 16. PROJECTS SECTION
 // =============================================
-export const projectsSection = pgTable('projects_section', {
+export const projects = pgTable('projects', {
   id: serial('id').primaryKey(),
-  title: text('title'),
-  overlayTitle: text('overlay_title'),
+  title: text('title').notNull(),
+  category: text('category').notNull(),
+  description: text('description'),
+  image: text('image'),
+  link: text('link'),
+  githubUrl: text('github_url'),
+  sortOrder: integer('sort_order').default(0),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 })
 
-export type ProjectsSection = typeof projectsSection.$inferSelect
-export type NewProjectsSection = typeof projectsSection.$inferInsert
+export type Project = typeof projects.$inferSelect
+export type NewProject = typeof projects.$inferInsert
 
-export const projectItems = pgTable('project_items', {
-  id: serial('id').primaryKey(),
-  projectsId: integer('projects_id')
-    .notNull()
-    .references(() => projectsSection.id, { onDelete: 'cascade' }),
-  title: text('title').notNull(),
-  category: text('category').notNull(),
-  description: text('description'),
-  roles: text('roles').array(),
-  image: text('image'),
-  link: text('link'),
-  github: text('github'),
-  tech: text('tech').array(), // Array of technologies
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-})
+// #8: normalized roles (was text[].roles)
+export const projectRoles = pgTable(
+  'project_roles',
+  {
+    projectId: integer('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    role: text('role').notNull(),
+    sortOrder: integer('sort_order').default(0),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.projectId, table.role] }),
+    index('project_roles_project_id_idx').on(table.projectId),
+    index('project_roles_role_idx').on(table.role),
+  ],
+)
 
-export type ProjectItem = typeof projectItems.$inferSelect
-export type NewProjectItem = typeof projectItems.$inferInsert
+export type ProjectRole = typeof projectRoles.$inferSelect
+export type NewProjectRole = typeof projectRoles.$inferInsert
+
+// #8: normalized tech stack (was text[].tech)
+export const technologies = pgTable(
+  'technologies',
+  {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => [uniqueIndex('technologies_name_idx').on(table.name)],
+)
+
+export type Technology = typeof technologies.$inferSelect
+export type NewTechnology = typeof technologies.$inferInsert
+
+export const projectTechnologies = pgTable(
+  'project_technologies',
+  {
+    projectId: integer('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    technologyId: integer('technology_id')
+      .notNull()
+      .references(() => technologies.id, { onDelete: 'cascade' }),
+    sortOrder: integer('sort_order').default(0),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.projectId, table.technologyId] }),
+    index('project_technologies_project_id_idx').on(table.projectId),
+    index('project_technologies_technology_id_idx').on(table.technologyId),
+  ],
+)
+
+export type ProjectTechnology = typeof projectTechnologies.$inferSelect
+export type NewProjectTechnology = typeof projectTechnologies.$inferInsert
 
 // =============================================
-// 9. CONTACT SECTION
+// 17. CONTACT SECTION
 // =============================================
 export const contactSection = pgTable('contact_section', {
   id: serial('id').primaryKey(),
-  title: text('title'),
-  overlayTitle: text('overlay_title'),
+  sectionKey: text('section_key')
+    .notNull()
+    .unique()
+    .references(() => pageSections.sectionKey, { onDelete: 'cascade' }),
   formTitle: text('form_title'),
   buttonText: text('button_text'),
   buttonUrl: text('button_url'),
-  infoTitle: text('info_title'),
-  address: text('address'),
-  phone: text('phone'),
-  email: text('email'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 })
@@ -314,39 +395,45 @@ export type ContactSection = typeof contactSection.$inferSelect
 export type NewContactSection = typeof contactSection.$inferInsert
 
 // =============================================
-// 10. FOOTER
+// 18. FOOTER (singleton — merged with former footer_section)
 // =============================================
-export const footer = pgTable('footer', {
-  id: serial('id').primaryKey(),
-  termsPolicies: text('terms_policies'),
-  disclaimer: text('disclaimer'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-})
+export const footer = pgTable(
+  'footer',
+  {
+    id: integer('id').primaryKey().default(1),
+    companyName: text('company_name').default('Your Company'),
+    privacyPolicy: text('privacy_policy'),
+    termsOfService: text('terms_of_service'),
+    disclaimer: text('disclaimer'),
+    copyrightText: text('copyright_text'),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+  },
+  (table) => [check('footer_singleton', sql`${table.id} = 1`)],
+)
 
 export type Footer = typeof footer.$inferSelect
 export type NewFooter = typeof footer.$inferInsert
 
 // =============================================
-// 11. CONFIGURATION
+// 19. APPLICATION CONFIGURATION (singleton)
 // =============================================
-export const config = pgTable('config', {
-  id: serial('id').primaryKey(),
-  apiBaseUrl: text('api_base_url'),
-  smtpHost: text('smtp_host'),
-  smtpPort: text('smtp_port'),
-  smtpUsername: text('smtp_username'),
-  smtpPassword: text('smtp_password'),
-  recaptchaSiteKey: text('recaptcha_site_key'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-})
+export const appConfig = pgTable(
+  'app_config',
+  {
+    id: integer('id').primaryKey().default(1),
+    recaptchaSiteKey: text('recaptcha_site_key'),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+  },
+  (table) => [check('config_singleton', sql`${table.id} = 1`)],
+)
 
-export type Config = typeof config.$inferSelect
-export type NewConfig = typeof config.$inferInsert
+export type AppConfig = typeof appConfig.$inferSelect
+export type NewAppConfig = typeof appConfig.$inferInsert
 
 // =============================================
-// 12. ADMIN IDENTITY, PROFILES, AND SESSIONS
+// 20. ADMIN IDENTITY, PROFILES, AND SESSIONS
 // =============================================
 export const adminUsers = pgTable('admin_users', {
   id: serial('id').primaryKey(),
@@ -384,6 +471,7 @@ export const adminSessions = pgTable(
   (table) => [index('admin_sessions_user_id_idx').on(table.userId)],
 )
 
+// Prevent duplicate pending verifications for the same email and purpose.
 export const adminEmailVerifications = pgTable(
   'admin_email_verifications',
   {
@@ -403,7 +491,7 @@ export const adminEmailVerifications = pgTable(
     createdAt: timestamp('created_at').defaultNow(),
   },
   (table) => [
-    index('admin_email_verifications_email_purpose_idx').on(
+    uniqueIndex('admin_email_verifications_email_purpose_uq').on(
       table.email,
       table.purpose,
     ),
@@ -416,48 +504,24 @@ export type AdminProfile = typeof adminProfiles.$inferSelect
 export type NewAdminProfile = typeof adminProfiles.$inferInsert
 export type AdminSession = typeof adminSessions.$inferSelect
 export type NewAdminSession = typeof adminSessions.$inferInsert
-export type AdminEmailVerification = typeof adminEmailVerifications.$inferSelect
+export type AdminEmailVerification =
+  typeof adminEmailVerifications.$inferSelect
+export type NewAdminEmailVerification =
+  typeof adminEmailVerifications.$inferInsert
 
 // =============================================
-// 13. HEADER SECTIONS (Individual records)
+// 21. HEADER SETTINGS (singleton)
 // =============================================
-export const headerSections = pgTable('header_sections', {
-  id: serial('id').primaryKey(),
-  sectionId: text('section_id').notNull().unique(), // hero, about, experience, etc.
-  title: text('title').notNull(),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-})
-
-export type HeaderSection = typeof headerSections.$inferSelect
-export type NewHeaderSection = typeof headerSections.$inferInsert
-
-// =============================================
-// 14. HEADER SETTINGS (Default title, etc.)
-// =============================================
-export const headerSettings = pgTable('header_settings', {
-  id: serial('id').primaryKey(),
-  defaultTitle: text('default_title').default('Welcome'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-})
+export const headerSettings = pgTable(
+  'header_settings',
+  {
+    id: integer('id').primaryKey().default(1),
+    defaultTitle: text('default_title').default('Welcome'),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+  },
+  (table) => [check('header_settings_singleton', sql`${table.id} = 1`)],
+)
 
 export type HeaderSettings = typeof headerSettings.$inferSelect
 export type NewHeaderSettings = typeof headerSettings.$inferInsert
-
-// =============================================
-// 14. FOOTER SECTION
-// =============================================
-export const footerSection = pgTable('footer_section', {
-  id: serial('id').primaryKey(),
-  companyName: text('company_name').default('Your Company'),
-  privacyPolicy: text('privacy_policy'),
-  termsOfService: text('terms_of_service'),
-  copyrightText: text('copyright_text'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-})
-
-export type FooterSection = typeof footerSection.$inferSelect
-export type NewFooterSection = typeof footerSection.$inferInsert

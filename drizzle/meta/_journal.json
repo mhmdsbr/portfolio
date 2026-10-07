@@ -3,31 +3,10 @@
   "dialect": "postgresql",
   "entries": [
     {
-      "idx": 1,
+      "idx": 0,
       "version": "7",
-      "when": 1790249853776,
-      "tag": "0001_sweet_jocasta",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1791197528527,
-      "tag": "0002_admin_accounts",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1791197657460,
-      "tag": "0003_admin_session_user_index",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1791198718875,
-      "tag": "0004_admin_email_verification",
+      "when": 1791367362209,
+      "tag": "0000_simple_toro",
       "breakpoints": true
     }
   ]

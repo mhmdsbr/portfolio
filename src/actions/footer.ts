@@ -10,7 +10,7 @@ export async function getFooter() {
   await requireAuth()
   
   const [footer] = await db.select()
-    .from(schema.footerSection)
+    .from(schema.footer)
     .limit(1)
   
   return footer || { 
@@ -35,10 +35,10 @@ export async function updateFooter(formData: FormData) {
       termsOfService: termsOfService || null,
       copyrightText: copyrightText || null,
   }
-  const [existingFooter] = await db.select().from(schema.footerSection).limit(1)
+  const [existingFooter] = await db.select()  .from(schema.footer).limit(1)
   const [footer] = existingFooter
-    ? await db.update(schema.footerSection).set(values).where(eq(schema.footerSection.id, existingFooter.id)).returning()
-    : await db.insert(schema.footerSection).values(values).returning()
+  ? await db.update(schema.footer).set(values).where(eq(schema.footer.id, existingFooter.id)).returning()
+  : await db.insert(schema.footer).values(values).returning()
   
   revalidatePath('/admin/footer')
   revalidatePath('/api/all')

@@ -6,7 +6,7 @@ export default async function ProjectsPage() {
   const projects = await getProjects()
 
   return (
-    <div>
+    <div className="space-y-2">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Projects</h1>
         <Link
@@ -16,6 +16,9 @@ export default async function ProjectsPage() {
           + New Project
         </Link>
       </div>
+      <p className="-mt-6 mb-6 text-sm text-gray-400">
+        Edit the shared section titles and visibility in Page layout.
+      </p>
 
       <ProjectsTable projects={projects} />
     </div>
