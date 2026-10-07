@@ -40,7 +40,13 @@ export default async function AdminDashboard() {
               href="/admin/about"
               className="block text-sm text-cyan-400 hover:text-cyan-300 transition"
             >
-              ✏️ Edit About
+              Edit profile & about
+            </Link>
+            <Link
+              href="/admin/header"
+              className="block text-sm text-cyan-400 hover:text-cyan-300 transition"
+            >
+              Configure page layout
             </Link>
           </div>
         </div>

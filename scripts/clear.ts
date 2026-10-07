@@ -15,30 +15,31 @@ if (!process.argv.includes("--confirm")) {
   );
 }
 
-const tables = [
-  "social_media",
+// Keep authentication data intact when clearing portfolio content.
+const portfolioTables = [
+  "social_links",
   "hero_titles",
-  "about_contact_info",
-  "about_details",
-  "service_items",
-  "summary_jobs",
-  "summary_experiences",
-  "testimonial_items",
-  "project_items",
-  "header_sections",
+  "contact_methods",
+  "profile_facts",
+  "services",
+  "experiences",
+  "skills",
+  "testimonials",
+  "project_roles",
+  "project_technologies",
+  "projects",
+  "technologies",
   "hero_section",
   "about_section",
-  "services_section",
-  "summary_section",
-  "testimonials_section",
-  "projects_section",
+  "experience_section",
   "contact_section",
+  "page_sections",
   "sidebar",
-  "general_settings",
+  "portfolio_profile",
+  "site_settings",
   "footer",
-  "config",
+  "app_config",
   "header_settings",
-  "footer_section",
 ] as const;
 
 const client = postgres(connectionString, {
@@ -52,9 +53,11 @@ async function clearDatabase() {
 
   try {
     await client.unsafe(
-      `TRUNCATE TABLE ${tables.map((table) => `"${table}"`).join(", ")} RESTART IDENTITY CASCADE`,
+      `TRUNCATE TABLE ${portfolioTables
+        .map((table) => `"${table}"`)
+        .join(", ")} RESTART IDENTITY CASCADE`,
     );
-    console.log(`✅ Cleared ${tables.length} portfolio tables.`);
+    console.log(`✅ Cleared ${portfolioTables.length} portfolio tables.`);
   } catch (error) {
     console.error("❌ Error clearing database:", error);
     process.exitCode = 1;

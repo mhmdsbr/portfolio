@@ -12,44 +12,12 @@ import { requireAuth } from '@/lib/auth'
 
 export async function getTestimonials() {
   await requireAuth()
-  
-  const [testimonials] = await db.select()
-    .from(schema.testimonialsSection)
-    .limit(1)
-  
+
   const items = await db.select()
-    .from(schema.testimonialItems)
-    .orderBy(asc(schema.testimonialItems.sortOrder))
+    .from(schema.testimonials)
+    .orderBy(asc(schema.testimonials.sortOrder))
   
-  return {
-    ...testimonials,
-    items,
-  }
-}
-
-// =============================================
-// UPDATE TESTIMONIALS SECTION
-// =============================================
-
-export async function updateTestimonials(formData: FormData) {
-  await requireAuth()
-  
-  const title = formData.get('title') as string
-  const overlayTitle = formData.get('overlayTitle') as string
-  
-  const values = {
-      title: title || null,
-      overlayTitle: overlayTitle || null,
-  }
-  const [existingTestimonials] = await db.select().from(schema.testimonialsSection).limit(1)
-  const [testimonials] = existingTestimonials
-    ? await db.update(schema.testimonialsSection).set(values).where(eq(schema.testimonialsSection.id, existingTestimonials.id)).returning()
-    : await db.insert(schema.testimonialsSection).values(values).returning()
-  
-  revalidatePath('/admin/testimonials')
-  revalidatePath('/api/all')
-  
-  return testimonials
+  return { items }
 }
 
 // =============================================
@@ -62,31 +30,26 @@ export async function createTestimonialItem(formData: FormData) {
   const imageUrl = formData.get('imageUrl') as string
   const title = formData.get('title') as string
   const subtitle = formData.get('subtitle') as string
-  const rating = formData.get('rating') as string
-  const content = formData.get('content') as string
+  const ratingValue = String(formData.get('rating') ?? '').trim()
+  const rating = ratingValue ? Number(ratingValue) : null
+  if (rating !== null && (!Number.isInteger(rating) || rating < 1 || rating > 5)) {
+    throw new Error('Rating must be an integer from 1 to 5')
+  }
+  const body = formData.get('body') as string
   
-  const [testimonials] = await db.select()
-    .from(schema.testimonialsSection)
-    .limit(1)
-  
-  const testimonialsRecord = testimonials ?? (await db.insert(schema.testimonialsSection).values({}).returning())[0]
-  
-  // Get current max sort order
   const existing = await db.select()
-    .from(schema.testimonialItems)
-    .where(eq(schema.testimonialItems.testimonialsId, testimonialsRecord.id))
-    .orderBy(asc(schema.testimonialItems.sortOrder))
+    .from(schema.testimonials)
+    .orderBy(asc(schema.testimonials.sortOrder))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   
-  const [item] = await db.insert(schema.testimonialItems)
+  const [item] = await db.insert(schema.testimonials)
     .values({
-      testimonialsId: testimonialsRecord.id,
       imageUrl: imageUrl || null,
       title,
       subtitle: subtitle || null,
-      rating: (rating || null) as schema.NewTestimonialItem['rating'],
-      content: content || null,
+      rating,
+      body: body || null,
       sortOrder,
     })
     .returning()
@@ -103,18 +66,22 @@ export async function updateTestimonialItem(id: number, formData: FormData) {
   const imageUrl = formData.get('imageUrl') as string
   const title = formData.get('title') as string
   const subtitle = formData.get('subtitle') as string
-  const rating = formData.get('rating') as string
-  const content = formData.get('content') as string
+  const ratingValue = String(formData.get('rating') ?? '').trim()
+  const rating = ratingValue ? Number(ratingValue) : null
+  if (rating !== null && (!Number.isInteger(rating) || rating < 1 || rating > 5)) {
+    throw new Error('Rating must be an integer from 1 to 5')
+  }
+  const body = formData.get('body') as string
   
-  const [item] = await db.update(schema.testimonialItems)
+  const [item] = await db.update(schema.testimonials)
     .set({
       imageUrl: imageUrl || null,
       title,
       subtitle: subtitle || null,
-      rating: (rating || null) as schema.NewTestimonialItem['rating'],
-      content: content || null,
+      rating,
+      body: body || null,
     })
-    .where(eq(schema.testimonialItems.id, id))
+    .where(eq(schema.testimonials.id, id))
     .returning()
   
   revalidatePath('/admin/testimonials')
@@ -126,8 +93,8 @@ export async function updateTestimonialItem(id: number, formData: FormData) {
 export async function deleteTestimonialItem(id: number) {
   await requireAuth()
   
-  await db.delete(schema.testimonialItems)
-    .where(eq(schema.testimonialItems.id, id))
+  await db.delete(schema.testimonials)
+    .where(eq(schema.testimonials.id, id))
   
   revalidatePath('/admin/testimonials')
   revalidatePath('/api/all')
@@ -138,9 +105,9 @@ export async function reorderTestimonialItems(ids: number[]) {
   
   await Promise.all(
     ids.map((id, index) =>
-      db.update(schema.testimonialItems)
+      db.update(schema.testimonials)
         .set({ sortOrder: index })
-        .where(eq(schema.testimonialItems.id, id))
+        .where(eq(schema.testimonials.id, id))
     )
   )
   

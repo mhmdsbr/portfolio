@@ -12,9 +12,7 @@ export default function Contact() {
 
   const { data: allData, isLoading } = useAllData();
   const contact = allData?.contact;
-  const sectionId =
-    allData?.header?.sections.find((section) => section.sortOrder === 6)
-      ?.sectionId ?? "contact";
+  const sectionId = "contact";
 
   const [formData, setFormData] = useState({
     name: '',
@@ -56,34 +54,24 @@ export default function Contact() {
 
         <div className="grid md:grid-cols-2 gap-10 text-left">
           <div className="space-y-6 text-gray-700">
-            {contact?.email && (
-              <div className="flex items-start gap-3">
+            {contact?.methods.map((method) => (
+              <div key={method.id} className="flex items-start gap-3">
                 <div>
-                  <p className="font-semibold">Email</p>
-                  <a href={`mailto:${contact.email}`} className="text-sm text-white hover:underline">
-                    {contact.email}
-                  </a>
+                  <p className="font-semibold">{method.title}</p>
+                  {method.kind === 'email' ? (
+                    <a href={`mailto:${method.value.replace(/^mailto:/i, '')}`} className="text-sm text-white hover:underline">
+                      {method.value.replace(/^mailto:/i, '')}
+                    </a>
+                  ) : method.kind === 'phone' ? (
+                    <a href={`tel:${method.value.replace(/^tel:/i, '')}`} className="text-sm text-white hover:underline">
+                      {method.value}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-white">{method.value}</p>
+                  )}
                 </div>
               </div>
-            )}
-            {contact?.phone && (
-              <div className="flex items-start gap-3">
-                <div>
-                  <p className="font-semibold">Phone</p>
-                  <a href={`tel:${contact.phone}`} className="text-sm text-white hover:underline">
-                    {contact.phone}
-                  </a>
-                </div>
-              </div>
-            )}
-            {contact?.address && (
-              <div className="flex items-start gap-3">
-                <div>
-                  <p className="font-semibold">Location</p>
-                  <p className="text-sm text-white">{contact.address}</p>
-                </div>
-              </div>
-            )}
+            ))}
             <div className="pt-4">
               <p className="font-semibold mb-2">Follow me</p>
               <div className="flex gap-4 text-primary">

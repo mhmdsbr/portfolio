@@ -23,11 +23,8 @@ export default function Services() {
   const [animationReady, setAnimationReady] = useState(false);
 
   const services = allData?.services;
-  const sectionId =
-    allData?.header?.sections.find((section) => section.sortOrder === 3)
-      ?.sectionId ?? "services";
+  const sectionId = "services";
   const title = services?.title;
-  const overlayTitle = services?.overlay_title;
   const content = services?.items || [];
 
   useEffect(() => {
@@ -86,7 +83,7 @@ export default function Services() {
                 {item.title}
               </h3>
               <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto md:items-start md:justify-start">
-                <p className="text-gray-400">{item.content}</p>
+                <p className="text-gray-400">{item.description}</p>
               </div>
             </div>
           ))}

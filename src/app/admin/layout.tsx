@@ -1,11 +1,13 @@
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminHeader from '@/components/admin/AdminHeader'
+import { requireAuth } from '@/lib/auth'
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  await requireAuth()
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-white">

@@ -2,6 +2,8 @@
 // Response Types for New API
 // =============================================
 
+import type { PortfolioSectionKey } from '@/lib/portfolio-sections'
+
 export interface Button {
   text: string | null;
   url: string | null;
@@ -36,8 +38,9 @@ export interface AboutResponse {
   description: string | null;
   button: Button;
   contact_information: Array<{
+    kind: 'email' | 'phone' | 'address' | 'other';
     title: string;
-    content: string;
+    value: string;
   }>;
   details: Array<{
     number: number;
@@ -50,7 +53,7 @@ export interface ServicesResponse {
   overlay_title: string | null;
   items: Array<{
     title: string;
-    content: string | null;
+    description: string | null;
     icon: string | null;
   }>;
 }
@@ -61,7 +64,7 @@ export interface SummaryResponse {
   button: Button;
   jobs: Array<{
     from: number | null;
-    to: string | null;
+    to: number | null;
     title: string;
     company: string;
     description: string | null;
@@ -79,7 +82,8 @@ export interface Project {
   description: string | null;
   image: string | null;
   link: string | null;
-  github: string | null;
+  github_url: string | null;
+  roles: string[] | null;
   tech: string[] | null;
 }
 
@@ -96,8 +100,8 @@ export interface TestimonialsResponse {
     image: string | null;
     title: string;
     subtitle: string | null;
-    rating: string | null;
-    content: string | null;
+    rating: number | null;
+    body: string | null;
   }>;
 }
 
@@ -106,32 +110,30 @@ export interface ContactResponse {
   overlay_title: string | null;
   form_title: string | null;
   button: Button;
-  info_title: string | null;
-  address: string | null;
-  phone: string | null;
-  email: string | null;
+  methods: Array<{
+    id: number;
+    kind: 'email' | 'phone' | 'address' | 'other';
+    title: string;
+    value: string;
+  }>;
 }
 
 export interface ConfigResponse {
-  api_base_url: string | null;
-  smtp: {
-    host: string | null;
-    port: string | null;
-    username: string | null;
-    password: string | null;
-  };
   recaptcha_site_key: string | null;
 }
 
-export interface HeaderSection {
+export interface PageSection {
   id: number;
-  sectionId: string;
-  title: string;
+  sectionKey: PortfolioSectionKey;
+  navigationTitle: string;
+  title: string | null;
+  overlayTitle: string | null;
   sortOrder: number | null;
+  isEnabled: boolean;
 }
 
 export interface HeaderResponse {
-  sections: HeaderSection[];
+  sections: PageSection[];
   defaultTitle: string | null;
 }
 
@@ -164,7 +166,7 @@ export interface AllDataResponse {
 // API Response Wrapper
 // =============================================
 
-export interface ApiResponseWrapper<T = any> {
+export interface ApiResponseWrapper<T = unknown> {
   data?: T;
   timestamp?: string;
   error?: string;

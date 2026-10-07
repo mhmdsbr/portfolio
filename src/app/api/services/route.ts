@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { asc } from 'drizzle-orm'
+import { asc, eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import type { ApiResponse, ServicesResponse } from '@/types/api'
 
@@ -8,19 +8,17 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<ServicesResponse>>> {
   try {
-    const [servicesData, itemsData] = await Promise.all([
-      db.select().from(schema.servicesSection),
-      db.select().from(schema.serviceItems).orderBy(asc(schema.serviceItems.sortOrder)),
+    const [sectionData, itemsData] = await Promise.all([
+      db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'services')),
+      db.select().from(schema.services).orderBy(asc(schema.services.sortOrder)),
     ])
 
-    const services = servicesData[0]
-
     const response: ServicesResponse = {
-      title: services?.title ?? null,
-      overlay_title: services?.overlayTitle ?? null,
+      title: sectionData[0]?.title ?? null,
+      overlay_title: sectionData[0]?.overlayTitle ?? null,
       items: itemsData.map((item) => ({
         title: item.title,
-        content: item.content ?? null,
+        description: item.description ?? null,
         icon: item.icon ?? null,
       })),
     }

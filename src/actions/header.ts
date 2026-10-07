@@ -2,98 +2,159 @@
 
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { eq, asc, desc } from 'drizzle-orm'
+import { PORTFOLIO_SECTIONS, isPortfolioSectionKey } from '@/lib/portfolio-sections'
+import { ensurePortfolioSections } from '@/lib/db/portfolio-sections'
+import { asc, eq, inArray } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 
 export async function getHeader() {
   await requireAuth()
-  
-  const [settings] = await db.select()
-    .from(schema.headerSettings)
-    .limit(1)
-  
-  const sections = await db.select()
-    .from(schema.headerSections)
-    .orderBy(asc(schema.headerSections.sortOrder))
-  
+
+  await ensurePortfolioSections()
+
+  const [settings, sections] = await Promise.all([
+    db.select()
+      .from(schema.headerSettings)
+      .limit(1),
+    db.select()
+      .from(schema.pageSections)
+      .where(inArray(schema.pageSections.sectionKey, PORTFOLIO_SECTIONS.map(({ key }) => key)))
+      .orderBy(asc(schema.pageSections.sortOrder)),
+  ])
+
   return {
-    settings: settings || { defaultTitle: 'Welcome' },
+    settings: settings[0] || { defaultTitle: 'Welcome' },
     sections,
   }
 }
 
-export async function updateHeaderSection(id: number, title: string) {
+export async function updatePageSection(
+  id: number,
+  values: { navigationTitle: string; title: string; overlayTitle: string },
+) {
   await requireAuth()
-  
-  const [section] = await db.update(schema.headerSections)
-    .set({ title })
-    .where(eq(schema.headerSections.id, id))
+
+  if (
+    !Number.isSafeInteger(id) ||
+    id <= 0 ||
+    !values ||
+    typeof values.navigationTitle !== 'string' ||
+    typeof values.title !== 'string' ||
+    typeof values.overlayTitle !== 'string'
+  ) {
+    throw new Error('Invalid page section metadata')
+  }
+
+  const normalizedValues = {
+    navigationTitle: values.navigationTitle.trim(),
+    title: values.title.trim() || null,
+    overlayTitle: values.overlayTitle.trim() || null,
+  }
+  if (!normalizedValues.navigationTitle) {
+    throw new Error('A valid section and non-empty navigation title are required')
+  }
+
+  const [section] = await db.update(schema.pageSections)
+    .set(normalizedValues)
+    .where(eq(schema.pageSections.id, id))
     .returning()
-  
+
+  if (!section) throw new Error('Portfolio section not found')
+
   revalidatePath('/admin/header')
+  revalidatePath('/')
   revalidatePath('/api/all')
-  
+
   return section
 }
 
-export async function addHeaderSection(sectionId: string, title: string) {
+export async function togglePortfolioSection(id: number, isEnabled: boolean) {
   await requireAuth()
 
-  const normalizedSectionId = sectionId.trim()
-  const normalizedTitle = title.trim()
-
-  if (!normalizedSectionId || !normalizedTitle) {
-    throw new Error('Section ID and title are required')
+  if (!Number.isSafeInteger(id) || id <= 0 || typeof isEnabled !== 'boolean') {
+    throw new Error('Invalid portfolio section update')
   }
 
-  const [lastSection] = await db.select({ sortOrder: schema.headerSections.sortOrder })
-    .from(schema.headerSections)
-    .orderBy(desc(schema.headerSections.sortOrder))
-    .limit(1)
+  await db.transaction(async (transaction) => {
+    const [section] = await transaction.select()
+      .from(schema.pageSections)
+      .where(eq(schema.pageSections.id, id))
+      .limit(1)
+    if (!section || !isPortfolioSectionKey(section.sectionKey)) {
+      throw new Error('Portfolio section not found')
+    }
 
-  const [section] = await db.insert(schema.headerSections)
-    .values({
-      sectionId: normalizedSectionId,
-      title: normalizedTitle,
-      sortOrder: (lastSection?.sortOrder ?? -1) + 1,
-    })
-    .returning()
+    if (!isEnabled) {
+      const enabledSections = await transaction.select({ id: schema.pageSections.id })
+        .from(schema.pageSections)
+        .where(eq(schema.pageSections.isEnabled, true))
+      if (section.isEnabled && enabledSections.length <= 1) {
+        throw new Error('At least one portfolio section must remain visible')
+      }
+    }
 
-  revalidatePath('/admin/header')
+    await transaction.update(schema.pageSections)
+      .set({ isEnabled })
+      .where(eq(schema.pageSections.id, id))
+  })
+
+  revalidatePath('/')
   revalidatePath('/api/all')
-
-  return section
 }
 
 export async function updateHeaderSettings(formData: FormData) {
   await requireAuth()
-  
-  const defaultTitle = formData.get('defaultTitle') as string
 
+  const defaultTitle = String(formData.get('defaultTitle') ?? '').trim()
   const values = { defaultTitle: defaultTitle || 'Welcome' }
-  const [existingSettings] = await db.select().from(schema.headerSettings).limit(1)
+  const [existingSettings] = await db.select()
+    .from(schema.headerSettings)
+    .limit(1)
   const [settings] = existingSettings
-    ? await db.update(schema.headerSettings).set(values).where(eq(schema.headerSettings.id, existingSettings.id)).returning()
+    ? await db.update(schema.headerSettings)
+        .set(values)
+        .where(eq(schema.headerSettings.id, existingSettings.id))
+        .returning()
     : await db.insert(schema.headerSettings).values(values).returning()
-  
+
   revalidatePath('/admin/header')
   revalidatePath('/api/all')
-  
+
   return settings
 }
 
 export async function reorderHeaderSections(ids: number[]) {
   await requireAuth()
-  
-  await Promise.all(
-    ids.map((id, index) => 
-      db.update(schema.headerSections)
+
+  if (
+    ids.length !== PORTFOLIO_SECTIONS.length ||
+    ids.some((id) => !Number.isSafeInteger(id) || id <= 0) ||
+    new Set(ids).size !== ids.length
+  ) {
+    throw new Error('Invalid portfolio section order')
+  }
+
+  await db.transaction(async (transaction) => {
+    const existingSections = await transaction.select({ id: schema.pageSections.id })
+      .from(schema.pageSections)
+      .where(inArray(
+        schema.pageSections.sectionKey,
+        PORTFOLIO_SECTIONS.map(({ key }) => key),
+      ))
+    const existingIds = new Set(existingSections.map(({ id }) => id))
+    if (ids.some((id) => !existingIds.has(id)) || existingIds.size !== ids.length) {
+      throw new Error('Portfolio section order does not match the configured sections')
+    }
+
+    await Promise.all(ids.map((id, index) =>
+      transaction.update(schema.pageSections)
         .set({ sortOrder: index })
-        .where(eq(schema.headerSections.id, id))
-    )
-  )
-  
+        .where(eq(schema.pageSections.id, id)),
+    ))
+  })
+
   revalidatePath('/admin/header')
   revalidatePath('/api/all')
+  revalidatePath('/')
 }

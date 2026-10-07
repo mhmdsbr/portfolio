@@ -16,9 +16,8 @@ export default function Hero() {
 
   const { data: allData } = useAllData();
   const hero = allData?.hero;
-  const sectionId =
-    allData?.header?.sections.find((section) => section.sortOrder === 0)
-      ?.sectionId ?? "hero";
+  const sectionId = "hero";
+  console.log(allData)
 
   const [animationReady, setAnimationReady] = useState(false);
 

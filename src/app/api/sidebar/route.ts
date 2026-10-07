@@ -11,8 +11,8 @@ export async function GET(): Promise<NextResponse<ApiResponse<SidebarResponse>>>
     // Fetch data in parallel
     const [sidebarData, socialData, generalData] = await Promise.all([
       db.select().from(schema.sidebar),
-      db.select().from(schema.socialMedia).orderBy(asc(schema.socialMedia.sortOrder)),
-      db.select().from(schema.generalSettings),
+      db.select().from(schema.socialLinks).orderBy(asc(schema.socialLinks.sortOrder)),
+      db.select().from(schema.siteSettings),
     ])
 
     const sidebar = sidebarData[0]

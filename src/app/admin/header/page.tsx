@@ -6,7 +6,11 @@ export default async function HeaderPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Header Settings</h1>
+      <h1 className="text-2xl font-bold mb-2">Page layout</h1>
+      <p className="mb-6 text-sm text-gray-400">
+        Choose which portfolio sections appear and set their order. This controls
+        presentation only; it does not delete portfolio content.
+      </p>
       <HeaderForm 
         initialSettings={{
           defaultTitle: settings.defaultTitle ?? 'Welcome',

@@ -19,29 +19,29 @@ if (!process.argv.includes("--confirm")) {
 }
 
 const tables = [
+  "page_sections",
   "sidebar",
-  "social_media",
-  "general_settings",
+  "portfolio_profile",
+  "social_links",
+  "site_settings",
   "hero_section",
   "hero_titles",
   "about_section",
-  "about_contact_info",
-  "about_details",
-  "services_section",
-  "service_items",
-  "summary_section",
-  "summary_jobs",
-  "summary_experiences",
-  "testimonials_section",
-  "testimonial_items",
-  "projects_section",
-  "project_items",
+  "contact_methods",
+  "profile_facts",
+  "services",
+  "experience_section",
+  "experiences",
+  "skills",
+  "testimonials",
+  "projects",
+  "project_roles",
+  "technologies",
+  "project_technologies",
   "contact_section",
   "footer",
-  "config",
-  "header_sections",
+  "app_config",
   "header_settings",
-  "footer_section",
 ] as const;
 
 const quoteIdentifier = (identifier: string) =>
@@ -101,8 +101,13 @@ async function syncProduction() {
       }
 
       for (const table of tables) {
+        const [{ sequence }] = await transaction<{ sequence: string | null }[]>`
+          SELECT pg_get_serial_sequence(${table}, 'id') AS sequence
+        `;
+        if (!sequence) continue;
         await transaction.unsafe(
-          `SELECT setval(pg_get_serial_sequence('${table}', 'id'), COALESCE(MAX(id), 1), MAX(id) IS NOT NULL) FROM ${quoteIdentifier(table)}`,
+          `SELECT setval($1::regclass, COALESCE(MAX(id), 1), MAX(id) IS NOT NULL) FROM ${quoteIdentifier(table)}`,
+          [sequence],
         );
       }
     });

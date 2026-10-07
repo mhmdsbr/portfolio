@@ -1,104 +1,113 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createExperience, updateExperience, deleteExperience, reorderExperiences } from '@/actions/summary'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  createSkill,
+  updateSkill,
+  deleteSkill,
+  reorderSkills,
+} from "@/actions/experience";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 interface Experience {
-  id: number
-  skill: string
-  level: number | null
-  sortOrder: number | null
+  id: number;
+  skill: string;
+  level: number | null;
+  sortOrder: number | null;
 }
 
 interface ExperiencesFormProps {
-  experiences: Experience[]
+  experiences: Experience[];
 }
 
 export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
-  const [items, setItems] = useState(experiences)
-  const [editingId, setEditingId] = useState<number | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [deletingId, setDeletingId] = useState<number | null>(null)
-  const router = useRouter()
+  const [items, setItems] = useState(experiences);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const router = useRouter();
 
   const handleCreate = async (formData: FormData) => {
-    setLoading(true)
-    setMessage('')
+    setLoading(true);
+    setMessage("");
     try {
-      await createExperience(formData)
-      setMessage('✅ Skill added successfully!')
-      router.refresh()
+      await createSkill(formData);
+      setMessage("✅ Skill added successfully!");
+      router.refresh();
     } catch (error) {
-      setMessage('❌ Failed to add skill')
-      console.error('Error creating experience:', error)
+      setMessage("❌ Failed to add skill");
+      console.error("Error creating experience:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleUpdate = async (id: number, formData: FormData) => {
-    setLoading(true)
-    setMessage('')
+    setLoading(true);
+    setMessage("");
     try {
-      await updateExperience(id, formData)
-      setMessage('✅ Skill updated successfully!')
-      setEditingId(null)
-      router.refresh()
+      await updateSkill(id, formData);
+      setMessage("✅ Skill updated successfully!");
+      setEditingId(null);
+      router.refresh();
     } catch (error) {
-      setMessage('❌ Failed to update skill')
-      console.error('Error updating experience:', error)
+      setMessage("❌ Failed to update skill");
+      console.error("Error updating experience:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Delete this skill?')) return
-    
-    setDeletingId(id)
+    if (!confirm("Delete this skill?")) return;
+
+    setDeletingId(id);
     try {
-      await deleteExperience(id)
-      router.refresh()
+      await deleteSkill(id);
+      router.refresh();
     } catch (error) {
-      console.error('Error deleting experience:', error)
+      console.error("Error deleting experience:", error);
     } finally {
-      setDeletingId(null)
+      setDeletingId(null);
     }
-  }
+  };
 
   const onDragEnd = async (result: any) => {
-    if (!result.destination) return
+    if (!result.destination) return;
 
-    const itemsCopy = Array.from(items)
-    const [reorderedItem] = itemsCopy.splice(result.source.index, 1)
-    itemsCopy.splice(result.destination.index, 0, reorderedItem)
+    const itemsCopy = Array.from(items);
+    const [reorderedItem] = itemsCopy.splice(result.source.index, 1);
+    itemsCopy.splice(result.destination.index, 0, reorderedItem);
 
-    setItems(itemsCopy)
+    setItems(itemsCopy);
 
-    const ids = itemsCopy.map(item => item.id)
-    await reorderExperiences(ids)
-    router.refresh()
-  }
+    const ids = itemsCopy.map((item) => item.id);
+    await reorderSkills(ids);
+    router.refresh();
+  };
 
   // Handle edit form submission
   const handleEditSubmit = (id: number, formData: FormData) => {
-    handleUpdate(id, formData)
-  }
+    handleUpdate(id, formData);
+  };
 
   return (
     <div className="space-y-4">
       {message && (
-        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+        <div
+          className={`p-3 rounded ${message.includes("Failed") ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}
+        >
           {message}
         </div>
       )}
       {/* Create New Experience */}
       <form action={handleCreate} className="flex gap-3 items-end">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-300 mb-1">Skill</label>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Skill
+          </label>
           <input
             type="text"
             name="skill"
@@ -108,7 +117,9 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
           />
         </div>
         <div className="w-32">
-          <label className="block text-sm font-medium text-gray-300 mb-1">Level (1-100)</label>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Level (1-100)
+          </label>
           <input
             type="number"
             name="level"
@@ -138,22 +149,33 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
               className="space-y-2"
             >
               {items.map((item, index) => (
-                <Draggable key={item.id} draggableId={String(item.id)} index={index}>
+                <Draggable
+                  key={item.id}
+                  draggableId={String(item.id)}
+                  index={index}
+                >
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       className={`flex items-center gap-3 p-3 bg-gray-800 rounded-lg ${
-                        snapshot.isDragging ? 'shadow-lg ring-2 ring-cyan-500' : ''
+                        snapshot.isDragging
+                          ? "shadow-lg ring-2 ring-cyan-500"
+                          : ""
                       }`}
                     >
-                      <span {...provided.dragHandleProps} className="text-gray-400 cursor-grab">
+                      <span
+                        {...provided.dragHandleProps}
+                        className="text-gray-400 cursor-grab"
+                      >
                         ⠿
                       </span>
 
                       {editingId === item.id ? (
                         <form
-                          action={(formData) => handleEditSubmit(item.id, formData)}
+                          action={(formData) =>
+                            handleEditSubmit(item.id, formData)
+                          }
                           className="flex-1 flex items-center gap-3"
                         >
                           <input
@@ -167,7 +189,7 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
                           <input
                             type="number"
                             name="level"
-                            defaultValue={item.level || ''}
+                            defaultValue={item.level || ""}
                             placeholder="Level"
                             min="1"
                             max="100"
@@ -191,7 +213,9 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
                         </form>
                       ) : (
                         <>
-                          <span className="flex-1 text-white">{item.skill}</span>
+                          <span className="flex-1 text-white">
+                            {item.skill}
+                          </span>
                           <div className="flex items-center gap-3 w-48">
                             <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
                               <div
@@ -199,7 +223,9 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
                                 style={{ width: `${item.level || 0}%` }}
                               />
                             </div>
-                            <span className="text-sm text-gray-400 w-8">{item.level || 0}%</span>
+                            <span className="text-sm text-gray-400 w-8">
+                              {item.level || 0}%
+                            </span>
                           </div>
                           <button
                             onClick={() => setEditingId(item.id)}
@@ -212,7 +238,7 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
                             disabled={deletingId === item.id}
                             className="text-red-400 hover:text-red-300 transition disabled:opacity-50"
                           >
-                            {deletingId === item.id ? 'Deleting...' : 'Delete'}
+                            {deletingId === item.id ? "Deleting..." : "Delete"}
                           </button>
                         </>
                       )}
@@ -226,5 +252,5 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
         </Droppable>
       </DragDropContext>
     </div>
-  )
+  );
 }

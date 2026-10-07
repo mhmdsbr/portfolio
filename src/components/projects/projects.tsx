@@ -12,7 +12,7 @@ interface Project {
   description: string | null;
   image: string | null;
   link?: string | null;
-  github?: string | null;
+  github_url?: string | null;
   tech?: string[] | null;
 }
 
@@ -23,7 +23,7 @@ export default function Projects() {
   const { data: allData } = useAllData();
   const sectionId =
     allData?.header?.sections.find((section) => section.sortOrder === 4)
-      ?.sectionId ?? "projects";
+      ?.sectionKey ?? "projects";
 
   const allProjects: Project[] = useMemo(() => {
     return allData?.projects?.items || [];

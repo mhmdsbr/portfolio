@@ -13,9 +13,7 @@ import Link from "next/link";
 const Testimonials: React.FC = () => {
   const { data: allData } = useAllData();
   const testimonialsData = allData?.testimonials;
-  const sectionId =
-    allData?.header?.sections.find((section) => section.sortOrder === 5)
-      ?.sectionId ?? "testimonial";
+  const sectionId = "testimonials";
 
   const colors = ["#337BFF", "#FF5733", "#33FF57", "#FF33A1", "#8A33FF"];
 
@@ -76,12 +74,12 @@ const Testimonials: React.FC = () => {
               }}
             >
               <div className={styles["testimonial-content"]}>
-                {item.content && (
+                {item.body && (
                   <>
                     <p
                       className={`${styles["testimonial-quote"]} line-clamp-4`}
                     >
-                      {item.content}
+                      {item.body}
                     </p>
                     <Link
                       href="https://www.linkedin.com/in/mohammad-saber-20b9551a3/"
@@ -107,7 +105,7 @@ const Testimonials: React.FC = () => {
                         {"⭐".repeat(
                           Math.max(
                             0,
-                            Math.min(5, Math.round(Number(item.rating) || 0)),
+                            Math.min(5, Math.round(item.rating || 0)),
                           ),
                         )}
                       </div>
