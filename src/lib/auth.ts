@@ -335,6 +335,280 @@ export async function beginAdminEmailVerification(
   return { success: true as const, challengeId: reservation.challengeId };
 }
 
+export async function beginAdminPasswordResetVerification(
+  userId: number,
+  password: string,
+  currentAdmin: CurrentAdmin,
+) {
+  if (password.length < 12 || password.length > 256) {
+    return {
+      success: false as const,
+      error: "Choose a password between 12 and 256 characters.",
+    };
+  }
+  if (userId === currentAdmin.id) {
+    return {
+      success: false as const,
+      error: "Use Change Password to update your own password.",
+    };
+  }
+
+  const [target] = await db
+    .select({
+      email: schema.adminUsers.email,
+      displayName: schema.adminProfiles.displayName,
+    })
+    .from(schema.adminUsers)
+    .leftJoin(
+      schema.adminProfiles,
+      eq(schema.adminProfiles.userId, schema.adminUsers.id),
+    )
+    .where(
+      and(
+        eq(schema.adminUsers.id, userId),
+        eq(schema.adminUsers.isActive, true),
+      ),
+    )
+    .limit(1);
+  if (!target) {
+    return {
+      success: false as const,
+      error: "Active admin account was not found.",
+    };
+  }
+
+  const now = new Date();
+  const passwordHash = await hashPassword(password);
+  const reservation = await db.transaction(async (transaction) => {
+    await transaction.execute(
+      sql`SELECT pg_advisory_xact_lock(735241, hashtext(${target.email}))`,
+    );
+    await transaction
+      .delete(schema.adminEmailVerifications)
+      .where(lt(schema.adminEmailVerifications.expiresAt, now));
+
+    const [activeRequester] = await transaction
+      .select({ id: schema.adminUsers.id })
+      .from(schema.adminUsers)
+      .where(
+        and(
+          eq(schema.adminUsers.id, currentAdmin.id),
+          eq(schema.adminUsers.isActive, true),
+        ),
+      )
+      .limit(1);
+    const [activeTarget] = await transaction
+      .select({ id: schema.adminUsers.id })
+      .from(schema.adminUsers)
+      .where(
+        and(
+          eq(schema.adminUsers.id, userId),
+          eq(schema.adminUsers.isActive, true),
+        ),
+      )
+      .limit(1);
+    if (!activeRequester || !activeTarget) return "not-found" as const;
+
+    const [recentChallenge] = await transaction
+      .select({ createdAt: schema.adminEmailVerifications.createdAt })
+      .from(schema.adminEmailVerifications)
+      .where(
+        and(
+          eq(schema.adminEmailVerifications.email, target.email),
+          eq(schema.adminEmailVerifications.purpose, "password_reset"),
+          gt(
+            schema.adminEmailVerifications.expiresAt,
+            new Date(now.getTime() - VERIFICATION_RESEND_COOLDOWN_MS),
+          ),
+        ),
+      )
+      .limit(1);
+    if (
+      recentChallenge?.createdAt &&
+      now.getTime() - recentChallenge.createdAt.getTime() <
+        VERIFICATION_RESEND_COOLDOWN_MS
+    ) {
+      return "cooldown" as const;
+    }
+
+    await transaction
+      .delete(schema.adminEmailVerifications)
+      .where(
+        and(
+          eq(schema.adminEmailVerifications.email, target.email),
+          eq(schema.adminEmailVerifications.purpose, "password_reset"),
+        ),
+      );
+
+    const code = String(randomInt(100_000, 1_000_000));
+    const codeSalt = randomBytes(16);
+    const codeHash = await derivePasswordKey(code, codeSalt);
+    const challengeId = randomBytes(32).toString("base64url");
+    await transaction.insert(schema.adminEmailVerifications).values({
+      id: challengeId,
+      purpose: "password_reset",
+      email: target.email,
+      displayName: target.displayName ?? target.email,
+      passwordHash,
+      codeSalt: codeSalt.toString("base64url"),
+      codeHash: codeHash.toString("base64url"),
+      createdByUserId: currentAdmin.id,
+      expiresAt: new Date(now.getTime() + VERIFICATION_DURATION_MS),
+    });
+    return { status: "created" as const, challengeId, code };
+  });
+
+  if (reservation === "cooldown") {
+    return {
+      success: false as const,
+      error: "Please wait one minute before requesting another code.",
+    };
+  }
+  if (reservation === "not-found") {
+    return {
+      success: false as const,
+      error: "Active admin account was not found.",
+    };
+  }
+  if (typeof reservation === "string") {
+    return {
+      success: false as const,
+      error: "Could not start password reset verification.",
+    };
+  }
+
+  try {
+    await sendAdminEmailVerification(
+      target.email,
+      reservation.code,
+      "password-reset",
+    );
+  } catch (error) {
+    await db
+      .delete(schema.adminEmailVerifications)
+      .where(eq(schema.adminEmailVerifications.id, reservation.challengeId));
+    if (!(error instanceof EmailVerificationDeliveryError)) throw error;
+    console.error("Failed to send admin password reset email:", error.message);
+    return {
+      success: false as const,
+      error:
+        "Could not send the password reset email. Check the server SMTP configuration.",
+    };
+  }
+
+  return {
+    success: true as const,
+    challengeId: reservation.challengeId,
+    email: target.email,
+  };
+}
+
+export async function verifyAdminPasswordReset(
+  challengeId: string,
+  code: string,
+  currentAdmin: CurrentAdmin,
+) {
+  if (!/^[A-Za-z0-9_-]{43}$/.test(challengeId) || !/^\d{6}$/.test(code)) {
+    return { success: false as const, error: "Invalid or expired code." };
+  }
+
+  const result = await db.transaction(async (transaction) => {
+    await transaction.execute(
+      sql`SELECT pg_advisory_xact_lock(735242, hashtext(${challengeId}))`,
+    );
+    const [challenge] = await transaction
+      .select()
+      .from(schema.adminEmailVerifications)
+      .where(
+        and(
+          eq(schema.adminEmailVerifications.id, challengeId),
+          eq(schema.adminEmailVerifications.purpose, "password_reset"),
+          eq(schema.adminEmailVerifications.createdByUserId, currentAdmin.id),
+          gt(schema.adminEmailVerifications.expiresAt, new Date()),
+          sql`${schema.adminEmailVerifications.attempts} < ${MAX_VERIFICATION_ATTEMPTS}`,
+        ),
+      )
+      .for("update")
+      .limit(1);
+    if (!challenge) return { status: "expired" as const };
+
+    const salt = Buffer.from(challenge.codeSalt, "base64url");
+    const expectedHash = Buffer.from(challenge.codeHash, "base64url");
+    if (salt.length !== 16 || expectedHash.length !== SCRYPT_KEY_LENGTH) {
+      return { status: "expired" as const };
+    }
+    const candidateHash = await derivePasswordKey(code, salt);
+    if (!timingSafeEqual(candidateHash, expectedHash)) {
+      const attempts = challenge.attempts + 1;
+      if (attempts >= MAX_VERIFICATION_ATTEMPTS) {
+        await transaction
+          .delete(schema.adminEmailVerifications)
+          .where(eq(schema.adminEmailVerifications.id, challengeId));
+      } else {
+        await transaction
+          .update(schema.adminEmailVerifications)
+          .set({ attempts })
+          .where(eq(schema.adminEmailVerifications.id, challengeId));
+      }
+      return { status: "invalid" as const };
+    }
+
+    const [activeRequester] = await transaction
+      .select({ id: schema.adminUsers.id })
+      .from(schema.adminUsers)
+      .where(
+        and(
+          eq(schema.adminUsers.id, currentAdmin.id),
+          eq(schema.adminUsers.isActive, true),
+        ),
+      )
+      .limit(1);
+    if (!activeRequester) return { status: "expired" as const };
+
+    const [target] = await transaction
+      .update(schema.adminUsers)
+      .set({ passwordHash: challenge.passwordHash, updatedAt: new Date() })
+      .where(
+        and(
+          eq(schema.adminUsers.email, challenge.email),
+          eq(schema.adminUsers.isActive, true),
+        ),
+      )
+      .returning({ id: schema.adminUsers.id });
+    if (!target) {
+      await transaction
+        .delete(schema.adminEmailVerifications)
+        .where(eq(schema.adminEmailVerifications.id, challengeId));
+      return { status: "not-found" as const };
+    }
+
+    await transaction
+      .delete(schema.adminSessions)
+      .where(eq(schema.adminSessions.userId, target.id));
+    await transaction
+      .delete(schema.adminEmailVerifications)
+      .where(eq(schema.adminEmailVerifications.id, challengeId));
+    return { status: "updated" as const };
+  });
+
+  if (result.status === "invalid") {
+    return {
+      success: false as const,
+      error: "Incorrect code. Check the admin's email and try again.",
+    };
+  }
+  if (result.status === "not-found") {
+    return {
+      success: false as const,
+      error: "Active admin account was not found.",
+    };
+  }
+  if (result.status !== "updated") {
+    return { success: false as const, error: "Invalid or expired code." };
+  }
+  return { success: true as const };
+}
+
 export async function verifyAdminEmail(
   challengeId: string,
   code: string,
@@ -477,7 +751,7 @@ export async function verifyAdminEmail(
   return { success: true as const };
 }
 
-export async function changeCurrentAdminPassword(
+export async function beginCurrentAdminPasswordChange(
   currentPassword: string,
   newPassword: string,
 ) {
@@ -501,13 +775,198 @@ export async function changeCurrentAdminPassword(
   }
 
   const passwordHash = await hashPassword(newPassword);
-  const currentSessionId = (await cookies()).get(SESSION_COOKIE)?.value;
-  await db.transaction(async (transaction) => {
+  const now = new Date();
+  const reservation = await db.transaction(async (transaction) => {
+    await transaction.execute(
+      sql`SELECT pg_advisory_xact_lock(735241, hashtext(${admin.email}))`,
+    );
     await transaction
-      .update(schema.adminUsers)
-      .set({ passwordHash, updatedAt: new Date() })
-      .where(eq(schema.adminUsers.id, admin.id));
+      .delete(schema.adminEmailVerifications)
+      .where(lt(schema.adminEmailVerifications.expiresAt, now));
 
+    const [recentChallenge] = await transaction
+      .select({ createdAt: schema.adminEmailVerifications.createdAt })
+      .from(schema.adminEmailVerifications)
+      .where(
+        and(
+          eq(schema.adminEmailVerifications.email, admin.email),
+          eq(schema.adminEmailVerifications.purpose, "password_change"),
+          gt(
+            schema.adminEmailVerifications.expiresAt,
+            new Date(now.getTime() - VERIFICATION_RESEND_COOLDOWN_MS),
+          ),
+        ),
+      )
+      .limit(1);
+    if (
+      recentChallenge?.createdAt &&
+      now.getTime() - recentChallenge.createdAt.getTime() <
+        VERIFICATION_RESEND_COOLDOWN_MS
+    ) {
+      return "cooldown" as const;
+    }
+
+    await transaction
+      .delete(schema.adminEmailVerifications)
+      .where(
+        and(
+          eq(schema.adminEmailVerifications.email, admin.email),
+          eq(schema.adminEmailVerifications.purpose, "password_change"),
+        ),
+      );
+
+    const [activeAdmin] = await transaction
+      .select({
+        email: schema.adminUsers.email,
+        displayName: schema.adminProfiles.displayName,
+      })
+      .from(schema.adminUsers)
+      .leftJoin(
+        schema.adminProfiles,
+        eq(schema.adminProfiles.userId, schema.adminUsers.id),
+      )
+      .where(
+        and(
+          eq(schema.adminUsers.id, admin.id),
+          eq(schema.adminUsers.isActive, true),
+        ),
+      )
+      .limit(1);
+    if (!activeAdmin) return "not-found" as const;
+
+    const code = String(randomInt(100_000, 1_000_000));
+    const codeSalt = randomBytes(16);
+    const codeHash = await derivePasswordKey(code, codeSalt);
+    const challengeId = randomBytes(32).toString("base64url");
+    await transaction.insert(schema.adminEmailVerifications).values({
+      id: challengeId,
+      purpose: "password_change",
+      email: activeAdmin.email,
+      displayName: activeAdmin.displayName ?? activeAdmin.email,
+      passwordHash,
+      codeSalt: codeSalt.toString("base64url"),
+      codeHash: codeHash.toString("base64url"),
+      createdByUserId: admin.id,
+      expiresAt: new Date(now.getTime() + VERIFICATION_DURATION_MS),
+    });
+    return {
+      status: "created" as const,
+      challengeId,
+      code,
+      email: activeAdmin.email,
+    };
+  });
+
+  if (reservation === "cooldown") {
+    return {
+      success: false as const,
+      error: "Please wait one minute before requesting another code.",
+    };
+  }
+  if (reservation === "not-found") {
+    return {
+      success: false as const,
+      error: "Active admin account was not found.",
+    };
+  }
+  if (typeof reservation === "string") {
+    return {
+      success: false as const,
+      error: "Could not start password change verification.",
+    };
+  }
+
+  try {
+    await sendAdminEmailVerification(
+      reservation.email,
+      reservation.code,
+      "password-change",
+    );
+  } catch (error) {
+    await db
+      .delete(schema.adminEmailVerifications)
+      .where(eq(schema.adminEmailVerifications.id, reservation.challengeId));
+    if (!(error instanceof EmailVerificationDeliveryError)) throw error;
+    console.error("Failed to send admin password change email:", error.message);
+    return {
+      success: false as const,
+      error:
+        "Could not send the verification email. Check the server SMTP configuration.",
+    };
+  }
+
+  return {
+    success: true as const,
+    challengeId: reservation.challengeId,
+    email: reservation.email,
+  };
+}
+
+export async function completeCurrentAdminPasswordChange(
+  challengeId: string,
+  code: string,
+) {
+  const admin = await getSessionAdmin();
+  if (!admin) return { success: false as const, error: "Sign in again." };
+  if (!/^[A-Za-z0-9_-]{43}$/.test(challengeId) || !/^\d{6}$/.test(code)) {
+    return { success: false as const, error: "Invalid or expired code." };
+  }
+
+  const result = await db.transaction(async (transaction) => {
+    await transaction.execute(
+      sql`SELECT pg_advisory_xact_lock(735242, hashtext(${challengeId}))`,
+    );
+    const [challenge] = await transaction
+      .select()
+      .from(schema.adminEmailVerifications)
+      .where(
+        and(
+          eq(schema.adminEmailVerifications.id, challengeId),
+          eq(schema.adminEmailVerifications.purpose, "password_change"),
+          eq(schema.adminEmailVerifications.createdByUserId, admin.id),
+          gt(schema.adminEmailVerifications.expiresAt, new Date()),
+          sql`${schema.adminEmailVerifications.attempts} < ${MAX_VERIFICATION_ATTEMPTS}`,
+        ),
+      )
+      .for("update")
+      .limit(1);
+    if (!challenge) return { status: "expired" as const };
+
+    const salt = Buffer.from(challenge.codeSalt, "base64url");
+    const expectedHash = Buffer.from(challenge.codeHash, "base64url");
+    if (salt.length !== 16 || expectedHash.length !== SCRYPT_KEY_LENGTH) {
+      return { status: "expired" as const };
+    }
+    const candidateHash = await derivePasswordKey(code, salt);
+    if (!timingSafeEqual(candidateHash, expectedHash)) {
+      const attempts = challenge.attempts + 1;
+      if (attempts >= MAX_VERIFICATION_ATTEMPTS) {
+        await transaction
+          .delete(schema.adminEmailVerifications)
+          .where(eq(schema.adminEmailVerifications.id, challengeId));
+      } else {
+        await transaction
+          .update(schema.adminEmailVerifications)
+          .set({ attempts })
+          .where(eq(schema.adminEmailVerifications.id, challengeId));
+      }
+      return { status: "invalid" as const };
+    }
+
+    const [updatedAdmin] = await transaction
+      .update(schema.adminUsers)
+      .set({ passwordHash: challenge.passwordHash, updatedAt: new Date() })
+      .where(
+        and(
+          eq(schema.adminUsers.id, admin.id),
+          eq(schema.adminUsers.email, challenge.email),
+          eq(schema.adminUsers.isActive, true),
+        ),
+      )
+      .returning({ id: schema.adminUsers.id });
+    if (!updatedAdmin) return { status: "expired" as const };
+
+    const currentSessionId = (await cookies()).get(SESSION_COOKIE)?.value;
     await transaction
       .delete(schema.adminSessions)
       .where(
@@ -518,8 +977,21 @@ export async function changeCurrentAdminPassword(
             )
           : eq(schema.adminSessions.userId, admin.id),
       );
+    await transaction
+      .delete(schema.adminEmailVerifications)
+      .where(eq(schema.adminEmailVerifications.id, challengeId));
+    return { status: "updated" as const };
   });
 
+  if (result.status === "invalid") {
+    return {
+      success: false as const,
+      error: "Incorrect code. Check your email and try again.",
+    };
+  }
+  if (result.status !== "updated") {
+    return { success: false as const, error: "Invalid or expired code." };
+  }
   return { success: true as const };
 }
 

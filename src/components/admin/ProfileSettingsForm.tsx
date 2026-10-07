@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  beginAdminUserPasswordReset,
   beginAdminUserEmailVerification,
   changeMyPassword,
+  completeMyPasswordChange,
+  completeAdminUserPasswordReset,
   completeAdminUserEmailVerification,
-  resetAdminUserPassword,
   setAdminUserActive,
   updateMyProfile,
 } from "@/actions/profile";
@@ -133,6 +135,10 @@ export default function ProfileSettingsForm({
   const [newPassword, setNewPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordChallengeId, setPasswordChallengeId] = useState("");
+  const [passwordVerificationCode, setPasswordVerificationCode] = useState("");
+  const [passwordVerificationEmail, setPasswordVerificationEmail] =
+    useState("");
   const [newAdminName, setNewAdminName] = useState("");
   const [newAdminEmail, setNewAdminEmail] = useState("");
   const [newAdminPassword, setNewAdminPassword] = useState("");
@@ -143,6 +149,10 @@ export default function ProfileSettingsForm({
   const [resetPassword, setResetPassword] = useState<Record<number, string>>(
     {},
   );
+  const [resetChallenges, setResetChallenges] = useState<
+    Record<number, string>
+  >({});
+  const [resetCodes, setResetCodes] = useState<Record<number, string>>({});
   const [resetMessage, setResetMessage] = useState("");
   const [resetLoadingId, setResetLoadingId] = useState<number | null>(null);
 
@@ -178,16 +188,34 @@ export default function ProfileSettingsForm({
     event.preventDefault();
     setPasswordLoading(true);
     setPasswordMessage("");
-    const formData = new FormData();
-    formData.set("currentPassword", currentPassword);
-    formData.set("newPassword", newPassword);
-
     try {
-      const result = await changeMyPassword(formData);
-      setPasswordMessage(result.success ? "Password changed." : result.error);
-      if (result.success) {
+      if (passwordChallengeId) {
+        const result = await completeMyPasswordChange(
+          passwordChallengeId,
+          passwordVerificationCode,
+        );
+        if (!result.success) {
+          setPasswordMessage(result.error);
+          return;
+        }
+        setPasswordChallengeId("");
+        setPasswordVerificationCode("");
+        setPasswordVerificationEmail("");
+        setPasswordMessage("Password changed. Other sessions have ended.");
+      } else {
+        const formData = new FormData();
+        formData.set("currentPassword", currentPassword);
+        formData.set("newPassword", newPassword);
+        const result = await changeMyPassword(formData);
+        if (!result.success) {
+          setPasswordMessage(result.error);
+          return;
+        }
+        setPasswordChallengeId(result.challengeId);
+        setPasswordVerificationEmail(result.email);
         setCurrentPassword("");
         setNewPassword("");
+        setPasswordMessage(`Verification code sent to ${result.email}.`);
       }
     } catch (error) {
       console.error("Failed to change password:", error);
@@ -255,13 +283,41 @@ export default function ProfileSettingsForm({
     formData.set("password", resetPassword[userId] ?? "");
 
     try {
-      const result = await resetAdminUserPassword(formData);
-      if (!result.success) {
-        setResetMessage(result.error);
-        return;
+      const challengeId = resetChallenges[userId];
+      if (challengeId) {
+        const result = await completeAdminUserPasswordReset(
+          challengeId,
+          resetCodes[userId] ?? "",
+        );
+        if (!result.success) {
+          setResetMessage(result.error);
+          return;
+        }
+
+        setResetChallenges((challenges) => {
+          const nextChallenges = { ...challenges };
+          delete nextChallenges[userId];
+          return nextChallenges;
+        });
+        setResetCodes((codes) => {
+          const nextCodes = { ...codes };
+          delete nextCodes[userId];
+          return nextCodes;
+        });
+        setResetMessage("Admin password reset; their existing sessions ended.");
+      } else {
+        const result = await beginAdminUserPasswordReset(formData);
+        if (!result.success) {
+          setResetMessage(result.error);
+          return;
+        }
+        setResetChallenges((challenges) => ({
+          ...challenges,
+          [userId]: result.challengeId,
+        }));
+        setResetPassword((passwords) => ({ ...passwords, [userId]: "" }));
+        setResetMessage(`Verification code sent to ${result.email}.`);
       }
-      setResetPassword((passwords) => ({ ...passwords, [userId]: "" }));
-      setResetMessage("Admin password reset; their existing sessions ended.");
     } catch (error) {
       console.error("Failed to reset admin password:", error);
       setResetMessage("Failed to reset admin password.");
@@ -368,7 +424,8 @@ export default function ProfileSettingsForm({
         <div>
           <h2 className="text-lg font-semibold">Change Password</h2>
           <p className="mt-1 text-sm text-gray-400">
-            Passwords are stored as scrypt hashes, never as plaintext.
+            Confirm your current password and verify a code sent to your account
+            email. Passwords are stored as scrypt hashes.
           </p>
         </div>
         {passwordMessage && (
@@ -377,49 +434,101 @@ export default function ProfileSettingsForm({
           </p>
         )}
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="currentPassword"
-              className="mb-1 block text-sm font-medium text-gray-300"
-            >
-              Current password
-            </label>
-            <input
-              id="currentPassword"
-              type="password"
-              autoComplete="current-password"
-              value={currentPassword}
-              onChange={(event) => setCurrentPassword(event.target.value)}
-              className={fieldClassName}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="newPassword"
-              className="mb-1 block text-sm font-medium text-gray-300"
-            >
-              New password
-            </label>
-            <input
-              id="newPassword"
-              type="password"
-              autoComplete="new-password"
-              minLength={12}
-              maxLength={256}
-              value={newPassword}
-              onChange={(event) => setNewPassword(event.target.value)}
-              className={fieldClassName}
-              required
-            />
-          </div>
+          {passwordChallengeId ? (
+            <div>
+              <label
+                htmlFor="passwordVerificationCode"
+                className="mb-1 block text-sm font-medium text-gray-300"
+              >
+                Verification code sent to {passwordVerificationEmail}
+              </label>
+              <input
+                id="passwordVerificationCode"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                value={passwordVerificationCode}
+                onChange={(event) =>
+                  setPasswordVerificationCode(
+                    event.target.value.replace(/\D/g, "").slice(0, 6),
+                  )
+                }
+                className={fieldClassName}
+                required
+              />
+              <p className="mt-1 text-xs text-gray-400">
+                The code expires in 10 minutes and allows five attempts.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div>
+                <label
+                  htmlFor="currentPassword"
+                  className="mb-1 block text-sm font-medium text-gray-300"
+                >
+                  Current password
+                </label>
+                <input
+                  id="currentPassword"
+                  type="password"
+                  autoComplete="current-password"
+                  value={currentPassword}
+                  onChange={(event) => setCurrentPassword(event.target.value)}
+                  className={fieldClassName}
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="newPassword"
+                  className="mb-1 block text-sm font-medium text-gray-300"
+                >
+                  New password
+                </label>
+                <input
+                  id="newPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={12}
+                  maxLength={256}
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  className={fieldClassName}
+                  required
+                />
+              </div>
+            </>
+          )}
           <button
             type="submit"
             disabled={passwordLoading}
             className="rounded-md bg-cyan-500 px-5 py-2 font-semibold text-white transition hover:bg-cyan-600 disabled:opacity-50"
           >
-            {passwordLoading ? "Updating..." : "Change Password"}
+            {passwordLoading
+              ? passwordChallengeId
+                ? "Verifying..."
+                : "Sending code..."
+              : passwordChallengeId
+                ? "Verify and change password"
+                : "Send verification code"}
           </button>
+          {passwordChallengeId && (
+            <button
+              type="button"
+              onClick={() => {
+                setPasswordChallengeId("");
+                setPasswordVerificationCode("");
+                setPasswordVerificationEmail("");
+                setPasswordMessage("");
+              }}
+              className="w-full text-sm text-gray-400 underline hover:text-white"
+            >
+              Cancel verification
+            </button>
+          )}
         </form>
       </section>
 
@@ -560,9 +669,15 @@ export default function ProfileSettingsForm({
       </section>
 
       <section className="space-y-4 rounded-lg bg-gray-800 p-6">
-        <h2 className="text-lg font-semibold">
-          Reset Another Admin’s Password
-        </h2>
+        <div>
+          <h2 className="text-lg font-semibold">
+            Reset Another Admin’s Password
+          </h2>
+          <p className="mt-1 text-sm text-gray-400">
+            A verification code will be sent to that admin’s email before their
+            password is changed.
+          </p>
+        </div>
         {resetMessage && (
           <p role="status" className="text-sm text-cyan-300">
             {resetMessage}
@@ -578,35 +693,76 @@ export default function ProfileSettingsForm({
                 className="flex flex-col gap-3 rounded-md border border-gray-700 p-4 sm:flex-row sm:items-end"
               >
                 <div className="min-w-0 flex-1">
-                  <label
-                    htmlFor={`reset-${account.id}`}
-                    className="mb-1 block text-sm font-medium text-gray-300"
-                  >
-                    New password for {account.email}
-                  </label>
-                  <input
-                    id={`reset-${account.id}`}
-                    type="password"
-                    autoComplete="new-password"
-                    minLength={12}
-                    maxLength={256}
-                    value={resetPassword[account.id] ?? ""}
-                    onChange={(event) =>
-                      setResetPassword((passwords) => ({
-                        ...passwords,
-                        [account.id]: event.target.value,
-                      }))
-                    }
-                    className={fieldClassName}
-                    required
-                  />
+                  {resetChallenges[account.id] ? (
+                    <>
+                      <label
+                        htmlFor={`reset-code-${account.id}`}
+                        className="mb-1 block text-sm font-medium text-gray-300"
+                      >
+                        Verification code sent to {account.email}
+                      </label>
+                      <input
+                        id={`reset-code-${account.id}`}
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        pattern="[0-9]{6}"
+                        maxLength={6}
+                        value={resetCodes[account.id] ?? ""}
+                        onChange={(event) =>
+                          setResetCodes((codes) => ({
+                            ...codes,
+                            [account.id]: event.target.value
+                              .replace(/\D/g, "")
+                              .slice(0, 6),
+                          }))
+                        }
+                        className={fieldClassName}
+                        required
+                      />
+                      <p className="mt-1 text-xs text-gray-400">
+                        The code expires in 10 minutes and allows five attempts.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <label
+                        htmlFor={`reset-${account.id}`}
+                        className="mb-1 block text-sm font-medium text-gray-300"
+                      >
+                        New password for {account.email}
+                      </label>
+                      <input
+                        id={`reset-${account.id}`}
+                        type="password"
+                        autoComplete="new-password"
+                        minLength={12}
+                        maxLength={256}
+                        value={resetPassword[account.id] ?? ""}
+                        onChange={(event) =>
+                          setResetPassword((passwords) => ({
+                            ...passwords,
+                            [account.id]: event.target.value,
+                          }))
+                        }
+                        className={fieldClassName}
+                        required
+                      />
+                    </>
+                  )}
                 </div>
                 <button
                   type="submit"
                   disabled={resetLoadingId === account.id}
                   className="rounded-md border border-gray-600 px-4 py-2 text-sm text-gray-200 transition hover:bg-gray-700 disabled:opacity-50"
                 >
-                  {resetLoadingId === account.id ? "Resetting..." : "Reset"}
+                  {resetLoadingId === account.id
+                    ? resetChallenges[account.id]
+                      ? "Verifying..."
+                      : "Sending code..."
+                    : resetChallenges[account.id]
+                      ? "Verify and reset"
+                      : "Send verification code"}
                 </button>
               </form>
             ))}

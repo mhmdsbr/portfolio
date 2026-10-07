@@ -49,8 +49,14 @@ Navigate and interact with the portfolio seamlessly, experiencing the blend of R
 Apply the database schema before opening the admin area with `npm run db:push`
 using the database environment you intend to use. The first visit to
 `/admin/login` redirects to the one-time `/admin/signup` page while no admin
-accounts exist. Configure SMTP host, port, username, and password under
-**General Settings** before signing up. Initial and additional admin accounts
+accounts exist. Configure SMTP on the server before signing up by setting
+`SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, and `SMTP_PASSWORD` in the local
+`.env` file or your deployment secret manager. These values are server-only and
+are not editable through the admin panel or returned by public APIs. Existing
+installations should move their SMTP values from General Settings into the
+server environment before applying the schema migration, which removes the
+database columns. Rotate credentials that were stored in the database.
+Initial and additional admin accounts
 are created only after confirming a six-digit code sent to their email address.
 Codes expire after 10 minutes, allow five attempts, and can be requested once
 per minute. Once the first account is created, public sign-up closes; signed-in

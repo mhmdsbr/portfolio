@@ -1,16 +1,18 @@
 "use server";
 
-import { and, count, eq, sql } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import {
-  changeCurrentAdminPassword,
+  beginCurrentAdminPasswordChange,
   beginAdminEmailVerification,
-  hashPassword,
+  beginAdminPasswordResetVerification,
+  completeCurrentAdminPasswordChange,
   requireAuth,
   validateAdminIdentity,
   verifyAdminEmail,
+  verifyAdminPasswordReset,
 } from "@/lib/auth";
 
 const PROFILE_PATH = "/admin/profile-settings";
@@ -159,7 +161,19 @@ export async function changeMyPassword(formData: FormData) {
     return { success: false as const, error: "Invalid password data." };
   }
 
-  const result = await changeCurrentAdminPassword(currentPassword, newPassword);
+  const result = await beginCurrentAdminPasswordChange(
+    currentPassword,
+    newPassword,
+  );
+  return result;
+}
+
+export async function completeMyPasswordChange(
+  challengeId: string,
+  code: string,
+) {
+  await requireAuth();
+  const result = await completeCurrentAdminPasswordChange(challengeId, code);
   if (result.success) revalidatePath(PROFILE_PATH);
   return result;
 }
@@ -278,7 +292,7 @@ export async function setAdminUserActive(formData: FormData) {
   return { success: true as const };
 }
 
-export async function resetAdminUserPassword(formData: FormData) {
+export async function beginAdminUserPasswordReset(formData: FormData) {
   const currentAdmin = await requireAuth();
   const idValue = Number(formData.get("userId"));
   const passwordValue = formData.get("password");
@@ -301,31 +315,25 @@ export async function resetAdminUserPassword(formData: FormData) {
     };
   }
 
-  const passwordHash = await hashPassword(passwordValue);
-  const updated = await db.transaction(async (transaction) => {
-    const [user] = await transaction
-      .update(schema.adminUsers)
-      .set({ passwordHash, updatedAt: new Date() })
-      .where(
-        and(
-          eq(schema.adminUsers.id, idValue),
-          eq(schema.adminUsers.isActive, true),
-        ),
-      )
-      .returning({ id: schema.adminUsers.id });
-    if (user) {
-      await transaction
-        .delete(schema.adminSessions)
-        .where(eq(schema.adminSessions.userId, idValue));
-    }
-    return user;
-  });
-  if (!updated) {
-    return {
-      success: false as const,
-      error: "Active admin account was not found.",
-    };
-  }
+  const result = await beginAdminPasswordResetVerification(
+    idValue,
+    passwordValue,
+    currentAdmin,
+  );
+  return result;
+}
+
+export async function completeAdminUserPasswordReset(
+  challengeId: string,
+  code: string,
+) {
+  const currentAdmin = await requireAuth();
+  const result = await verifyAdminPasswordReset(
+    challengeId,
+    code,
+    currentAdmin,
+  );
+  if (!result.success) return result;
 
   revalidatePath(PROFILE_PATH);
   return { success: true as const };
