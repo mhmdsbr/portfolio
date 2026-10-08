@@ -26,12 +26,12 @@ export async function getExperienceSectionData() {
   const jobs = await db
     .select()
     .from(schema.experiences)
-    .orderBy(asc(schema.experiences.sortOrder));
+    .orderBy(asc(schema.experiences.sortOrder), asc(schema.experiences.id));
 
   const experiences = await db
     .select()
     .from(schema.skills)
-    .orderBy(asc(schema.skills.sortOrder));
+    .orderBy(asc(schema.skills.sortOrder), asc(schema.skills.id));
 
   return {
     ...summary,
@@ -106,7 +106,7 @@ export async function createJob(formData: FormData) {
   const existing = await db
     .select()
     .from(schema.experiences)
-    .orderBy(asc(schema.experiences.sortOrder));
+    .orderBy(asc(schema.experiences.sortOrder), asc(schema.experiences.id));
 
   const sortOrder =
     existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0;
@@ -205,7 +205,7 @@ export async function createSkill(formData: FormData) {
   const existing = await db
     .select()
     .from(schema.skills)
-    .orderBy(asc(schema.skills.sortOrder));
+    .orderBy(asc(schema.skills.sortOrder), asc(schema.skills.id));
 
   const sortOrder =
     existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0;

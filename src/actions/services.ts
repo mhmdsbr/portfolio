@@ -15,7 +15,7 @@ export async function getServices() {
 
   const items = await db.select()
     .from(schema.services)
-    .orderBy(asc(schema.services.sortOrder))
+    .orderBy(asc(schema.services.sortOrder), asc(schema.services.id))
   
   return { items }
 }
@@ -33,7 +33,7 @@ export async function createServiceItem(formData: FormData) {
   
   const existing = await db.select()
     .from(schema.services)
-    .orderBy(asc(schema.services.sortOrder))
+    .orderBy(asc(schema.services.sortOrder), asc(schema.services.id))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   

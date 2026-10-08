@@ -92,7 +92,7 @@ export async function getProfileSettings() {
       schema.adminProfiles,
       eq(schema.adminProfiles.userId, schema.adminUsers.id),
     )
-    .orderBy(schema.adminUsers.createdAt);
+    .orderBy(schema.adminUsers.createdAt, schema.adminUsers.id);
 
   return { admin: { ...identity, ...profile }, admins };
 }

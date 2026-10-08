@@ -10,7 +10,10 @@ export async function GET(): Promise<NextResponse<ApiResponse<TestimonialsRespon
   try {
     const [sectionData, itemsData] = await Promise.all([
       db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'testimonials')),
-      db.select().from(schema.testimonials).orderBy(asc(schema.testimonials.sortOrder)),
+      db.select().from(schema.testimonials).orderBy(
+        asc(schema.testimonials.sortOrder),
+        asc(schema.testimonials.id),
+      ),
     ])
 
     const response: TestimonialsResponse = {

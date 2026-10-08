@@ -13,7 +13,7 @@ export async function getProjects() {
     db
     .select()
     .from(schema.projects)
-    .orderBy(asc(schema.projects.sortOrder)),
+    .orderBy(asc(schema.projects.sortOrder), asc(schema.projects.id)),
     db
       .select({
         projectId: schema.projectTechnologies.projectId,
@@ -25,7 +25,11 @@ export async function getProjects() {
         schema.technologies,
         eq(schema.technologies.id, schema.projectTechnologies.technologyId),
       )
-      .orderBy(asc(schema.projectTechnologies.sortOrder)),
+      .orderBy(
+        asc(schema.projectTechnologies.sortOrder),
+        asc(schema.projectTechnologies.projectId),
+        asc(schema.projectTechnologies.technologyId),
+      ),
     db
       .select({
         projectId: schema.projectRoles.projectId,
@@ -33,7 +37,11 @@ export async function getProjects() {
         sortOrder: schema.projectRoles.sortOrder,
       })
       .from(schema.projectRoles)
-      .orderBy(asc(schema.projectRoles.sortOrder)),
+      .orderBy(
+        asc(schema.projectRoles.sortOrder),
+        asc(schema.projectRoles.projectId),
+        asc(schema.projectRoles.role),
+      ),
   ]);
 
   const technologiesByProject = new Map<number, string[]>();

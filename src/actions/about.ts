@@ -18,7 +18,10 @@ export async function getAbout() {
     db.select().from(schema.aboutSection).limit(1),
     db.select().from(schema.portfolioProfile).limit(1),
     db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'about')).limit(1),
-    db.select().from(schema.profileFacts).orderBy(asc(schema.profileFacts.sortOrder)),
+    db.select().from(schema.profileFacts).orderBy(
+      asc(schema.profileFacts.sortOrder),
+      asc(schema.profileFacts.id),
+    ),
   ])
   
   return {
@@ -104,7 +107,7 @@ export async function createDetail(formData: FormData) {
   
   const existing = await db.select()
     .from(schema.profileFacts)
-    .orderBy(asc(schema.profileFacts.sortOrder))
+    .orderBy(asc(schema.profileFacts.sortOrder), asc(schema.profileFacts.id))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   

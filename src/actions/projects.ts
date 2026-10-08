@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { eq, inArray } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 import { getProjectById, getProjects as getProjectsWithDetails } from '@/lib/projects'
@@ -49,18 +49,23 @@ async function replaceProjectDetails(
 
   await transaction.insert(schema.technologies)
     .values(technologyNames.map((name) => ({ name })))
-    .onConflictDoNothing({ target: schema.technologies.name })
+    .onConflictDoNothing()
 
   const technologies = await transaction.select({
     id: schema.technologies.id,
     name: schema.technologies.name,
   }).from(schema.technologies)
-    .where(inArray(schema.technologies.name, technologyNames))
-  const technologyIds = new Map(technologies.map(({ id, name }) => [name, id]))
+    .where(sql`lower(${schema.technologies.name}) IN ${sql.join(
+      technologyNames.map((name) => sql`${name.toLocaleLowerCase()}`),
+      sql`, `,
+    )}`)
+  const technologyIds = new Map(
+    technologies.map(({ id, name }) => [name.toLocaleLowerCase(), id]),
+  )
 
   await transaction.insert(schema.projectTechnologies).values(
     technologyNames.map((name, sortOrder) => {
-      const technologyId = technologyIds.get(name)
+      const technologyId = technologyIds.get(name.toLocaleLowerCase())
       if (technologyId === undefined) {
         throw new Error(`Unable to resolve project technology "${name}"`)
       }

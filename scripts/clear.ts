@@ -16,6 +16,7 @@ if (!process.argv.includes("--confirm")) {
 }
 
 // Keep authentication data intact when clearing portfolio content.
+// RESTART IDENTITY also resets the generated identity sequences.
 const portfolioTables = [
   "social_links",
   "hero_titles",
@@ -55,7 +56,9 @@ async function clearDatabase() {
         .map((table) => `"${table}"`)
         .join(", ")} RESTART IDENTITY CASCADE`,
     );
-    console.log(`✅ Cleared ${portfolioTables.length} portfolio tables.`);
+    console.log(
+      `✅ Cleared ${portfolioTables.length} portfolio tables and reset identity sequences.`,
+    );
   } catch (error) {
     console.error("❌ Error clearing database:", error);
     process.exitCode = 1;

@@ -10,7 +10,10 @@ export async function GET(): Promise<NextResponse<ApiResponse<HeroResponse>>> {
   try {
     const [heroData, titlesData] = await Promise.all([
       db.select().from(schema.heroSection),
-      db.select().from(schema.heroTitles).orderBy(asc(schema.heroTitles.sortOrder)),
+      db.select().from(schema.heroTitles).orderBy(
+        asc(schema.heroTitles.sortOrder),
+        asc(schema.heroTitles.id),
+      ),
     ])
 
     const hero = heroData[0]

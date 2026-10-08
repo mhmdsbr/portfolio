@@ -17,7 +17,7 @@ export async function getHeader() {
     db.select()
       .from(schema.pageSections)
       .where(inArray(schema.pageSections.sectionKey, PORTFOLIO_SECTIONS.map(({ key }) => key)))
-      .orderBy(asc(schema.pageSections.sortOrder)),
+      .orderBy(asc(schema.pageSections.sortOrder), asc(schema.pageSections.id)),
   ])
 
   return {

@@ -11,7 +11,10 @@ export async function GET(): Promise<NextResponse<ApiResponse<ContactResponse>>>
     const [contactData, sectionData, methodsData] = await Promise.all([
       db.select().from(schema.contactSection),
       db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'contact')),
-      db.select().from(schema.contactMethods).orderBy(asc(schema.contactMethods.sortOrder)),
+      db.select().from(schema.contactMethods).orderBy(
+        asc(schema.contactMethods.sortOrder),
+        asc(schema.contactMethods.id),
+      ),
     ])
 
     const response: ContactResponse = {

@@ -5,8 +5,6 @@
 # React
 build
 drizzle/
-!drizzle/
-!drizzle/*.sql
 *.tsbuildinfo
 .next/
 

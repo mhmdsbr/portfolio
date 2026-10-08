@@ -39,7 +39,7 @@ export async function GET(): Promise<
       db
         .select()
         .from(schema.socialLinks)
-        .orderBy(asc(schema.socialLinks.sortOrder)),
+        .orderBy(asc(schema.socialLinks.sortOrder), asc(schema.socialLinks.id)),
       db.select().from(schema.heroSection).limit(1),
       db
         .select({ title: schema.heroTitles.title })
@@ -49,37 +49,37 @@ export async function GET(): Promise<
           eq(schema.heroSection.id, schema.heroTitles.heroSectionId),
         )
         .where(eq(schema.heroSection.sectionKey, 'hero'))
-        .orderBy(asc(schema.heroTitles.sortOrder)),
+        .orderBy(asc(schema.heroTitles.sortOrder), asc(schema.heroTitles.id)),
       db.select().from(schema.aboutSection).limit(1),
       db
         .select()
         .from(schema.contactMethods)
-        .orderBy(asc(schema.contactMethods.sortOrder)),
+        .orderBy(asc(schema.contactMethods.sortOrder), asc(schema.contactMethods.id)),
       db
         .select()
         .from(schema.profileFacts)
-        .orderBy(asc(schema.profileFacts.sortOrder)),
+        .orderBy(asc(schema.profileFacts.sortOrder), asc(schema.profileFacts.id)),
       db
         .select()
         .from(schema.services)
-        .orderBy(asc(schema.services.sortOrder)),
+        .orderBy(asc(schema.services.sortOrder), asc(schema.services.id)),
       db.select().from(schema.experienceSection).limit(1),
       db
         .select()
         .from(schema.experiences)
-        .orderBy(asc(schema.experiences.sortOrder)),
+        .orderBy(asc(schema.experiences.sortOrder), asc(schema.experiences.id)),
       db
         .select()
         .from(schema.skills)
-        .orderBy(asc(schema.skills.sortOrder)),
+        .orderBy(asc(schema.skills.sortOrder), asc(schema.skills.id)),
       db
         .select()
         .from(schema.testimonials)
-        .orderBy(asc(schema.testimonials.sortOrder)),
+        .orderBy(asc(schema.testimonials.sortOrder), asc(schema.testimonials.id)),
       db
         .select()
         .from(schema.projects)
-        .orderBy(asc(schema.projects.sortOrder)),
+        .orderBy(asc(schema.projects.sortOrder), asc(schema.projects.id)),
       // tech links (normalized from projects.tech text[])
       db
         .select({
@@ -92,7 +92,11 @@ export async function GET(): Promise<
           schema.technologies,
           eq(schema.technologies.id, schema.projectTechnologies.technologyId),
         )
-        .orderBy(asc(schema.projectTechnologies.sortOrder)),
+        .orderBy(
+          asc(schema.projectTechnologies.sortOrder),
+          asc(schema.projectTechnologies.projectId),
+          asc(schema.projectTechnologies.technologyId),
+        ),
       // role links (normalized from projects.roles text[])
       db
         .select({
@@ -101,13 +105,17 @@ export async function GET(): Promise<
           sortOrder: schema.projectRoles.sortOrder,
         })
         .from(schema.projectRoles)
-        .orderBy(asc(schema.projectRoles.sortOrder)),
+        .orderBy(
+          asc(schema.projectRoles.sortOrder),
+          asc(schema.projectRoles.projectId),
+          asc(schema.projectRoles.role),
+        ),
       db.select().from(schema.contactSection).limit(1),
       db.select().from(schema.appConfig).limit(1),
       db
         .select()
         .from(schema.pageSections)
-        .orderBy(asc(schema.pageSections.sortOrder)),
+        .orderBy(asc(schema.pageSections.sortOrder), asc(schema.pageSections.id)),
       db.select().from(schema.footer).limit(1),
     ]);
 

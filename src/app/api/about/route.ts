@@ -11,8 +11,14 @@ export async function GET(): Promise<NextResponse<ApiResponse<AboutResponse>>> {
     const [aboutData, profileData, contactInfoData, detailsData, sectionData] = await Promise.all([
       db.select().from(schema.aboutSection),
       db.select().from(schema.portfolioProfile),
-      db.select().from(schema.contactMethods).orderBy(asc(schema.contactMethods.sortOrder)),
-      db.select().from(schema.profileFacts).orderBy(asc(schema.profileFacts.sortOrder)),
+      db.select().from(schema.contactMethods).orderBy(
+        asc(schema.contactMethods.sortOrder),
+        asc(schema.contactMethods.id),
+      ),
+      db.select().from(schema.profileFacts).orderBy(
+        asc(schema.profileFacts.sortOrder),
+        asc(schema.profileFacts.id),
+      ),
       db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'about')),
     ])
 

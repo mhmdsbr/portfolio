@@ -13,9 +13,9 @@ export async function ensurePortfolioSections() {
   if (missingSections.length === 0) return
 
   const [lastSection] = await db
-    .select({ sortOrder: pageSections.sortOrder })
+    .select({ sortOrder: pageSections.sortOrder, id: pageSections.id })
     .from(pageSections)
-    .orderBy(desc(pageSections.sortOrder))
+    .orderBy(desc(pageSections.sortOrder), desc(pageSections.id))
     .limit(1)
   const nextSortOrder = (lastSection?.sortOrder ?? -1) + 1
 

@@ -19,7 +19,10 @@ export async function getContact() {
   const [[contact], [section], contactMethods] = await Promise.all([
     db.select().from(schema.contactSection).limit(1),
     db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'contact')).limit(1),
-    db.select().from(schema.contactMethods).orderBy(asc(schema.contactMethods.sortOrder)),
+    db.select().from(schema.contactMethods).orderBy(
+      asc(schema.contactMethods.sortOrder),
+      asc(schema.contactMethods.id),
+    ),
   ])
 
   return {
@@ -87,7 +90,7 @@ export async function createContactMethod(formData: FormData) {
 
   const existing = await db.select()
     .from(schema.contactMethods)
-    .orderBy(schema.contactMethods.sortOrder)
+    .orderBy(asc(schema.contactMethods.sortOrder), asc(schema.contactMethods.id))
   const sortOrder = existing.length > 0
     ? (existing[existing.length - 1].sortOrder ?? -1) + 1
     : 0

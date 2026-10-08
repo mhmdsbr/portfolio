@@ -22,7 +22,7 @@ export async function getHero() {
     ? await db.select()
         .from(schema.heroTitles)
         .where(eq(schema.heroTitles.heroSectionId, hero.id))
-        .orderBy(asc(schema.heroTitles.sortOrder))
+        .orderBy(asc(schema.heroTitles.sortOrder), asc(schema.heroTitles.id))
     : []
 
   return {

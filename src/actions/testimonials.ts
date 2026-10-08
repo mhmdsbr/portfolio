@@ -15,7 +15,7 @@ export async function getTestimonials() {
 
   const items = await db.select()
     .from(schema.testimonials)
-    .orderBy(asc(schema.testimonials.sortOrder))
+    .orderBy(asc(schema.testimonials.sortOrder), asc(schema.testimonials.id))
   
   return { items }
 }
@@ -39,7 +39,7 @@ export async function createTestimonialItem(formData: FormData) {
   
   const existing = await db.select()
     .from(schema.testimonials)
-    .orderBy(asc(schema.testimonials.sortOrder))
+    .orderBy(asc(schema.testimonials.sortOrder), asc(schema.testimonials.id))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   

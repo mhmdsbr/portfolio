@@ -7,7 +7,7 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 import { redirect } from "next/navigation";
-import { and, count, eq, gt, lt, sql } from "drizzle-orm";
+import { and, count, eq, gt, isNull, lt, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import {
@@ -223,6 +223,7 @@ export async function beginAdminEmailVerification(
       .where(
         purpose === "initial"
           ? and(
+              isNull(schema.adminEmailVerifications.consumedAt),
               eq(schema.adminEmailVerifications.purpose, purpose),
               gt(
                 schema.adminEmailVerifications.expiresAt,
@@ -230,6 +231,7 @@ export async function beginAdminEmailVerification(
               ),
             )
           : and(
+              isNull(schema.adminEmailVerifications.consumedAt),
               eq(schema.adminEmailVerifications.email, validated.email),
               eq(schema.adminEmailVerifications.purpose, purpose),
               gt(
@@ -414,6 +416,7 @@ export async function beginAdminPasswordResetVerification(
       .from(schema.adminEmailVerifications)
       .where(
         and(
+          isNull(schema.adminEmailVerifications.consumedAt),
           eq(schema.adminEmailVerifications.email, target.email),
           eq(schema.adminEmailVerifications.purpose, "password_reset"),
           gt(
@@ -521,6 +524,7 @@ export async function verifyAdminPasswordReset(
       .from(schema.adminEmailVerifications)
       .where(
         and(
+          isNull(schema.adminEmailVerifications.consumedAt),
           eq(schema.adminEmailVerifications.id, challengeId),
           eq(schema.adminEmailVerifications.purpose, "password_reset"),
           eq(schema.adminEmailVerifications.createdByUserId, currentAdmin.id),
@@ -542,7 +546,8 @@ export async function verifyAdminPasswordReset(
       const attempts = challenge.attempts + 1;
       if (attempts >= MAX_VERIFICATION_ATTEMPTS) {
         await transaction
-          .delete(schema.adminEmailVerifications)
+          .update(schema.adminEmailVerifications)
+          .set({ consumedAt: new Date() })
           .where(eq(schema.adminEmailVerifications.id, challengeId));
       } else {
         await transaction
@@ -577,7 +582,8 @@ export async function verifyAdminPasswordReset(
       .returning({ id: schema.adminUsers.id });
     if (!target) {
       await transaction
-        .delete(schema.adminEmailVerifications)
+        .update(schema.adminEmailVerifications)
+        .set({ consumedAt: new Date() })
         .where(eq(schema.adminEmailVerifications.id, challengeId));
       return { status: "not-found" as const };
     }
@@ -586,7 +592,8 @@ export async function verifyAdminPasswordReset(
       .delete(schema.adminSessions)
       .where(eq(schema.adminSessions.userId, target.id));
     await transaction
-      .delete(schema.adminEmailVerifications)
+      .update(schema.adminEmailVerifications)
+      .set({ consumedAt: new Date() })
       .where(eq(schema.adminEmailVerifications.id, challengeId));
     return { status: "updated" as const };
   });
@@ -633,6 +640,7 @@ export async function verifyAdminEmail(
       .from(schema.adminEmailVerifications)
       .where(
         and(
+          isNull(schema.adminEmailVerifications.consumedAt),
           eq(schema.adminEmailVerifications.id, challengeId),
           eq(schema.adminEmailVerifications.purpose, purpose),
           gt(schema.adminEmailVerifications.expiresAt, new Date()),
@@ -659,7 +667,8 @@ export async function verifyAdminEmail(
       const attempts = challenge.attempts + 1;
       if (attempts >= MAX_VERIFICATION_ATTEMPTS) {
         await transaction
-          .delete(schema.adminEmailVerifications)
+          .update(schema.adminEmailVerifications)
+          .set({ consumedAt: new Date() })
           .where(eq(schema.adminEmailVerifications.id, challengeId));
       } else {
         await transaction
@@ -677,7 +686,8 @@ export async function verifyAdminEmail(
         .from(schema.adminUsers);
       if (existing.value > 0) {
         await transaction
-          .delete(schema.adminEmailVerifications)
+          .update(schema.adminEmailVerifications)
+          .set({ consumedAt: new Date() })
           .where(eq(schema.adminEmailVerifications.id, challengeId));
         return { status: "closed" as const };
       }
@@ -723,7 +733,8 @@ export async function verifyAdminEmail(
       preferences: {},
     });
     await transaction
-      .delete(schema.adminEmailVerifications)
+      .update(schema.adminEmailVerifications)
+      .set({ consumedAt: new Date() })
       .where(eq(schema.adminEmailVerifications.id, challengeId));
     return { status: "created" as const, userId: user.id };
   });
@@ -789,6 +800,7 @@ export async function beginCurrentAdminPasswordChange(
       .from(schema.adminEmailVerifications)
       .where(
         and(
+          isNull(schema.adminEmailVerifications.consumedAt),
           eq(schema.adminEmailVerifications.email, admin.email),
           eq(schema.adminEmailVerifications.purpose, "password_change"),
           gt(
@@ -921,6 +933,7 @@ export async function completeCurrentAdminPasswordChange(
       .from(schema.adminEmailVerifications)
       .where(
         and(
+          isNull(schema.adminEmailVerifications.consumedAt),
           eq(schema.adminEmailVerifications.id, challengeId),
           eq(schema.adminEmailVerifications.purpose, "password_change"),
           eq(schema.adminEmailVerifications.createdByUserId, admin.id),
@@ -978,7 +991,8 @@ export async function completeCurrentAdminPasswordChange(
           : eq(schema.adminSessions.userId, admin.id),
       );
     await transaction
-      .delete(schema.adminEmailVerifications)
+      .update(schema.adminEmailVerifications)
+      .set({ consumedAt: new Date() })
       .where(eq(schema.adminEmailVerifications.id, challengeId));
     return { status: "updated" as const };
   });

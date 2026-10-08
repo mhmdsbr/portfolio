@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { db } from "../src/lib/db/index.js";
 import * as schema from "../src/lib/db/schema.js";
 
@@ -594,17 +594,24 @@ async function seed() {
         );
       }
 
-      const uniqueTechnologies = [...new Set(tech)];
+      const uniqueTechnologies = [
+        ...new Map(
+          tech
+            .map((name) => name.trim())
+            .filter(Boolean)
+            .map((name) => [name.toLocaleLowerCase(), name]),
+        ).values(),
+      ];
       for (const [sortOrder, name] of uniqueTechnologies.entries()) {
         await db
           .insert(schema.technologies)
           .values({ name })
-          .onConflictDoNothing({ target: schema.technologies.name });
+          .onConflictDoNothing();
 
         const [technology] = await db
           .select({ id: schema.technologies.id })
           .from(schema.technologies)
-          .where(eq(schema.technologies.name, name))
+          .where(sql`lower(${schema.technologies.name}) = ${name.toLocaleLowerCase()}`)
           .limit(1);
 
         if (!technology) {

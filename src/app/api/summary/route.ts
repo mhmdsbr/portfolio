@@ -10,8 +10,14 @@ export async function GET(): Promise<NextResponse<ApiResponse<SummaryResponse>>>
   try {
     const [summaryData, jobsData, experiencesData, sectionData] = await Promise.all([
       db.select().from(schema.experienceSection),
-      db.select().from(schema.experiences).orderBy(asc(schema.experiences.sortOrder)),
-      db.select().from(schema.skills).orderBy(asc(schema.skills.sortOrder)),
+      db.select().from(schema.experiences).orderBy(
+        asc(schema.experiences.sortOrder),
+        asc(schema.experiences.id),
+      ),
+      db.select().from(schema.skills).orderBy(
+        asc(schema.skills.sortOrder),
+        asc(schema.skills.id),
+      ),
       db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'experience')),
     ])
 
