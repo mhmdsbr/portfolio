@@ -6,7 +6,6 @@ import {
   reorderHeaderSections,
   togglePortfolioSection,
   updatePageSection,
-  updateHeaderSettings,
 } from '@/actions/header'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 
@@ -21,9 +20,6 @@ interface PageSection {
 }
 
 interface HeaderFormProps {
-  initialSettings: {
-    defaultTitle: string
-  }
   initialSections: PageSection[]
 }
 
@@ -37,9 +33,8 @@ const sectionIcons: Record<string, string> = {
   contact: '✉️',
 }
 
-export default function HeaderForm({ initialSettings, initialSections }: HeaderFormProps) {
+export default function HeaderForm({ initialSections }: HeaderFormProps) {
   const [sections, setSections] = useState(initialSections)
-  const [defaultTitle, setDefaultTitle] = useState(initialSettings.defaultTitle)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const router = useRouter()
@@ -95,25 +90,6 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
     }
   }
 
-  const handleDefaultTitleChange = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setLoading(true)
-    setMessage('')
-
-    const formData = new FormData()
-    formData.set('defaultTitle', defaultTitle)
-
-    try {
-      await updateHeaderSettings(formData)
-      setMessage('Header title saved.')
-      router.refresh()
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Failed to save header title')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return
 
@@ -141,31 +117,6 @@ export default function HeaderForm({ initialSettings, initialSections }: HeaderF
           {message}
         </div>
       )}
-
-      <form onSubmit={handleDefaultTitleChange} className="space-y-4 max-w-md">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Header Title
-          </label>
-          <input
-            type="text"
-            value={defaultTitle}
-            onChange={(event) => setDefaultTitle(event.target.value)}
-            placeholder="Welcome"
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
-          <p className="text-xs text-gray-400 mt-1">
-            Shown in the header before the active section title.
-          </p>
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-6 rounded-md transition disabled:opacity-50"
-        >
-          {loading ? 'Saving...' : 'Save Header Title'}
-        </button>
-      </form>
 
       <section>
         <h2 className="text-lg font-semibold mb-1">Portfolio Page Layout</h2>

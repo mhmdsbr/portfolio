@@ -23,7 +23,6 @@ const tables = [
   "sidebar",
   "portfolio_profile",
   "social_links",
-  "site_settings",
   "hero_section",
   "hero_titles",
   "about_section",
@@ -41,7 +40,6 @@ const tables = [
   "contact_section",
   "footer",
   "app_config",
-  "header_settings",
 ] as const;
 
 const quoteIdentifier = (identifier: string) =>

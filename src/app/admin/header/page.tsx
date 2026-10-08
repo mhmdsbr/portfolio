@@ -2,7 +2,7 @@ import { getHeader } from '@/actions/header'
 import HeaderForm from '@/components/admin/HeaderForm'
 
 export default async function HeaderPage() {
-  const { settings, sections } = await getHeader()
+  const { sections } = await getHeader()
 
   return (
     <div>
@@ -12,9 +12,6 @@ export default async function HeaderPage() {
         presentation only; it does not delete portfolio content.
       </p>
       <HeaderForm 
-        initialSettings={{
-          defaultTitle: settings.defaultTitle ?? 'Welcome',
-        }}
         initialSections={sections.map((section) => ({
           ...section,
           sortOrder: section.sortOrder ?? 0,

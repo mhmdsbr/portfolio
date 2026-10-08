@@ -13,10 +13,7 @@ export async function getHeader() {
 
   await ensurePortfolioSections()
 
-  const [settings, sections] = await Promise.all([
-    db.select()
-      .from(schema.headerSettings)
-      .limit(1),
+  const [sections] = await Promise.all([
     db.select()
       .from(schema.pageSections)
       .where(inArray(schema.pageSections.sectionKey, PORTFOLIO_SECTIONS.map(({ key }) => key)))
@@ -24,7 +21,6 @@ export async function getHeader() {
   ])
 
   return {
-    settings: settings[0] || { defaultTitle: 'Welcome' },
     sections,
   }
 }
@@ -101,27 +97,6 @@ export async function togglePortfolioSection(id: number, isEnabled: boolean) {
 
   revalidatePath('/')
   revalidatePath('/api/all')
-}
-
-export async function updateHeaderSettings(formData: FormData) {
-  await requireAuth()
-
-  const defaultTitle = String(formData.get('defaultTitle') ?? '').trim()
-  const values = { defaultTitle: defaultTitle || 'Welcome' }
-  const [existingSettings] = await db.select()
-    .from(schema.headerSettings)
-    .limit(1)
-  const [settings] = existingSettings
-    ? await db.update(schema.headerSettings)
-        .set(values)
-        .where(eq(schema.headerSettings.id, existingSettings.id))
-        .returning()
-    : await db.insert(schema.headerSettings).values(values).returning()
-
-  revalidatePath('/admin/header')
-  revalidatePath('/api/all')
-
-  return settings
 }
 
 export async function reorderHeaderSections(ids: number[]) {

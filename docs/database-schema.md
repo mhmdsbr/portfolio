@@ -154,17 +154,6 @@ erDiagram
         int sort_order
     }
 
-    SITE_SETTINGS {
-        int id PK
-        text portfolio_title
-        text portfolio_overlay_title
-    }
-
-    HEADER_SETTINGS {
-        int id PK
-        text default_title
-    }
-
     FOOTER {
         int id PK
         text company_name
@@ -244,5 +233,5 @@ by foreign keys:
 | `contact` | `contact_section`, `contact_methods` |
 
 The schema also contains independent site-level tables: `sidebar`,
-`social_links`, `site_settings`, `header_settings`, `footer`, and `app_config`.
+`social_links`, `footer`, and `app_config`.
 No foreign keys currently connect these tables to each other.

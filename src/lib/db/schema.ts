@@ -42,10 +42,10 @@ export const pageSections = pgTable('page_sections', {
   navigationTitle: text('navigation_title').notNull(),
   title: text('title'),
   overlayTitle: text('overlay_title'),
-  sortOrder: integer('sort_order').default(0),
+  sortOrder: integer('sort_order').notNull().default(0),
   isEnabled: boolean('is_enabled').notNull().default(true),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type PageSection = typeof pageSections.$inferSelect
@@ -61,8 +61,8 @@ export const sidebar = pgTable(
     profileImageUrl: text('profile_image_url'),
     profileImageAlt: text('profile_image_alt'),
     profileTitle: text('profile_title'),
-    createdAt: timestamp('created_at').defaultNow(),
-    updatedAt: timestamp('updated_at').defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
   (table) => [check('sidebar_singleton', sql`${table.id} = 1`)],
 )
@@ -80,8 +80,8 @@ export const portfolioProfile = pgTable(
     name: text('name'),
     jobTitle: text('job_title'),
     biography: text('biography'),
-    createdAt: timestamp('created_at').defaultNow(),
-    updatedAt: timestamp('updated_at').defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
   (table) => [check('portfolio_profile_singleton', sql`${table.id} = 1`)],
 )
@@ -96,34 +96,16 @@ export const socialLinks = pgTable('social_links', {
   id: serial('id').primaryKey(),
   platform: text('platform').notNull(),
   url: text('url').notNull(),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type SocialLink = typeof socialLinks.$inferSelect
 export type NewSocialLink = typeof socialLinks.$inferInsert
 
 // =============================================
-// 05. SITE SETTINGS (singleton)
-// =============================================
-export const siteSettings = pgTable(
-  'site_settings',
-  {
-    id: integer('id').primaryKey().default(1),
-    portfolioTitle: text('portfolio_title'),
-    portfolioOverlayTitle: text('portfolio_overlay_title'),
-    createdAt: timestamp('created_at').defaultNow(),
-    updatedAt: timestamp('updated_at').defaultNow(),
-  },
-  (table) => [check('general_settings_singleton', sql`${table.id} = 1`)],
-)
-
-export type SiteSettings = typeof siteSettings.$inferSelect
-export type NewSiteSettings = typeof siteSettings.$inferInsert
-
-// =============================================
-// 06. HERO SECTION
+// 05. HERO SECTION
 // =============================================
 export const heroSection = pgTable('hero_section', {
   id: serial('id').primaryKey(),
@@ -135,8 +117,8 @@ export const heroSection = pgTable('hero_section', {
   subtitleOne: text('subtitle_one'),
   subtitleTwo: text('subtitle_two'),
   logoUrl: text('logo_url'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type HeroSection = typeof heroSection.$inferSelect
@@ -151,9 +133,9 @@ export const heroTitles = pgTable('hero_titles', {
     .notNull()
     .references(() => heroSection.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type HeroTitle = typeof heroTitles.$inferSelect
@@ -170,8 +152,8 @@ export const aboutSection = pgTable('about_section', {
     .references(() => pageSections.sectionKey, { onDelete: 'cascade' }),
   buttonText: text('button_text'),
   buttonUrl: text('button_url'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type AboutSection = typeof aboutSection.$inferSelect
@@ -185,9 +167,9 @@ export const contactMethods = pgTable('contact_methods', {
   kind: contactMethodKindEnum('kind').notNull().default('other'),
   title: text('title').notNull(),
   value: text('value').notNull(),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type ContactMethod = typeof contactMethods.$inferSelect
@@ -201,9 +183,9 @@ export const profileFacts = pgTable('profile_facts', {
   id: serial('id').primaryKey(),
   number: integer('number').notNull(),
   title: text('title').notNull(),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type ProfileFact = typeof profileFacts.$inferSelect
@@ -217,9 +199,9 @@ export const services = pgTable('services', {
   title: text('title').notNull(),
   description: text('description'),
   icon: iconEnum('icon'),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type Service = typeof services.$inferSelect
@@ -236,8 +218,8 @@ export const experienceSection = pgTable('experience_section', {
     .references(() => pageSections.sectionKey, { onDelete: 'cascade' }),
   buttonText: text('button_text'),
   buttonUrl: text('button_url'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type ExperienceSection = typeof experienceSection.$inferSelect
@@ -253,9 +235,9 @@ export const experiences = pgTable('experiences', {
   jobTitle: text('job_title').notNull(),
   company: text('company').notNull(),
   description: text('description'),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type Experience = typeof experiences.$inferSelect
@@ -268,9 +250,9 @@ export const skills = pgTable('skills', {
   id: serial('id').primaryKey(),
   skill: text('skill').notNull(),
   level: integer('level'),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type Skill = typeof skills.$inferSelect
@@ -286,9 +268,9 @@ export const testimonials = pgTable('testimonials', {
   subtitle: text('subtitle'),
   rating: integer('rating'),
   body: text('body'),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(), // #5 added
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 }, (table) => [
   check(
     'testimonials_rating_range',
@@ -310,9 +292,9 @@ export const projects = pgTable('projects', {
   image: text('image'),
   link: text('link'),
   githubUrl: text('github_url'),
-  sortOrder: integer('sort_order').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type Project = typeof projects.$inferSelect
@@ -326,12 +308,11 @@ export const projectRoles = pgTable(
       .notNull()
       .references(() => projects.id, { onDelete: 'cascade' }),
     role: text('role').notNull(),
-    sortOrder: integer('sort_order').default(0),
-    createdAt: timestamp('created_at').defaultNow(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     primaryKey({ columns: [table.projectId, table.role] }),
-    index('project_roles_project_id_idx').on(table.projectId),
     index('project_roles_role_idx').on(table.role),
   ],
 )
@@ -345,7 +326,7 @@ export const technologies = pgTable(
   {
     id: serial('id').primaryKey(),
     name: text('name').notNull(),
-    createdAt: timestamp('created_at').defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [uniqueIndex('technologies_name_idx').on(table.name)],
 )
@@ -362,12 +343,11 @@ export const projectTechnologies = pgTable(
     technologyId: integer('technology_id')
       .notNull()
       .references(() => technologies.id, { onDelete: 'cascade' }),
-    sortOrder: integer('sort_order').default(0),
-    createdAt: timestamp('created_at').defaultNow(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     primaryKey({ columns: [table.projectId, table.technologyId] }),
-    index('project_technologies_project_id_idx').on(table.projectId),
     index('project_technologies_technology_id_idx').on(table.technologyId),
   ],
 )
@@ -387,8 +367,8 @@ export const contactSection = pgTable('contact_section', {
   formTitle: text('form_title'),
   buttonText: text('button_text'),
   buttonUrl: text('button_url'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export type ContactSection = typeof contactSection.$inferSelect
@@ -406,8 +386,8 @@ export const footer = pgTable(
     termsOfService: text('terms_of_service'),
     disclaimer: text('disclaimer'),
     copyrightText: text('copyright_text'),
-    createdAt: timestamp('created_at').defaultNow(),
-    updatedAt: timestamp('updated_at').defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
   (table) => [check('footer_singleton', sql`${table.id} = 1`)],
 )
@@ -423,8 +403,8 @@ export const appConfig = pgTable(
   {
     id: integer('id').primaryKey().default(1),
     recaptchaSiteKey: text('recaptcha_site_key'),
-    createdAt: timestamp('created_at').defaultNow(),
-    updatedAt: timestamp('updated_at').defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
   (table) => [check('config_singleton', sql`${table.id} = 1`)],
 )
@@ -437,12 +417,14 @@ export type NewAppConfig = typeof appConfig.$inferInsert
 // =============================================
 export const adminUsers = pgTable('admin_users', {
   id: serial('id').primaryKey(),
-  email: text('email').notNull().unique(),
+  email: text('email').notNull(),
   passwordHash: text('password_hash').notNull(),
   isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-})
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+}, (table) => [
+  uniqueIndex('admin_users_email_lower_uq').on(sql`lower(${table.email})`),
+])
 
 export const adminProfiles = pgTable('admin_profiles', {
   userId: integer('user_id')
@@ -454,8 +436,8 @@ export const adminProfiles = pgTable('admin_profiles', {
     .$type<Record<string, unknown>>()
     .notNull()
     .default({}),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
 export const adminSessions = pgTable(
@@ -466,7 +448,7 @@ export const adminSessions = pgTable(
       .notNull()
       .references(() => adminUsers.id, { onDelete: 'cascade' }),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-    createdAt: timestamp('created_at').defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index('admin_sessions_user_id_idx').on(table.userId)],
 )
@@ -488,11 +470,11 @@ export const adminEmailVerifications = pgTable(
       { onDelete: 'cascade' },
     ),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-    createdAt: timestamp('created_at').defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    uniqueIndex('admin_email_verifications_email_purpose_uq').on(
-      table.email,
+    uniqueIndex('admin_email_verifications_email_purpose_lower_uq').on(
+      sql`lower(${table.email})`,
       table.purpose,
     ),
   ],
@@ -508,20 +490,3 @@ export type AdminEmailVerification =
   typeof adminEmailVerifications.$inferSelect
 export type NewAdminEmailVerification =
   typeof adminEmailVerifications.$inferInsert
-
-// =============================================
-// 21. HEADER SETTINGS (singleton)
-// =============================================
-export const headerSettings = pgTable(
-  'header_settings',
-  {
-    id: integer('id').primaryKey().default(1),
-    defaultTitle: text('default_title').default('Welcome'),
-    createdAt: timestamp('created_at').defaultNow(),
-    updatedAt: timestamp('updated_at').defaultNow(),
-  },
-  (table) => [check('header_settings_singleton', sql`${table.id} = 1`)],
-)
-
-export type HeaderSettings = typeof headerSettings.$inferSelect
-export type NewHeaderSettings = typeof headerSettings.$inferInsert

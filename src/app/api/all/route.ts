@@ -16,7 +16,6 @@ export async function GET(): Promise<
       sidebarData,
       profileData,
       socialData,
-      generalData,
       heroData,
       heroTitlesData,
       aboutData,
@@ -33,7 +32,6 @@ export async function GET(): Promise<
       contactData,
       configData,
       pageSectionsData,
-      headerSettingsData,
       footerData,
     ] = await Promise.all([
       db.select().from(schema.sidebar).limit(1),
@@ -42,7 +40,6 @@ export async function GET(): Promise<
         .select()
         .from(schema.socialLinks)
         .orderBy(asc(schema.socialLinks.sortOrder)),
-      db.select().from(schema.siteSettings).limit(1),
       db.select().from(schema.heroSection).limit(1),
       db
         .select({ title: schema.heroTitles.title })
@@ -111,20 +108,17 @@ export async function GET(): Promise<
         .select()
         .from(schema.pageSections)
         .orderBy(asc(schema.pageSections.sortOrder)),
-      db.select().from(schema.headerSettings).limit(1),
       db.select().from(schema.footer).limit(1),
     ]);
 
     // Extract first records
     const sidebar = sidebarData[0];
     const profile = profileData[0];
-    const general = generalData[0];
     const hero = heroData[0];
     const about = aboutData[0];
     const summary = summaryData[0];
     const contact = contactData[0];
     const configRecord = configData[0];
-    const headerSettings = headerSettingsData[0];
     const footerRecord = footerData[0];
 
     const savedSections = new Map(
@@ -182,8 +176,8 @@ export async function GET(): Promise<
         profile_image_alt: sidebar?.profileImageAlt ?? null,
         profile_title: sidebar?.profileTitle ?? null,
         social_media: socialMediaMap,
-        portfolio_title: general?.portfolioTitle ?? null,
-        portfolio_overlay_title: general?.portfolioOverlayTitle ?? null,
+        portfolio_title: profile?.name ?? null,
+        portfolio_overlay_title: profile?.jobTitle ?? null,
       },
       hero: {
         titles: heroTitlesData.map(({ title }) => title),
@@ -290,7 +284,7 @@ export async function GET(): Promise<
         sections: [...sectionMetadata.values()].sort(
           (left, right) => left.sortOrder - right.sortOrder,
         ),
-        defaultTitle: headerSettings?.defaultTitle || "Welcome",
+        defaultTitle: "Welcome",
       },
       footer: {
         companyName: footerRecord?.companyName || "Your Company",

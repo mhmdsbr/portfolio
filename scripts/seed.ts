@@ -6,7 +6,6 @@ import * as schema from "../src/lib/db/schema.js";
 interface SeedConfig {
   profile: schema.NewPortfolioProfile;
   socialLinks: schema.NewSocialLink[];
-  siteSettings: schema.NewSiteSettings;
   hero: Omit<schema.NewHeroSection, "id" | "sectionKey">;
   heroTitles: Omit<schema.NewHeroTitle, "id" | "heroSectionId">[];
   about: Omit<schema.NewAboutSection, "id" | "sectionKey">;
@@ -23,7 +22,6 @@ interface SeedConfig {
     Omit<schema.NewProject, "id"> & { roles: string[]; tech: string[] }
   >;
   pageSections: Omit<schema.NewPageSection, "id">[];
-  headerSettings: schema.NewHeaderSettings;
   footer: schema.NewFooter;
 }
 
@@ -42,10 +40,6 @@ const seedData: SeedConfig = {
     },
     { platform: "mail", url: "mailto:saaber.mohamad@gmail.com", sortOrder: 1 },
   ],
-  siteSettings: {
-    portfolioTitle: "Mohammad Saber",
-    portfolioOverlayTitle: "Portfolio",
-  },
   hero: {
     location: "Berlin, Germany",
     subtitleOne: "Frontend Developer",
@@ -524,9 +518,6 @@ const seedData: SeedConfig = {
       isEnabled: true,
     },
   ],
-  headerSettings: {
-    defaultTitle: "Welcome",
-  },
   footer: {
     companyName: "Mohammad Saber",
     privacyPolicy:
@@ -548,7 +539,6 @@ async function seed() {
     await db.insert(schema.socialLinks).values(seedData.socialLinks);
 
     // Insert site settings.
-    await db.insert(schema.siteSettings).values(seedData.siteSettings);
 
     // Insert page sections before their section-specific settings.
     await db.insert(schema.pageSections).values(seedData.pageSections);
@@ -639,7 +629,6 @@ async function seed() {
     await db.insert(schema.appConfig).values(seedData.appConfig);
 
     // Insert header settings.
-    await db.insert(schema.headerSettings).values(seedData.headerSettings);
 
     console.log("✅ Database seeded successfully!");
     console.log(`📊 Inserted:`, {

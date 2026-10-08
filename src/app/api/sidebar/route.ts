@@ -9,14 +9,14 @@ export const dynamic = 'force-dynamic'
 export async function GET(): Promise<NextResponse<ApiResponse<SidebarResponse>>> {
   try {
     // Fetch data in parallel
-    const [sidebarData, socialData, generalData] = await Promise.all([
+    const [sidebarData, socialData, profileData] = await Promise.all([
       db.select().from(schema.sidebar),
       db.select().from(schema.socialLinks).orderBy(asc(schema.socialLinks.sortOrder)),
-      db.select().from(schema.siteSettings),
+      db.select().from(schema.portfolioProfile),
     ])
 
     const sidebar = sidebarData[0]
-    const general = generalData[0]
+    const profile = profileData[0]
 
     // Transform social media into key-value map
     const socialMediaMap = socialData.reduce<Record<string, string>>((acc, item) => {
@@ -29,8 +29,8 @@ export async function GET(): Promise<NextResponse<ApiResponse<SidebarResponse>>>
       profile_image_alt: sidebar?.profileImageAlt ?? null,
       profile_title: sidebar?.profileTitle ?? null,
       social_media: socialMediaMap,
-      portfolio_title: general?.portfolioTitle ?? null,
-      portfolio_overlay_title: general?.portfolioOverlayTitle ?? null,
+      portfolio_title: profile?.name ?? null,
+      portfolio_overlay_title: profile?.jobTitle ?? null,
     }
 
     return NextResponse.json({
