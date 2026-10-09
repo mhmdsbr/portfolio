@@ -470,7 +470,7 @@ const seedData: SeedConfig = {
       title: "About Me",
       sortOrder: 1,
       isEnabled: true,
-      config: { buttonText: "Download CV", buttonUrl: "/cv.pdf" },
+      config: {},
     },
     {
       kind: "experience",
@@ -478,7 +478,7 @@ const seedData: SeedConfig = {
       title: "Summary",
       sortOrder: 2,
       isEnabled: true,
-      config: { buttonText: "Download Resume", buttonUrl: "/resume.pdf" },
+      config: {},
     },
     {
       kind: "services",

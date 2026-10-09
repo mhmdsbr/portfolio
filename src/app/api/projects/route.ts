@@ -3,7 +3,7 @@ import * as schema from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import type { ApiResponse, ProjectsResponse } from '@/types/api'
-import { getProjects } from '@/lib/projects'
+import { getProjects } from '@/server/repos/projects'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,11 +1,10 @@
 import { getExperience } from "@/actions/experience";
-import ExperienceSectionForm from "@/components/admin/ExperienceSectionForm";
 import ExperiencesForm from "@/components/admin/ExperiencesForm";
 import SkillsForm from "@/components/admin/SkillsForm";
 import SectionSettingsForm from "@/components/admin/SectionSettingsForm";
 
 export default async function ExperiencePage() {
-  const { section, config, experiences, skills } = await getExperience();
+  const { section, experiences, skills } = await getExperience();
 
   return (
     <div className="space-y-8">
@@ -14,12 +13,6 @@ export default async function ExperiencePage() {
       <div className="bg-gray-800 rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Section settings</h2>
         <SectionSettingsForm section={section} />
-      </div>
-
-      {/* Section-specific resume settings */}
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Resume download link</h2>
-        <ExperienceSectionForm config={config} />
       </div>
 
       {/* Experiences */}

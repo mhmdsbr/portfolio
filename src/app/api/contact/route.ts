@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getSection } from '@/lib/db/sections'
-import { getContactMethodsForSection } from '@/lib/contact-methods'
+import { getSection } from '@/server/repos/page-sections'
+import { getContactMethodsForSection } from '@/server/repos/contact-methods'
 import type { ApiResponse, ContactResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'

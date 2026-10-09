@@ -2,7 +2,7 @@ import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
 import { asc } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
-import { getSection } from '@/lib/db/sections'
+import { getSection } from '@/server/repos/page-sections'
 import type { ApiResponse, ExperienceResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
@@ -23,10 +23,6 @@ export async function GET(): Promise<NextResponse<ApiResponse<ExperienceResponse
 
     const response: ExperienceResponse = {
       title: section?.title ?? null,
-      button: {
-        text: section?.config.buttonText ?? null,
-        url: section?.config.buttonUrl ?? null,
-      },
       experiences: experiencesData.map((experience) => ({
         from: experience.fromYear ?? null,
         to: experience.toYear,

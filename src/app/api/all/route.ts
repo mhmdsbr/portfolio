@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import type { SectionKind } from "@/lib/db/constants";
 import { readSectionConfig } from "@/lib/db/section-config";
-import { getContactMethodsWithSections } from "@/lib/contact-methods";
+import { getContactMethodsWithSections } from "@/server/repos/contact-methods";
 import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import type { ApiResponse, AllDataResponse } from "@/types/api";
@@ -118,8 +118,6 @@ export async function GET(): Promise<
       readSectionConfig(kind, sectionsByKind.get(kind)?.config);
 
     const hero = sectionConfig("hero");
-    const about = sectionConfig("about");
-    const experienceConfig = sectionConfig("experience");
     const contact = sectionConfig("contact");
 
     // Group normalized tech + roles by projectId
@@ -152,10 +150,6 @@ export async function GET(): Promise<
         name: profile?.name ?? null,
         job_title: profile?.jobTitle ?? null,
         description: profile?.biography ?? null,
-        button: {
-          text: about.buttonText,
-          url: about.buttonUrl,
-        },
         contact_information: methodsFor("about").map((info) => ({
           kind: info.kind,
           title: info.title,
@@ -176,10 +170,6 @@ export async function GET(): Promise<
       },
       experience: {
         title: sectionTitle("experience"),
-        button: {
-          text: experienceConfig.buttonText,
-          url: experienceConfig.buttonUrl,
-        },
         experiences: experiencesData.map((experience) => ({
           from: experience.fromYear ?? null,
           to: experience.toYear,

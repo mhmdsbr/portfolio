@@ -5,7 +5,7 @@ import ContactMethodsForm from '@/components/admin/ContactMethodsForm'
 import SectionSettingsForm from '@/components/admin/SectionSettingsForm'
 
 export default async function AboutPage() {
-  const { section, config, profile, details, contactMethods } = await getAbout()
+  const { section, profile, details, contactMethods } = await getAbout()
 
   return (
     <div className="space-y-8">
@@ -19,7 +19,7 @@ export default async function AboutPage() {
       {/* Main About Section */}
       <div className="bg-gray-800 rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Main Content</h2>
-        <AboutForm profile={profile} config={config} />
+        <AboutForm profile={profile} />
       </div>
 
       {/* Details / Stats */}

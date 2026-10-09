@@ -1,121 +1,46 @@
 'use server'
 
-import { db } from '@/lib/db'
-import * as schema from '@/lib/db/schema'
-import { eq, asc } from 'drizzle-orm'
-import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
-import { optionalUrl } from '@/lib/validation'
-import { requireSection } from '@/lib/db/sections'
+import { revalidateContent } from '@/server/revalidate'
+import * as service from '@/server/services/testimonials'
 
-// =============================================
-// GET
-// =============================================
+function readForm(formData: FormData) {
+  return {
+    imageUrl: formData.get('imageUrl'),
+    title: formData.get('title'),
+    subtitle: formData.get('subtitle'),
+    rating: formData.get('rating'),
+    body: formData.get('body'),
+  }
+}
 
 export async function getTestimonials() {
   await requireAuth()
-
-  const [{ section }, items] = await Promise.all([
-    requireSection('testimonials'),
-    db.select()
-      .from(schema.testimonials)
-      .orderBy(asc(schema.testimonials.sortOrder), asc(schema.testimonials.id)),
-  ])
-  
-  return { section, items }
+  return service.getTestimonials()
 }
-
-// =============================================
-// TESTIMONIAL ITEMS CRUD
-// =============================================
 
 export async function createTestimonialItem(formData: FormData) {
   await requireAuth()
-  
-  const imageUrl = optionalUrl(formData.get('imageUrl'), 'Image URL', 'asset')
-  const title = formData.get('title') as string
-  const subtitle = formData.get('subtitle') as string
-  const ratingValue = String(formData.get('rating') ?? '').trim()
-  const rating = ratingValue ? Number(ratingValue) : null
-  if (rating !== null && (!Number.isInteger(rating) || rating < 1 || rating > 5)) {
-    throw new Error('Rating must be an integer from 1 to 5')
-  }
-  const body = formData.get('body') as string
-  
-  const existing = await db.select()
-    .from(schema.testimonials)
-    .orderBy(asc(schema.testimonials.sortOrder), asc(schema.testimonials.id))
-  
-  const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
-  
-  const [item] = await db.insert(schema.testimonials)
-    .values({
-      imageUrl,
-      title,
-      subtitle: subtitle || null,
-      rating,
-      body: body || null,
-      sortOrder,
-    })
-    .returning()
-  
-  revalidatePath('/admin/testimonials')
-  revalidatePath('/api/all')
-  
+  const item = await service.createTestimonial(readForm(formData))
+  revalidateContent('/admin/testimonials')
   return item
 }
 
 export async function updateTestimonialItem(id: number, formData: FormData) {
   await requireAuth()
-  
-  const imageUrl = optionalUrl(formData.get('imageUrl'), 'Image URL', 'asset')
-  const title = formData.get('title') as string
-  const subtitle = formData.get('subtitle') as string
-  const ratingValue = String(formData.get('rating') ?? '').trim()
-  const rating = ratingValue ? Number(ratingValue) : null
-  if (rating !== null && (!Number.isInteger(rating) || rating < 1 || rating > 5)) {
-    throw new Error('Rating must be an integer from 1 to 5')
-  }
-  const body = formData.get('body') as string
-  
-  const [item] = await db.update(schema.testimonials)
-    .set({
-      imageUrl,
-      title,
-      subtitle: subtitle || null,
-      rating,
-      body: body || null,
-    })
-    .where(eq(schema.testimonials.id, id))
-    .returning()
-  
-  revalidatePath('/admin/testimonials')
-  revalidatePath('/api/all')
-  
+  const item = await service.updateTestimonial(id, readForm(formData))
+  revalidateContent('/admin/testimonials')
   return item
 }
 
 export async function deleteTestimonialItem(id: number) {
   await requireAuth()
-  
-  await db.delete(schema.testimonials)
-    .where(eq(schema.testimonials.id, id))
-  
-  revalidatePath('/admin/testimonials')
-  revalidatePath('/api/all')
+  await service.deleteTestimonial(id)
+  revalidateContent('/admin/testimonials')
 }
 
 export async function reorderTestimonialItems(ids: number[]) {
   await requireAuth()
-  
-  await Promise.all(
-    ids.map((id, index) =>
-      db.update(schema.testimonials)
-        .set({ sortOrder: index })
-        .where(eq(schema.testimonials.id, id))
-    )
-  )
-  
-  revalidatePath('/admin/testimonials')
-  revalidatePath('/api/all')
+  await service.reorderTestimonials(ids)
+  revalidateContent('/admin/testimonials')
 }

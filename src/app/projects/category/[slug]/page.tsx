@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/header";
 import { ApiDataProvider } from "@/providers/ApiDataProvider";
-import { getProjectsByCategory } from "@/lib/projects";
+import { getProjectsByCategory } from "@/server/repos/projects";
 
 interface CategoryPageProps {
   params: Promise<{

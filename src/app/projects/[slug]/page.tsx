@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProjectBySlug } from "@/lib/projects";
+import { getProjectBySlug } from "@/server/repos/projects";
 import Header from "@/components/header";
 import { ApiDataProvider } from "@/providers/ApiDataProvider";
 import BackgroundGradient from "@/components/backgroundGradient";

@@ -2,8 +2,8 @@ import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
 import { asc } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
-import { getSection } from '@/lib/db/sections'
-import { getContactMethodsForSection } from '@/lib/contact-methods'
+import { getSection } from '@/server/repos/page-sections'
+import { getContactMethodsForSection } from '@/server/repos/contact-methods'
 import type { ApiResponse, AboutResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
@@ -27,10 +27,6 @@ export async function GET(): Promise<NextResponse<ApiResponse<AboutResponse>>> {
       name: profile?.name ?? null,
       job_title: profile?.jobTitle ?? null,
       description: profile?.biography ?? null,
-      button: {
-        text: section?.config.buttonText ?? null,
-        url: section?.config.buttonUrl ?? null,
-      },
       contact_information: contactInfoData.map((info) => ({
         kind: info.kind,
         title: info.title,

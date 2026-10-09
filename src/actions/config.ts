@@ -1,40 +1,18 @@
 'use server'
 
-import { db } from '@/lib/db'
-import * as schema from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
-import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
+import { revalidateContent } from '@/server/revalidate'
+import * as service from '@/server/services/site-settings'
 
 export async function getGeneralSettings() {
   await requireAuth()
-
-  const [config] = await db.select().from(schema.siteConfig).limit(1)
-
-  return {
-    recaptchaSiteKey: config?.recaptchaSiteKey ?? null,
-  }
+  return service.getGeneralSettings()
 }
 
 export async function updateGeneralSettings(formData: FormData) {
   await requireAuth()
-
-  const [existingConfig] = await db.select().from(schema.siteConfig).limit(1)
-  const values = {
-    recaptchaSiteKey:
-      String(formData.get('recaptchaSiteKey') ?? '').trim() || null,
-  }
-
-  if (existingConfig) {
-    await db
-      .update(schema.siteConfig)
-      .set(values)
-      .where(eq(schema.siteConfig.id, existingConfig.id))
-  } else {
-    await db.insert(schema.siteConfig).values(values)
-  }
-
-  revalidatePath('/admin/general-settings')
-  revalidatePath('/api/config')
-  revalidatePath('/api/all')
+  await service.saveGeneralSettings({
+    recaptchaSiteKey: formData.get('recaptchaSiteKey'),
+  })
+  revalidateContent('/admin/general-settings', '/api/config')
 }

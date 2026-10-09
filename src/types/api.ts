@@ -30,7 +30,6 @@ export interface AboutResponse {
   name: string | null;
   job_title: string | null;
   description: string | null;
-  button: Button;
   contact_information: Array<{
     kind: ContactMethodKind;
     title: string;
@@ -53,7 +52,6 @@ export interface ServicesResponse {
 
 export interface ExperienceResponse {
   title: string | null;
-  button: Button;
   experiences: Array<{
     from: number | null;
     to: number | null;

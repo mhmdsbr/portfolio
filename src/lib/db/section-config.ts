@@ -22,8 +22,8 @@ export type EmptyConfig = Record<string, never>
 
 export interface SectionConfigMap {
   hero: HeroConfig
-  about: ButtonConfig
-  experience: ButtonConfig
+  about: EmptyConfig
+  experience: EmptyConfig
   services: EmptyConfig
   projects: EmptyConfig
   testimonials: EmptyConfig
@@ -34,8 +34,8 @@ export type AnySectionConfig = SectionConfigMap[SectionKind]
 
 export const SECTION_CONFIG_DEFAULTS: SectionConfigMap = {
   hero: { location: null, subtitleOne: null, subtitleTwo: null, logoUrl: null },
-  about: { buttonText: null, buttonUrl: null },
-  experience: { buttonText: null, buttonUrl: null },
+  about: {},
+  experience: {},
   services: {},
   projects: {},
   testimonials: {},
@@ -51,8 +51,8 @@ const sanitizers: {
     subtitleTwo: optionalText(input.subtitleTwo),
     logoUrl: optionalUrl(input.logoUrl, 'Logo URL', 'asset'),
   }),
-  about: (input) => sanitizeButton(input),
-  experience: (input) => sanitizeButton(input),
+  about: () => ({}),
+  experience: () => ({}),
   services: () => ({}),
   projects: () => ({}),
   testimonials: () => ({}),

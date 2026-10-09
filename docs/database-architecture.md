@@ -24,8 +24,9 @@ flowchart LR
         direction TB
         UI["Components<br/>useAllData() via SWR"]
         API["Public API routes<br/>/api/all, /api/hero, /api/about, ...<br/>(read only)"]
-        ACT["Server actions<br/>src/actions/*<br/>requireAuth() first"]
-        LIB["Domain helpers<br/>sections.ts, contact-methods.ts,<br/>projects.ts, section-config.ts,<br/>validation.ts"]
+        ACT["Server actions (controllers)<br/>src/actions/*<br/>requireAuth, FormData to input,<br/>revalidate"]
+        SVC["Services<br/>src/server/services/*<br/>validation, rules, transactions"]
+        LIB["Repositories<br/>src/server/repos/*<br/>the only layer that queries the DB"]
         AUTH["auth.ts<br/>sessions, email codes"]
         DRZ["Drizzle ORM<br/>src/lib/db/schema.ts"]
     end
@@ -35,7 +36,7 @@ flowchart LR
     V --> UI --> API
     A -->|forms / FormData| ACT
     A -->|login, signup| AUTH
-    ACT --> LIB
+    ACT --> SVC --> LIB
     API --> LIB
     ACT --> AUTH
     LIB --> DRZ
@@ -200,13 +201,11 @@ flowchart TB
         HT[("hero_titles")]
     end
     subgraph about["about"]
-        AC["config: buttonText, buttonUrl"]
         PR[("profile")]
         PF[("profile_facts")]
         CMA[("contact_methods<br/>via contact_method_sections")]
     end
     subgraph exp["experience"]
-        EC["config: buttonText, buttonUrl"]
         EX[("experiences")]
         SK[("skills")]
     end
@@ -314,8 +313,8 @@ sequenceDiagram
 | Action module | Tables written | Notes |
 | --- | --- | --- |
 | `hero.ts` | `page_sections.config` (hero), `hero_titles` | titles are replaced as a list |
-| `about.ts` | `page_sections.config` (about), `profile`, `profile_facts` | profile is a singleton row |
-| `experience.ts` | `page_sections.config` (experience), `experiences`, `skills` | year range validated |
+| `about.ts` | `profile`, `profile_facts` | profile is a singleton row |
+| `experience.ts` | `experiences`, `skills` | year range validated |
 | `contact.ts` | `page_sections.config` (contact), `contact_methods`, `contact_method_sections` | method + section links in one transaction |
 | `services.ts` | `services` | icon checked against `SERVICE_ICONS` |
 | `testimonials.ts` | `testimonials` | rating 1-5, image URL validated |
@@ -376,8 +375,7 @@ flowchart LR
 | Kind | Config keys |
 | --- | --- |
 | `hero` | `location`, `subtitleOne`, `subtitleTwo`, `logoUrl` |
-| `about` | `buttonText`, `buttonUrl` |
-| `experience` | `buttonText`, `buttonUrl` |
+| `about`, `experience` | none |
 | `contact` | `formTitle`, `buttonText`, `buttonUrl` |
 | `services`, `projects`, `testimonials` | none |
 

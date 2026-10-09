@@ -214,8 +214,7 @@ validates input on write and fills defaults on read:
 | Kind | `config` keys |
 | --- | --- |
 | `hero` | `location`, `subtitleOne`, `subtitleTwo`, `logoUrl` |
-| `about` | `buttonText`, `buttonUrl` |
-| `experience` | `buttonText`, `buttonUrl` |
+| `about`, `experience` | none |
 | `contact` | `formTitle`, `buttonText`, `buttonUrl` |
 | `services`, `projects`, `testimonials` | none |
 
@@ -226,8 +225,8 @@ validates input on write and fills defaults on read:
 | Section | Data returned with it |
 | --- | --- |
 | `hero` | `config`, `hero_titles` |
-| `about` | `config`, `profile`, `profile_facts`, contact methods linked to it |
-| `experience` | `config`, `experiences`, `skills` |
+| `about` | `profile`, `profile_facts`, contact methods linked to it |
+| `experience` | `experiences`, `skills` |
 | `services` | `services` |
 | `projects` | `projects`, `project_categories`, `project_roles`, `technologies` |
 | `testimonials` | `testimonials` |

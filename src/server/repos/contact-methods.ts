@@ -1,11 +1,10 @@
-import { asc, eq, inArray } from 'drizzle-orm'
-import { db } from '@/lib/db'
+import { asc, desc, eq, inArray } from 'drizzle-orm'
 import * as schema from '@/lib/db/schema'
 import {
   CONTACT_METHOD_SECTION_KINDS,
   type ContactMethodSectionKind,
 } from '@/lib/db/constants'
-import type { DbExecutor } from '@/lib/db/sections'
+import { defaultExecutor, type DbExecutor } from './executor'
 
 export type ContactMethodWithSections = schema.ContactMethod & {
   sections: ContactMethodSectionKind[]
@@ -16,7 +15,7 @@ const isMethodSection = (kind: string): kind is ContactMethodSectionKind =>
 
 /** All contact methods in display order, each with the sections showing it. */
 export async function getContactMethodsWithSections(
-  executor: DbExecutor = db,
+  executor: DbExecutor = defaultExecutor,
 ): Promise<ContactMethodWithSections[]> {
   const rows = await executor
     .select({
@@ -53,17 +52,10 @@ export async function getContactMethodsWithSections(
 /** Contact methods shown by one section, in display order. */
 export async function getContactMethodsForSection(
   kind: ContactMethodSectionKind,
-  executor: DbExecutor = db,
+  executor: DbExecutor = defaultExecutor,
 ) {
   const methods = await getContactMethodsWithSections(executor)
   return methods.filter((method) => method.sections.includes(kind))
-}
-
-/** Reads the section kinds submitted by a form, ignoring unknown values. */
-export function parseContactMethodSections(
-  values: FormDataEntryValue[],
-): ContactMethodSectionKind[] {
-  return CONTACT_METHOD_SECTION_KINDS.filter((kind) => values.includes(kind))
 }
 
 /** Replaces the set of sections that display a contact method. */
@@ -87,4 +79,63 @@ export async function setContactMethodSections(
   await executor.insert(schema.contactMethodSections).values(
     sections.map(({ id }) => ({ contactMethodId, sectionId: id })),
   )
+}
+
+export type ContactMethodFields = Pick<
+  schema.NewContactMethod,
+  'kind' | 'title' | 'value'
+>
+
+export async function insertContactMethodAtEnd(
+  executor: DbExecutor,
+  fields: ContactMethodFields,
+) {
+  const [last] = await executor
+    .select({ sortOrder: schema.contactMethods.sortOrder })
+    .from(schema.contactMethods)
+    .orderBy(desc(schema.contactMethods.sortOrder), desc(schema.contactMethods.id))
+    .limit(1)
+  const [created] = await executor
+    .insert(schema.contactMethods)
+    .values({ ...fields, sortOrder: last ? last.sortOrder + 1 : 0 })
+    .returning()
+  return created
+}
+
+export async function updateContactMethodRow(
+  executor: DbExecutor,
+  id: number,
+  fields: ContactMethodFields,
+) {
+  const [updated] = await executor
+    .update(schema.contactMethods)
+    .set(fields)
+    .where(eq(schema.contactMethods.id, id))
+    .returning()
+  return updated
+}
+
+/** Returns true when a row was removed. */
+export async function deleteContactMethodRow(id: number) {
+  const deleted = await defaultExecutor
+    .delete(schema.contactMethods)
+    .where(eq(schema.contactMethods.id, id))
+    .returning({ id: schema.contactMethods.id })
+  return deleted.length > 0
+}
+
+export async function listContactMethodIds(executor: DbExecutor) {
+  const rows = await executor
+    .select({ id: schema.contactMethods.id })
+    .from(schema.contactMethods)
+  return rows.map(({ id }) => id)
+}
+
+export async function setContactMethodOrder(executor: DbExecutor, ids: number[]) {
+  for (const [sortOrder, id] of ids.entries()) {
+    await executor
+      .update(schema.contactMethods)
+      .set({ sortOrder })
+      .where(eq(schema.contactMethods.id, id))
+  }
 }

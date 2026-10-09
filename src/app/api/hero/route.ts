@@ -2,7 +2,7 @@ import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
 import { asc, eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
-import { getSection } from '@/lib/db/sections'
+import { getSection } from '@/server/repos/page-sections'
 import type { ApiResponse, HeroResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
