@@ -51,17 +51,17 @@ export interface ServicesResponse {
   }>;
 }
 
-export interface SummaryResponse {
+export interface ExperienceResponse {
   title: string | null;
   button: Button;
-  jobs: Array<{
+  experiences: Array<{
     from: number | null;
     to: number | null;
     title: string;
     company: string;
     description: string | null;
   }>;
-  experiences: Array<{
+  skills: Array<{
     skill: string;
     level: number | null;
   }>;
@@ -142,7 +142,7 @@ export interface AllDataResponse {
   hero: HeroResponse;
   about: AboutResponse;
   services: ServicesResponse;
-  summary: SummaryResponse;
+  experience: ExperienceResponse;
   testimonials: TestimonialsResponse;
   projects: ProjectsResponse;
   contact: ContactResponse;
@@ -171,7 +171,7 @@ export interface EndpointMap {
   'api/hero': ApiResponseWrapper<HeroResponse>;
   'api/about': ApiResponseWrapper<AboutResponse>;
   'api/services': ApiResponseWrapper<ServicesResponse>;
-  'api/summary': ApiResponseWrapper<SummaryResponse>;
+  'api/experience': ApiResponseWrapper<ExperienceResponse>;
   'api/testimonials': ApiResponseWrapper<TestimonialsResponse>;
   'api/contact': ApiResponseWrapper<ContactResponse>;
   'api/footer': ApiResponseWrapper<FooterResponse>;

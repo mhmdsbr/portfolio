@@ -3,13 +3,13 @@ import * as schema from '@/lib/db/schema'
 import { asc } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { getSection } from '@/lib/db/sections'
-import type { ApiResponse, SummaryResponse } from '@/types/api'
+import type { ApiResponse, ExperienceResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(): Promise<NextResponse<ApiResponse<SummaryResponse>>> {
+export async function GET(): Promise<NextResponse<ApiResponse<ExperienceResponse>>> {
   try {
-    const [section, jobsData, experiencesData] = await Promise.all([
+    const [section, experiencesData, skillsData] = await Promise.all([
       getSection('experience'),
       db.select().from(schema.experiences).orderBy(
         asc(schema.experiences.sortOrder),
@@ -21,22 +21,22 @@ export async function GET(): Promise<NextResponse<ApiResponse<SummaryResponse>>>
       ),
     ])
 
-    const response: SummaryResponse = {
+    const response: ExperienceResponse = {
       title: section?.title ?? null,
       button: {
         text: section?.config.buttonText ?? null,
         url: section?.config.buttonUrl ?? null,
       },
-      jobs: jobsData.map((job) => ({
-        from: job.fromYear ?? null,
-        to: job.toYear,
-        title: job.jobTitle,
-        company: job.company,
-        description: job.description ?? null,
+      experiences: experiencesData.map((experience) => ({
+        from: experience.fromYear ?? null,
+        to: experience.toYear,
+        title: experience.jobTitle,
+        company: experience.company,
+        description: experience.description ?? null,
       })),
-      experiences: experiencesData.map((exp) => ({
-        skill: exp.skill,
-        level: exp.level ?? null,
+      skills: skillsData.map((item) => ({
+        skill: item.skill,
+        level: item.level ?? null,
       })),
     }
 
@@ -45,10 +45,10 @@ export async function GET(): Promise<NextResponse<ApiResponse<SummaryResponse>>>
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error('❌ Error fetching summary:', error)
+    console.error('❌ Error fetching experience:', error)
     return NextResponse.json(
       {
-        error: 'Failed to fetch summary data',
+        error: 'Failed to fetch experience data',
         timestamp: new Date().toISOString(),
       },
       { status: 500 }

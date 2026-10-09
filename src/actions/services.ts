@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 import { SERVICE_ICONS, type ServiceIcon } from '@/lib/db/constants'
 import { optionalText, requiredText } from '@/lib/validation'
+import { requireSection } from '@/lib/db/sections'
 
 function parseServiceIcon(value: FormDataEntryValue | null): ServiceIcon | null {
   const icon = optionalText(value)
@@ -23,11 +24,14 @@ function parseServiceIcon(value: FormDataEntryValue | null): ServiceIcon | null 
 export async function getServices() {
   await requireAuth()
 
-  const items = await db.select()
-    .from(schema.services)
-    .orderBy(asc(schema.services.sortOrder), asc(schema.services.id))
+  const [{ section }, items] = await Promise.all([
+    requireSection('services'),
+    db.select()
+      .from(schema.services)
+      .orderBy(asc(schema.services.sortOrder), asc(schema.services.id)),
+  ])
   
-  return { items }
+  return { section, items }
 }
 
 // =============================================

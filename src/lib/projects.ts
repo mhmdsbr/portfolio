@@ -95,6 +95,23 @@ export async function getProjectsByCategory(categorySlug: string) {
   return projects.filter((project) => project.categorySlug === categorySlug);
 }
 
+/** Category names (with project counts), alphabetically. */
+export async function listProjectCategories(executor: DbExecutor = db) {
+  const rows = await executor
+    .select({
+      name: schema.projectCategories.name,
+      projectCount: sql<number>`count(${schema.projects.id})::int`,
+    })
+    .from(schema.projectCategories)
+    .leftJoin(
+      schema.projects,
+      eq(schema.projects.categoryId, schema.projectCategories.id),
+    )
+    .groupBy(schema.projectCategories.id, schema.projectCategories.name)
+    .orderBy(asc(schema.projectCategories.name));
+  return rows;
+}
+
 /** Returns the id of the category with this name (case-insensitive), creating it if needed. */
 export async function findOrCreateCategory(
   executor: DbExecutor,

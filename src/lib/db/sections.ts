@@ -20,6 +20,32 @@ export type SectionWithConfig<K extends SectionKind> = Omit<
   config: SectionConfigMap[K]
 }
 
+export type SectionMeta = Pick<
+  schema.PageSection,
+  'id' | 'kind' | 'navigationTitle' | 'title' | 'isEnabled'
+>
+
+/** Admin-facing section data: shared metadata plus the typed config. */
+export async function requireSection<K extends SectionKind>(
+  kind: K,
+  executor: DbExecutor = db,
+) {
+  const section = await getSection(kind, executor)
+  if (!section) {
+    throw new Error(
+      `Page section "${kind}" not found. Seed the database or restore the page_sections row.`,
+    )
+  }
+  const meta: SectionMeta = {
+    id: section.id,
+    kind,
+    navigationTitle: section.navigationTitle,
+    title: section.title,
+    isEnabled: section.isEnabled,
+  }
+  return { section: meta, config: section.config }
+}
+
 /** Reads a section and its normalized config; returns null when not seeded. */
 export async function getSection<K extends SectionKind>(
   kind: K,

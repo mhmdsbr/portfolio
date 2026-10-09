@@ -3,18 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateExperienceSection } from "@/actions/experience";
+import type { ButtonConfig } from "@/lib/db/section-config";
 
-interface SummaryFormProps {
-  initialData: {
-    id: number;
-    buttonText: string | null;
-    buttonUrl: string | null;
-  };
+interface ExperienceSectionFormProps {
+  config: ButtonConfig;
 }
 
-export default function SummaryForm({ initialData }: SummaryFormProps) {
-  const [buttonText, setButtonText] = useState(initialData.buttonText || "");
-  const [buttonUrl, setButtonUrl] = useState(initialData.buttonUrl || "");
+export default function ExperienceSectionForm({ config }: ExperienceSectionFormProps) {
+  const [buttonText, setButtonText] = useState(config.buttonText || "");
+  const [buttonUrl, setButtonUrl] = useState(config.buttonUrl || "");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const router = useRouter();
@@ -30,11 +27,11 @@ export default function SummaryForm({ initialData }: SummaryFormProps) {
 
     try {
       await updateExperienceSection(formData);
-      setMessage("✅ Summary section updated successfully!");
+      setMessage("✅ Experience section updated successfully!");
       router.refresh();
     } catch (error) {
-      setMessage("❌ Failed to update summary section");
-      console.error("Error updating summary:", error);
+      setMessage("❌ Failed to update experience section");
+      console.error("Error updating experience section:", error);
     } finally {
       setLoading(false);
     }
@@ -82,7 +79,7 @@ export default function SummaryForm({ initialData }: SummaryFormProps) {
         disabled={loading}
         className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-6 rounded-md transition disabled:opacity-50"
       >
-        {loading ? "Saving..." : "Save Summary Section"}
+        {loading ? "Saving..." : "Save Experience Section"}
       </button>
     </form>
   );

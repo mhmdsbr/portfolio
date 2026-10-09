@@ -6,7 +6,7 @@ import { eq, asc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 import {
-  getSection,
+  requireSection,
   requireSectionId,
   updateSectionConfig,
 } from '@/lib/db/sections'
@@ -19,22 +19,13 @@ import { requiredText } from '@/lib/validation'
 export async function getHero() {
   await requireAuth()
 
-  const section = await getSection('hero')
-  const titles = section
-    ? await db.select()
-        .from(schema.heroTitles)
-        .where(eq(schema.heroTitles.sectionId, section.id))
-        .orderBy(asc(schema.heroTitles.sortOrder), asc(schema.heroTitles.id))
-    : []
+  const { section, config } = await requireSection('hero')
+  const titles = await db.select()
+    .from(schema.heroTitles)
+    .where(eq(schema.heroTitles.sectionId, section.id))
+    .orderBy(asc(schema.heroTitles.sortOrder), asc(schema.heroTitles.id))
 
-  return {
-    id: 0,
-    location: section?.config.location ?? null,
-    subtitleOne: section?.config.subtitleOne ?? null,
-    subtitleTwo: section?.config.subtitleTwo ?? null,
-    logoUrl: section?.config.logoUrl ?? null,
-    titles: titles.map(t => t.title),
-  }
+  return { section, config, titles: titles.map((t) => t.title) }
 }
 
 // =============================================

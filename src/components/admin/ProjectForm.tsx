@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import CategorySelect from '@/components/admin/CategorySelect'
 
 interface ProjectFormProps {
   initialData?: {
@@ -18,6 +19,7 @@ interface ProjectFormProps {
   }
   onSubmit: (formData: FormData) => Promise<unknown>
   submitLabel: string
+  categories: string[]
 }
 
 function hasProjectId(result: unknown): result is { id: number } {
@@ -29,10 +31,11 @@ function hasProjectId(result: unknown): result is { id: number } {
   )
 }
 
-export default function ProjectForm({ initialData, onSubmit, submitLabel }: ProjectFormProps) {
+export default function ProjectForm({ initialData, onSubmit, submitLabel, categories }: ProjectFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [category, setCategory] = useState(initialData?.category ?? '')
   const [techInput, setTechInput] = useState(initialData?.tech?.join(', ') || '')
   const [imageUrl, setImageUrl] = useState(initialData?.image || '')
 
@@ -80,20 +83,13 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel }: Proj
         <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-1">
           Category *
         </label>
-        <select
+        <CategorySelect
           id="category"
           name="category"
-          defaultValue={initialData?.category}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          required
-        >
-          <option value="React">React</option>
-          <option value="Next.js">Next.js</option>
-          <option value="WordPress">WordPress</option>
-          <option value="Vue.js">Vue.js</option>
-          <option value="Angular">Angular</option>
-          <option value="Other">Other</option>
-        </select>
+          categories={categories}
+          value={category}
+          onChange={setCategory}
+        />
       </div>
 
       <div>

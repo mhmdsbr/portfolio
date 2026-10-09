@@ -6,6 +6,7 @@ import { eq, asc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 import { optionalUrl } from '@/lib/validation'
+import { requireSection } from '@/lib/db/sections'
 
 // =============================================
 // GET
@@ -14,11 +15,14 @@ import { optionalUrl } from '@/lib/validation'
 export async function getTestimonials() {
   await requireAuth()
 
-  const items = await db.select()
-    .from(schema.testimonials)
-    .orderBy(asc(schema.testimonials.sortOrder), asc(schema.testimonials.id))
+  const [{ section }, items] = await Promise.all([
+    requireSection('testimonials'),
+    db.select()
+      .from(schema.testimonials)
+      .orderBy(asc(schema.testimonials.sortOrder), asc(schema.testimonials.id)),
+  ])
   
-  return { items }
+  return { section, items }
 }
 
 // =============================================

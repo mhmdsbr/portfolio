@@ -6,7 +6,7 @@ import { desc, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 import { CONTACT_METHOD_KINDS } from '@/lib/db/constants'
-import { getSection, updateSectionConfig } from '@/lib/db/sections'
+import { requireSection, updateSectionConfig } from '@/lib/db/sections'
 import {
   getContactMethodsWithSections,
   parseContactMethodSections,
@@ -21,19 +21,12 @@ import { requiredText } from '@/lib/validation'
 export async function getContact() {
   await requireAuth()
 
-  const [section, contactMethods] = await Promise.all([
-    getSection('contact'),
+  const [{ section, config }, contactMethods] = await Promise.all([
+    requireSection('contact'),
     getContactMethodsWithSections(),
   ])
 
-  return {
-    id: 0,
-    formTitle: section?.config.formTitle ?? null,
-    buttonText: section?.config.buttonText ?? null,
-    buttonUrl: section?.config.buttonUrl ?? null,
-    title: section?.title ?? null,
-    contactMethods,
-  }
+  return { section, config, contactMethods }
 }
 
 // =============================================
@@ -136,6 +129,7 @@ export async function reorderContactMethods(ids: number[]) {
 
 function revalidateContactMethods() {
   revalidatePath('/admin/contact')
+  revalidatePath('/admin/about')
   revalidatePath('/api/all')
   revalidatePath('/api/contact')
   revalidatePath('/api/about')

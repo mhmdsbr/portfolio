@@ -3,24 +3,23 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateAbout } from '@/actions/about'
+import type { ButtonConfig } from '@/lib/db/section-config'
 
 interface AboutFormProps {
-  initialData: {
-    id: number
+  profile: {
     name: string | null
     jobTitle: string | null
-    description: string | null
-    buttonText: string | null
-    buttonUrl: string | null
+    biography: string | null
   }
+  config: ButtonConfig
 }
 
-export default function AboutForm({ initialData }: AboutFormProps) {
-  const [name, setName] = useState(initialData.name || '')
-  const [jobTitle, setJobTitle] = useState(initialData.jobTitle || '')
-  const [description, setDescription] = useState(initialData.description || '')
-  const [buttonText, setButtonText] = useState(initialData.buttonText || '')
-  const [buttonUrl, setButtonUrl] = useState(initialData.buttonUrl || '')
+export default function AboutForm({ profile, config }: AboutFormProps) {
+  const [name, setName] = useState(profile.name || '')
+  const [jobTitle, setJobTitle] = useState(profile.jobTitle || '')
+  const [description, setDescription] = useState(profile.biography || '')
+  const [buttonText, setButtonText] = useState(config.buttonText || '')
+  const [buttonUrl, setButtonUrl] = useState(config.buttonUrl || '')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const router = useRouter()

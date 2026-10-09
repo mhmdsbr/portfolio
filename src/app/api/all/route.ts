@@ -119,7 +119,7 @@ export async function GET(): Promise<
 
     const hero = sectionConfig("hero");
     const about = sectionConfig("about");
-    const summary = sectionConfig("experience");
+    const experienceConfig = sectionConfig("experience");
     const contact = sectionConfig("contact");
 
     // Group normalized tech + roles by projectId
@@ -174,22 +174,22 @@ export async function GET(): Promise<
           icon: item.icon ?? null,
         })),
       },
-      summary: {
+      experience: {
         title: sectionTitle("experience"),
         button: {
-          text: summary.buttonText,
-          url: summary.buttonUrl,
+          text: experienceConfig.buttonText,
+          url: experienceConfig.buttonUrl,
         },
-        jobs: experiencesData.map((job) => ({
-          from: job.fromYear ?? null,
-          to: job.toYear,
-          title: job.jobTitle,
-          company: job.company,
-          description: job.description ?? null,
+        experiences: experiencesData.map((experience) => ({
+          from: experience.fromYear ?? null,
+          to: experience.toYear,
+          title: experience.jobTitle,
+          company: experience.company,
+          description: experience.description ?? null,
         })),
-        experiences: skillsData.map((exp) => ({
-          skill: exp.skill,
-          level: exp.level ?? null,
+        skills: skillsData.map((item) => ({
+          skill: item.skill,
+          level: item.level ?? null,
         })),
       },
       testimonials: {

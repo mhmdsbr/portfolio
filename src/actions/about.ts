@@ -6,7 +6,8 @@ import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 import { orderBySortOrder } from '@/lib/db/order'
-import { getSection, updateSectionConfig } from '@/lib/db/sections'
+import { requireSection, updateSectionConfig } from '@/lib/db/sections'
+import { getContactMethodsWithSections } from '@/lib/contact-methods'
 
 // =============================================
 // GET
@@ -15,23 +16,25 @@ import { getSection, updateSectionConfig } from '@/lib/db/sections'
 export async function getAbout() {
   await requireAuth()
   
-  const [[profile], section, details] = await Promise.all([
+  const [[profile], { section, config }, details, contactMethods] = await Promise.all([
     db.select().from(schema.profile).limit(1),
-    getSection('about'),
+    requireSection('about'),
     db.select().from(schema.profileFacts).orderBy(
       ...orderBySortOrder(schema.profileFacts.sortOrder, schema.profileFacts.id),
     ),
+    getContactMethodsWithSections(),
   ])
   
   return {
-    id: 0,
-    buttonText: section?.config.buttonText ?? null,
-    buttonUrl: section?.config.buttonUrl ?? null,
-    title: section?.title ?? null,
-    name: profile?.name ?? null,
-    jobTitle: profile?.jobTitle ?? null,
-    description: profile?.biography ?? null,
+    section,
+    config,
+    profile: {
+      name: profile?.name ?? null,
+      jobTitle: profile?.jobTitle ?? null,
+      biography: profile?.biography ?? null,
+    },
     details,
+    contactMethods,
   }
 }
 

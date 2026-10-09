@@ -53,6 +53,7 @@ export async function updatePageSection(
   if (!section) throw new Error('Portfolio section not found')
 
   revalidatePath('/admin/header')
+  revalidatePath(`/admin/${kind}`)
   revalidatePath('/')
   revalidatePath('/api/all')
 
@@ -89,6 +90,8 @@ export async function togglePortfolioSection(kind: SectionKind, isEnabled: boole
       .where(eq(schema.pageSections.kind, kind))
   })
 
+  revalidatePath('/admin/header')
+  revalidatePath(`/admin/${kind}`)
   revalidatePath('/')
   revalidatePath('/api/all')
 }

@@ -10,8 +10,10 @@ import {
   findOrCreateCategory,
   getProjectById,
   getProjects as getProjectsWithDetails,
+  listProjectCategories,
   pruneEmptyCategories,
 } from '@/lib/projects'
+import { requireSection } from '@/lib/db/sections'
 import { optionalText, optionalUrl, requiredText } from '@/lib/validation'
 
 type ProjectTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
@@ -96,6 +98,23 @@ async function replaceProjectDetails(
 export async function getProjects() {
   await requireAuth()
   return getProjectsWithDetails()
+}
+
+// Projects page data: the section settings, projects and existing categories
+export async function getProjectsOverview() {
+  await requireAuth()
+  const [{ section }, projects, categories] = await Promise.all([
+    requireSection('projects'),
+    getProjectsWithDetails(),
+    listProjectCategories(),
+  ])
+  return { section, projects, categories }
+}
+
+// Existing category names for the category picker
+export async function getProjectCategories() {
+  await requireAuth()
+  return listProjectCategories()
 }
 
 // Get single project

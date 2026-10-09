@@ -1,5 +1,5 @@
 import ProjectForm from '@/components/admin/ProjectForm'
-import { getProject, updateProject } from '@/actions/projects'
+import { getProjectCategories, getProject, updateProject } from '@/actions/projects'
 import { notFound } from 'next/navigation'
 
 interface EditProjectPageProps {
@@ -17,7 +17,10 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
     notFound()
   }
   
-  const project = await getProject(id)
+  const [project, categories] = await Promise.all([
+    getProject(id),
+    getProjectCategories(),
+  ])
   
   if (!project) {
     notFound()
@@ -28,6 +31,7 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
       <h1 className="text-2xl font-bold mb-6">Edit Project</h1>
       <ProjectForm
         initialData={project}
+        categories={categories.map(({ name }) => name)}
         onSubmit={async (formData: FormData) => {
           'use server'
           return await updateProject(id, formData)

@@ -9,7 +9,7 @@ export const API_CONFIG = {
     hero: 'api/hero',
     about: 'api/about',
     services: 'api/services',
-    summary: 'api/summary',
+    experience: 'api/experience',
     testimonials: 'api/testimonials',
     contact: 'api/contact',
     footer: 'api/footer',

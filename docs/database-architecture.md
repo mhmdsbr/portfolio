@@ -320,9 +320,41 @@ sequenceDiagram
 | `services.ts` | `services` | icon checked against `SERVICE_ICONS` |
 | `testimonials.ts` | `testimonials` | rating 1-5, image URL validated |
 | `projects.ts` | `projects`, `project_categories`, `project_roles`, `technologies`, `project_technologies` | see section 7 |
-| `header.ts` | `page_sections` (title, nav title, order, enabled) | at least one section must stay enabled |
+| `header.ts` | `page_sections` (title, nav title, order, enabled) | used by every Section settings card and by Page layout; at least one section must stay enabled |
 | `footer.ts`, `config.ts` | `site_config` | singleton row |
 | `profile.ts`, `auth.ts` | `admin_*` tables | see section 8 |
+
+## 5a. Admin panel layout
+
+The admin is organised the same way as the data: every section page has the same
+first card, **Section settings**, which edits that section's `page_sections` row
+(navigation label, title, visibility). Below it come the section's own `config`
+form and its content records. **Page layout** only changes order and visibility.
+
+| Admin page | Section settings (`page_sections`) | Config form (`config`) | Content records |
+| --- | --- | --- | --- |
+| `/admin/hero` | `hero` | location, subtitles, logo | `hero_titles` |
+| `/admin/about` | `about` | button | `profile`, `profile_facts`, **contact methods** |
+| `/admin/experience` | `experience` | resume button | `experiences`, `skills` |
+| `/admin/services` | `services` | none | `services` |
+| `/admin/projects` | `projects` | none | `projects`, `project_categories` |
+| `/admin/testimonials` | `testimonials` | none | `testimonials` |
+| `/admin/contact` | `contact` | form title, button | **contact methods** |
+| `/admin/header` | all kinds | none | order and visibility only |
+
+Contact methods appear on both the About and Contact pages because they are shared
+records; the checkboxes on each method decide which sections show it.
+
+The section actions (`getHero`, `getAbout`, `getContact`, `getExperience`,
+`getServices`, `getTestimonials`, `getProjectsOverview`) return the same shape,
+`{ section, config?, ...content }`, where `section` is the `page_sections` metadata.
+
+Naming is the same in the database, the admin and the API: `experiences` are the
+jobs, `skills` are the skills, and the API key and route are `experience`
+(`/api/experience`, `data.experience.experiences`, `data.experience.skills`).
+
+Project categories are chosen from the existing rows (`CategorySelect`); typing a
+new name creates a category on save.
 
 ## 6. Section settings (`page_sections.config`)
 

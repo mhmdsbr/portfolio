@@ -3,17 +3,25 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  createSkill,
-  updateSkill,
-  deleteSkill,
-  reorderSkills,
+  createExperience,
+  updateExperience,
+  deleteExperience,
+  reorderExperiences,
 } from "@/actions/experience";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  type DropResult,
+} from "@hello-pangea/dnd";
 
 interface Experience {
   id: number;
-  skill: string;
-  level: number | null;
+  fromYear: number | null;
+  toYear: number | null;
+  jobTitle: string;
+  company: string;
+  description: string | null;
   sortOrder: number | null;
 }
 
@@ -33,11 +41,11 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
     setLoading(true);
     setMessage("");
     try {
-      await createSkill(formData);
-      setMessage("✅ Skill added successfully!");
+      await createExperience(formData);
+      setMessage("✅ Experience added successfully!");
       router.refresh();
     } catch (error) {
-      setMessage("❌ Failed to add skill");
+      setMessage("❌ Failed to add experience");
       console.error("Error creating experience:", error);
     } finally {
       setLoading(false);
@@ -48,12 +56,12 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
     setLoading(true);
     setMessage("");
     try {
-      await updateSkill(id, formData);
-      setMessage("✅ Skill updated successfully!");
+      await updateExperience(id, formData);
+      setMessage("✅ Experience updated successfully!");
       setEditingId(null);
       router.refresh();
     } catch (error) {
-      setMessage("❌ Failed to update skill");
+      setMessage("❌ Failed to update experience");
       console.error("Error updating experience:", error);
     } finally {
       setLoading(false);
@@ -61,11 +69,11 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Delete this skill?")) return;
+    if (!confirm("Delete this experience entry?")) return;
 
     setDeletingId(id);
     try {
-      await deleteSkill(id);
+      await deleteExperience(id);
       router.refresh();
     } catch (error) {
       console.error("Error deleting experience:", error);
@@ -74,7 +82,7 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
     }
   };
 
-  const onDragEnd = async (result: any) => {
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
 
     const itemsCopy = Array.from(items);
@@ -84,13 +92,8 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
     setItems(itemsCopy);
 
     const ids = itemsCopy.map((item) => item.id);
-    await reorderSkills(ids);
+    await reorderExperiences(ids);
     router.refresh();
-  };
-
-  // Handle edit form submission
-  const handleEditSubmit = (id: number, formData: FormData) => {
-    handleUpdate(id, formData);
   };
 
   return (
@@ -103,29 +106,53 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
         </div>
       )}
       {/* Create New Experience */}
-      <form action={handleCreate} className="flex gap-3 items-end">
-        <div className="flex-1">
+      <form
+        action={handleCreate}
+        className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end"
+      >
+        <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">
-            Skill
+            From
+          </label>
+          <input
+            type="number"
+            name="fromYear"
+            placeholder="2020"
+            required
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            To
+          </label>
+          <input
+            type="number"
+            name="toYear"
+            placeholder="Present (leave blank)"
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Job Title
           </label>
           <input
             type="text"
-            name="skill"
-            placeholder="JavaScript"
+            name="jobTitle"
+            placeholder="Senior Developer"
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             required
           />
         </div>
-        <div className="w-32">
+        <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">
-            Level (1-100)
+            Company
           </label>
           <input
-            type="number"
-            name="level"
-            placeholder="90"
-            min="1"
-            max="100"
+            type="text"
+            name="company"
+            placeholder="Tech Corp"
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             required
           />
@@ -135,7 +162,7 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
           disabled={loading}
           className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-md transition whitespace-nowrap disabled:opacity-50"
         >
-          Add Skill
+          Add Experience
         </button>
       </form>
 
@@ -158,90 +185,116 @@ export default function ExperiencesForm({ experiences }: ExperiencesFormProps) {
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      className={`flex items-center gap-3 p-3 bg-gray-800 rounded-lg ${
+                      className={`bg-gray-800 rounded-lg p-4 ${
                         snapshot.isDragging
                           ? "shadow-lg ring-2 ring-cyan-500"
                           : ""
                       }`}
                     >
-                      <span
-                        {...provided.dragHandleProps}
-                        className="text-gray-400 cursor-grab"
-                      >
-                        ⠿
-                      </span>
-
-                      {editingId === item.id ? (
-                        <form
-                          action={(formData) =>
-                            handleEditSubmit(item.id, formData)
-                          }
-                          className="flex-1 flex items-center gap-3"
+                      <div className="flex items-start gap-3">
+                        <span
+                          {...provided.dragHandleProps}
+                          className="text-gray-400 cursor-grab mt-1"
                         >
-                          <input
-                            type="text"
-                            name="skill"
-                            defaultValue={item.skill}
-                            placeholder="Skill"
-                            className="flex-1 px-2 py-1 bg-gray-700 border border-cyan-500 rounded text-white focus:outline-none"
-                            required
-                          />
-                          <input
-                            type="number"
-                            name="level"
-                            defaultValue={item.level || ""}
-                            placeholder="Level"
-                            min="1"
-                            max="100"
-                            className="w-24 px-2 py-1 bg-gray-700 border border-cyan-500 rounded text-white focus:outline-none"
-                            required
-                          />
-                          <button
-                            type="submit"
-                            disabled={loading}
-                            className="text-green-400 hover:text-green-300 transition"
+                          ⠿
+                        </span>
+
+                        {editingId === item.id ? (
+                          <form
+                            action={(formData) =>
+                              handleUpdate(item.id, formData)
+                            }
+                            className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3"
                           >
-                            Save
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setEditingId(null)}
-                            className="text-gray-400 hover:text-gray-300 transition"
-                          >
-                            Cancel
-                          </button>
-                        </form>
-                      ) : (
-                        <>
-                          <span className="flex-1 text-white">
-                            {item.skill}
-                          </span>
-                          <div className="flex items-center gap-3 w-48">
-                            <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all"
-                                style={{ width: `${item.level || 0}%` }}
+                            <input
+                              type="number"
+                              name="fromYear"
+                              defaultValue={item.fromYear || ""}
+                              placeholder="2020"
+                              required
+                              className="px-3 py-2 bg-gray-700 border border-cyan-500 rounded-md text-white focus:outline-none"
+                            />
+                            <input
+                              type="number"
+                              name="toYear"
+                              defaultValue={item.toYear ?? ""}
+                              placeholder="Present (leave blank)"
+                              className="px-3 py-2 bg-gray-700 border border-cyan-500 rounded-md text-white focus:outline-none"
+                            />
+                            <input
+                              type="text"
+                              name="jobTitle"
+                              defaultValue={item.jobTitle}
+                              placeholder="Job Title"
+                              className="px-3 py-2 bg-gray-700 border border-cyan-500 rounded-md text-white focus:outline-none"
+                              required
+                            />
+                            <input
+                              type="text"
+                              name="company"
+                              defaultValue={item.company}
+                              placeholder="Company"
+                              className="px-3 py-2 bg-gray-700 border border-cyan-500 rounded-md text-white focus:outline-none"
+                              required
+                            />
+                            <div className="md:col-span-4 flex gap-2">
+                              <textarea
+                                name="description"
+                                defaultValue={item.description || ""}
+                                placeholder="Description..."
+                                rows={2}
+                                className="flex-1 px-3 py-2 bg-gray-700 border border-cyan-500 rounded-md text-white focus:outline-none"
                               />
+                              <button
+                                type="submit"
+                                disabled={loading}
+                                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition"
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingId(null)}
+                                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition"
+                              >
+                                Cancel
+                              </button>
                             </div>
-                            <span className="text-sm text-gray-400 w-8">
-                              {item.level || 0}%
-                            </span>
-                          </div>
-                          <button
-                            onClick={() => setEditingId(item.id)}
-                            className="text-cyan-400 hover:text-cyan-300 transition"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            disabled={deletingId === item.id}
-                            className="text-red-400 hover:text-red-300 transition disabled:opacity-50"
-                          >
-                            {deletingId === item.id ? "Deleting..." : "Delete"}
-                          </button>
-                        </>
-                      )}
+                          </form>
+                        ) : (
+                          <>
+                            <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2">
+                              <span className="text-gray-300">
+                                {item.fromYear} - {item.toYear ?? "Present"}
+                              </span>
+                              <span className="font-semibold text-white">
+                                {item.jobTitle}
+                              </span>
+                              <span className="text-cyan-400">
+                                {item.company}
+                              </span>
+                              <span className="text-gray-400 text-sm truncate">
+                                {item.description || "No description"}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => setEditingId(item.id)}
+                              className="text-cyan-400 hover:text-cyan-300 transition ml-2"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              disabled={deletingId === item.id}
+                              className="text-red-400 hover:text-red-300 transition ml-2 disabled:opacity-50"
+                            >
+                              {deletingId === item.id
+                                ? "Deleting..."
+                                : "Delete"}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   )}
                 </Draggable>

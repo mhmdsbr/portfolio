@@ -1,18 +1,22 @@
 import { getHero } from '@/actions/hero'
 import HeroForm from '@/components/admin/HeroForm'
+import SectionSettingsForm from '@/components/admin/SectionSettingsForm'
 
 export default async function HeroPage() {
-  const hero = await getHero()
+  const { section, config, titles } = await getHero()
 
   return (
-    <div className="space-y-2">
-      <h1 className="text-2xl font-bold mb-6">Hero Section</h1>
-      <p className="-mt-6 mb-6 text-sm text-gray-400">
-        Shared section titles and visibility are managed in Page layout. Rotating hero titles,
-        subtitles, location, and logo are specific to this design.
-      </p>
+    <div className="space-y-8">
+      <h1 className="text-2xl font-bold">Hero Section</h1>
+
       <div className="bg-gray-800 rounded-lg p-6">
-        <HeroForm initialData={hero} />
+        <h2 className="text-lg font-semibold mb-4">Section settings</h2>
+        <SectionSettingsForm section={section} />
+      </div>
+
+      <div className="bg-gray-800 rounded-lg p-6">
+        <h2 className="text-lg font-semibold mb-4">Content</h2>
+        <HeroForm config={config} titles={titles} />
       </div>
     </div>
   )

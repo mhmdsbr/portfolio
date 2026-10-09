@@ -6,17 +6,17 @@ import { eq, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/lib/auth";
 import { YEAR_MAX, YEAR_MIN } from "@/lib/db/constants";
-import { getSection, updateSectionConfig } from "@/lib/db/sections";
+import { requireSection, updateSectionConfig } from "@/lib/db/sections";
 
 // =============================================
 // GET
 // =============================================
 
-export async function getExperienceSectionData() {
+export async function getExperience() {
   await requireAuth();
 
-  const [section, jobs, experiences] = await Promise.all([
-    getSection("experience"),
+  const [{ section, config }, experiences, skills] = await Promise.all([
+    requireSection("experience"),
     db
       .select()
       .from(schema.experiences)
@@ -27,18 +27,11 @@ export async function getExperienceSectionData() {
       .orderBy(asc(schema.skills.sortOrder), asc(schema.skills.id)),
   ]);
 
-  return {
-    id: 0,
-    buttonText: section?.config.buttonText ?? null,
-    buttonUrl: section?.config.buttonUrl ?? null,
-    title: section?.title ?? null,
-    jobs,
-    experiences,
-  };
+  return { section, config, experiences, skills };
 }
 
 // =============================================
-// UPDATE SUMMARY SECTION
+// UPDATE EXPERIENCE SECTION
 // =============================================
 
 export async function updateExperienceSection(formData: FormData) {
@@ -55,7 +48,7 @@ export async function updateExperienceSection(formData: FormData) {
   return config;
 }
 
-function parseJobYears(formData: FormData) {
+function parseExperienceYears(formData: FormData) {
   const fromYearInput = String(formData.get("fromYear") ?? "").trim();
   const fromYear = Number(fromYearInput);
   if (
@@ -81,13 +74,13 @@ function parseJobYears(formData: FormData) {
 }
 
 // =============================================
-// JOB CRUD
+// EXPERIENCE CRUD
 // =============================================
 
-export async function createJob(formData: FormData) {
+export async function createExperience(formData: FormData) {
   await requireAuth();
 
-  const { fromYear, toYear } = parseJobYears(formData);
+  const { fromYear, toYear } = parseExperienceYears(formData);
   const jobTitle = formData.get("jobTitle") as string;
   const company = formData.get("company") as string;
   const description = formData.get("description") as string;
@@ -100,7 +93,7 @@ export async function createJob(formData: FormData) {
   const sortOrder =
     existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0;
 
-  const [job] = await db
+  const [experience] = await db
     .insert(schema.experiences)
     .values({
       fromYear,
@@ -115,18 +108,18 @@ export async function createJob(formData: FormData) {
   revalidatePath("/admin/experience");
   revalidatePath("/api/all");
 
-  return job;
+  return experience;
 }
 
-export async function updateJob(id: number, formData: FormData) {
+export async function updateExperience(id: number, formData: FormData) {
   await requireAuth();
 
-  const { fromYear, toYear } = parseJobYears(formData);
+  const { fromYear, toYear } = parseExperienceYears(formData);
   const jobTitle = formData.get("jobTitle") as string;
   const company = formData.get("company") as string;
   const description = formData.get("description") as string;
 
-  const [job] = await db
+  const [experience] = await db
     .update(schema.experiences)
     .set({
       fromYear,
@@ -141,10 +134,10 @@ export async function updateJob(id: number, formData: FormData) {
   revalidatePath("/admin/experience");
   revalidatePath("/api/all");
 
-  return job;
+  return experience;
 }
 
-export async function deleteJob(id: number) {
+export async function deleteExperience(id: number) {
   await requireAuth();
 
   await db.delete(schema.experiences).where(eq(schema.experiences.id, id));
@@ -153,7 +146,7 @@ export async function deleteJob(id: number) {
   revalidatePath("/api/all");
 }
 
-export async function reorderJobs(ids: number[]) {
+export async function reorderExperiences(ids: number[]) {
   await requireAuth();
 
   await Promise.all(
@@ -170,7 +163,7 @@ export async function reorderJobs(ids: number[]) {
 }
 
 // =============================================
-// EXPERIENCE (SKILLS) CRUD
+// SKILLS CRUD
 // =============================================
 
 export async function createSkill(formData: FormData) {
@@ -187,7 +180,7 @@ export async function createSkill(formData: FormData) {
   const sortOrder =
     existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0;
 
-  const [experience] = await db
+  const [created] = await db
     .insert(schema.skills)
     .values({
       skill,
@@ -199,7 +192,7 @@ export async function createSkill(formData: FormData) {
   revalidatePath("/admin/experience");
   revalidatePath("/api/all");
 
-  return experience;
+  return created;
 }
 
 export async function updateSkill(id: number, formData: FormData) {
@@ -208,7 +201,7 @@ export async function updateSkill(id: number, formData: FormData) {
   const skill = formData.get("skill") as string;
   const level = parseInt(formData.get("level") as string);
 
-  const [experience] = await db
+  const [updated] = await db
     .update(schema.skills)
     .set({
       skill,
@@ -220,7 +213,7 @@ export async function updateSkill(id: number, formData: FormData) {
   revalidatePath("/admin/experience");
   revalidatePath("/api/all");
 
-  return experience;
+  return updated;
 }
 
 export async function deleteSkill(id: number) {

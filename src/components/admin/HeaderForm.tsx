@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   reorderHeaderSections,
   togglePortfolioSection,
-  updatePageSection,
 } from '@/actions/header'
 import type { SectionKind } from '@/lib/db/constants'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
@@ -37,38 +37,6 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const router = useRouter()
-
-  const handleSectionSave = async (section: PageSection) => {
-    setLoading(true)
-    setMessage('')
-    try {
-      const savedSection = await updatePageSection(section.kind, {
-        navigationTitle: section.navigationTitle,
-        title: section.title ?? '',
-      })
-      setSections((previous) => previous.map((item) =>
-        item.kind === section.kind
-          ? {
-              ...item,
-              navigationTitle: savedSection.navigationTitle,
-              title: savedSection.title,
-            }
-          : item,
-      ))
-      setMessage('Section presentation saved.')
-      router.refresh()
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Failed to save section presentation')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const updateSectionDraft = (kind: SectionKind, field: 'navigationTitle' | 'title', value: string) => {
-    setSections((previous) => previous.map((section) =>
-      section.kind === kind ? { ...section, [field]: value } : section,
-    ))
-  }
 
   const handleToggle = async (section: PageSection) => {
     setLoading(true)
@@ -118,8 +86,8 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
       <section>
         <h2 className="text-lg font-semibold mb-1">Portfolio Page Layout</h2>
         <p className="text-sm text-gray-400 mb-4">
-          Set shared section titles, reorder sections, or hide a section. Section-specific
-          content and portfolio records are managed on their own pages.
+          Reorder sections or hide one. Titles, navigation labels and content are
+          edited on each section page.
         </p>
 
         <DragDropContext onDragEnd={onDragEnd}>
@@ -150,37 +118,22 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
                         <span className="self-start pt-2 text-xl" aria-hidden="true">
                           {sectionIcons[section.kind] || '📄'}
                         </span>
-                        <div className="min-w-0 flex-1 space-y-3">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm text-gray-400 font-mono">{section.kind}</span>
-                            <span className="text-xs text-gray-500">#{index + 1}</span>
+                        <div className="min-w-0 flex-1 flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm text-white">{section.navigationTitle}</p>
+                            <p className="truncate text-xs text-gray-400">
+                              <span className="font-mono">{section.kind}</span>
+                              {section.title ? ` · ${section.title}` : ''}
+                              {' · '}#{index + 1}
+                            </p>
                           </div>
-                          <div className="grid gap-3 md:grid-cols-3">
-                            {([
-                              ['navigationTitle', 'Navigation label'],
-                              ['title', 'Section title'],
-                            ] as const).map(([field, label]) => (
-                              <label key={field} className="block text-xs text-gray-400">
-                                {label}
-                                <input
-                                  type="text"
-                                  value={section[field] ?? ''}
-                                  onChange={(event) => updateSectionDraft(section.kind, field, event.target.value)}
-                                  disabled={loading}
-                                  className="mt-1 w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                                />
-                              </label>
-                            ))}
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <button
-                              type="button"
-                              onClick={() => void handleSectionSave(section)}
-                              disabled={loading}
-                              className="rounded-md bg-gray-700 px-3 py-1.5 text-sm text-cyan-400 transition hover:bg-gray-600 disabled:opacity-50"
+                          <div className="flex items-center gap-4">
+                            <Link
+                              href={`/admin/${section.kind}`}
+                              className="text-sm text-cyan-400 transition hover:text-cyan-300"
                             >
-                              Save section data
-                            </button>
+                              Edit
+                            </Link>
                             <label className="flex items-center gap-2 text-sm text-gray-300">
                               <input
                                 type="checkbox"

@@ -1,15 +1,18 @@
 import { getServices } from '@/actions/services'
 import ServiceItemsForm from '@/components/admin/ServiceItemsForm'
+import SectionSettingsForm from '@/components/admin/SectionSettingsForm'
 
 export default async function ServicesPage() {
-  const services = await getServices()
+  const { section, items } = await getServices()
 
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">Services</h1>
-      <p className="-mt-6 text-sm text-gray-400">
-        Edit the shared section titles and visibility in Page layout.
-      </p>
+
+      <div className="bg-gray-800 rounded-lg p-6">
+        <h2 className="text-lg font-semibold mb-4">Section settings</h2>
+        <SectionSettingsForm section={section} />
+      </div>
 
       {/* Service Items */}
       <div className="bg-gray-800 rounded-lg p-6">
@@ -17,7 +20,7 @@ export default async function ServicesPage() {
         <p className="text-sm text-gray-400 mb-4">
           Drag to reorder. Click Edit to modify.
         </p>
-        <ServiceItemsForm items={services.items || []} />
+        <ServiceItemsForm items={items} />
       </div>
     </div>
   )

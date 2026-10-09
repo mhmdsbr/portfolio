@@ -9,10 +9,10 @@ export default function Experience() {
   const { data: allData } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
 
-  const experience = allData?.summary;
+  const experience = allData?.experience;
   const sectionId = "experience";
   const title = experience?.title;
-  const experienceItems = experience?.jobs || [];
+  const experienceItems = experience?.experiences || [];
 
   useEffect(() => {
     if (experience && containerRef.current) {

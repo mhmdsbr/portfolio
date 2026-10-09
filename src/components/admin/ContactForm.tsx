@@ -3,20 +3,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateContact } from '@/actions/contact'
+import type { ContactConfig } from '@/lib/db/section-config'
 
 interface ContactFormProps {
-  initialData: {
-    id: number
-    formTitle: string | null
-    buttonText: string | null
-    buttonUrl: string | null
-  }
+  config: ContactConfig
 }
 
-export default function ContactForm({ initialData }: ContactFormProps) {
-  const [formTitle, setFormTitle] = useState(initialData.formTitle || '')
-  const [buttonText, setButtonText] = useState(initialData.buttonText || '')
-  const [buttonUrl, setButtonUrl] = useState(initialData.buttonUrl || '')
+export default function ContactForm({ config }: ContactFormProps) {
+  const [formTitle, setFormTitle] = useState(config.formTitle || '')
+  const [buttonText, setButtonText] = useState(config.buttonText || '')
+  const [buttonUrl, setButtonUrl] = useState(config.buttonUrl || '')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const router = useRouter()

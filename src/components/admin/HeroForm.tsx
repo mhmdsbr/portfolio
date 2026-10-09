@@ -4,24 +4,19 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateHero, updateHeroTitles } from '@/actions/hero'
 import Image from 'next/image'
+import type { HeroConfig } from '@/lib/db/section-config'
 
 interface HeroFormProps {
-  initialData: {
-    id: number
-    location: string | null
-    subtitleOne: string | null
-    subtitleTwo: string | null
-    logoUrl: string | null
-    titles: string[]
-  }
+  config: HeroConfig
+  titles: string[]
 }
 
-export default function HeroForm({ initialData }: HeroFormProps) {
-  const [location, setLocation] = useState(initialData.location || '')
-  const [subtitleOne, setSubtitleOne] = useState(initialData.subtitleOne || '')
-  const [subtitleTwo, setSubtitleTwo] = useState(initialData.subtitleTwo || '')
-  const [logoUrl, setLogoUrl] = useState(initialData.logoUrl || '')
-  const [titles, setTitles] = useState(initialData.titles.join(', '))
+export default function HeroForm({ config, titles: initialTitles }: HeroFormProps) {
+  const [location, setLocation] = useState(config.location || '')
+  const [subtitleOne, setSubtitleOne] = useState(config.subtitleOne || '')
+  const [subtitleTwo, setSubtitleTwo] = useState(config.subtitleTwo || '')
+  const [logoUrl, setLogoUrl] = useState(config.logoUrl || '')
+  const [titles, setTitles] = useState(initialTitles.join(', '))
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const router = useRouter()

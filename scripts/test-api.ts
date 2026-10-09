@@ -3,7 +3,7 @@ async function testAPI() {
     '/api/hero',
     '/api/about',
     '/api/services',
-    '/api/summary',
+    '/api/experience',
     '/api/testimonials',
     '/api/contact',
     '/api/footer',
