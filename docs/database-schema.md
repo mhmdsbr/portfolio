@@ -1,72 +1,48 @@
 # Database schema
 
 This diagram describes the Drizzle schema in `src/lib/db/schema.ts`. Solid
-relations are enforced foreign keys. Content tables without a relation are
-independent in the database, even if the API currently combines them into
-sections.
+relations are enforced foreign keys. Value sets (section kinds, icons, contact
+kinds, social platforms, verification purposes) and URL/slug patterns live in
+`src/lib/db/constants.ts` and are enforced with `CHECK` constraints, so the
+TypeScript types and the database cannot drift apart.
 
 ```mermaid
 erDiagram
     PAGE_SECTIONS {
         int id PK
-        text section_key UK
+        text kind UK "hero, about, experience, services, projects, testimonials, contact"
         text navigation_title
         text title
         int sort_order
         boolean is_enabled
-    }
-
-    HERO_SECTION {
-        int id PK
-        text section_key FK_UK
-        text location
-        text subtitle_one
-        text subtitle_two
-        text logo_url
-    }
-
-    ABOUT_SECTION {
-        int id PK
-        text section_key FK_UK
-        text button_text
-        text button_url
-    }
-
-    EXPERIENCE_SECTION {
-        int id PK
-        text section_key FK_UK
-        text button_text
-        text button_url
-    }
-
-    CONTACT_SECTION {
-        int id PK
-        text section_key FK_UK
-        text form_title
-        text button_text
-        text button_url
+        jsonb config "settings for this kind"
     }
 
     HERO_TITLES {
         int id PK
-        int hero_section_id FK
+        int section_id FK
         text title
         int sort_order
-    }
-
-    PORTFOLIO_PROFILE {
-        int id PK
-        text name
-        text job_title
-        text biography
     }
 
     CONTACT_METHODS {
         int id PK
-        enum kind
+        text kind "email, phone, address, other"
         text title
         text value
         int sort_order
+    }
+
+    CONTACT_METHOD_SECTIONS {
+        int contact_method_id PK_FK
+        int section_id PK_FK
+    }
+
+    PROFILE {
+        int id PK "always 1"
+        text name
+        text job_title
+        text biography
     }
 
     PROFILE_FACTS {
@@ -89,7 +65,7 @@ erDiagram
     SKILLS {
         int id PK
         text skill
-        int level
+        int level "0 to 100"
         int sort_order
     }
 
@@ -97,14 +73,21 @@ erDiagram
         int id PK
         text title
         text description
-        enum icon
+        text icon
         int sort_order
+    }
+
+    PROJECT_CATEGORIES {
+        int id PK
+        text name UK "case-insensitive"
+        text slug UK
     }
 
     PROJECTS {
         int id PK
+        text slug UK
         text title
-        text category
+        int category_id FK
         text description
         text image
         text link
@@ -120,7 +103,7 @@ erDiagram
 
     TECHNOLOGIES {
         int id PK
-        text name UK
+        text name UK "case-insensitive"
     }
 
     PROJECT_TECHNOLOGIES {
@@ -139,38 +122,26 @@ erDiagram
         int sort_order
     }
 
-    SIDEBAR {
-        int id PK
-        text profile_image_url
-        text profile_image_alt
-        text profile_title
-    }
-
     SOCIAL_LINKS {
         int id PK
-        text platform
+        text platform UK
         text url
         int sort_order
     }
 
-    FOOTER {
-        int id PK
+    SITE_CONFIG {
+        int id PK "always 1"
         text company_name
-        text terms_policies
         text privacy_policy
         text terms_of_service
         text disclaimer
         text copyright_text
-    }
-
-    APP_CONFIG {
-        int id PK
         text recaptcha_site_key
     }
 
     ADMIN_USERS {
         int id PK
-        text email UK
+        text email UK "case-insensitive"
         text password_hash
         boolean is_active
     }
@@ -196,41 +167,92 @@ erDiagram
         text password_hash
         int created_by_user_id FK
         timestamp expires_at
+        timestamp consumed_at
     }
 
-    PAGE_SECTIONS ||--o| HERO_SECTION : "section_key"
-    PAGE_SECTIONS ||--o| ABOUT_SECTION : "section_key"
-    PAGE_SECTIONS ||--o| EXPERIENCE_SECTION : "section_key"
-    PAGE_SECTIONS ||--o| CONTACT_SECTION : "section_key"
-    HERO_SECTION ||--o{ HERO_TITLES : "hero_section_id"
+    PAGE_SECTIONS ||--o{ HERO_TITLES : "section_id"
+    PAGE_SECTIONS ||--o{ CONTACT_METHOD_SECTIONS : "section_id"
+    CONTACT_METHODS ||--o{ CONTACT_METHOD_SECTIONS : "contact_method_id"
+
+    PROJECT_CATEGORIES ||--o{ PROJECTS : "category_id"
+    PROJECTS ||--o{ PROJECT_ROLES : "project_id"
+    PROJECTS ||--o{ PROJECT_TECHNOLOGIES : "project_id"
+    TECHNOLOGIES ||--o{ PROJECT_TECHNOLOGIES : "technology_id"
 
     ADMIN_USERS ||--o| ADMIN_PROFILES : "user_id"
     ADMIN_USERS ||--o{ ADMIN_SESSIONS : "user_id"
     ADMIN_USERS o|--o{ ADMIN_EMAIL_VERIFICATIONS : "created_by_user_id"
-    PROJECTS ||--o{ PROJECT_ROLES : "project_id"
-    PROJECTS ||--o{ PROJECT_TECHNOLOGIES : "project_id"
-    TECHNOLOGIES ||--o{ PROJECT_TECHNOLOGIES : "technology_id"
 ```
 
-`PROJECTS` has a many-to-many relationship with `TECHNOLOGIES` through
-`PROJECT_TECHNOLOGIES`. Project roles are ordered records owned by one project
-in `PROJECT_ROLES`.
+## Conventions
 
-## App-level section associations
+- Content tables have `created_at` and `updated_at`, defined once by the
+  `timestamps()` helper in `schema.ts`. Join tables have neither;
+  `technologies`, `admin_sessions` and `admin_email_verifications` only have
+  `created_at`.
+- Ordered lists use `sort_order`; queries break ties with `id`
+  (`src/lib/db/order.ts`).
+- Empty form values are stored as `NULL`, never as empty strings.
+- URL columns are checked against `WEB_URL_PATTERN` (absolute http(s)),
+  `ASSET_URL_PATTERN` (http(s) or site path) or `LINK_URL_PATTERN` (also anchors,
+  `mailto:` and `tel:`).
 
-These associations are used by the current API and UI, but are **not** enforced
-by foreign keys:
+## Page sections
 
-| Page section | Data returned with that section |
+`page_sections` has exactly one row per section `kind`. The code looks sections
+up by kind through the typed constants in `src/lib/db/constants.ts`; there are
+no section names in the queries themselves.
+
+Section-specific settings are stored in `page_sections.config` (jsonb). Their
+shape is defined per kind in `src/lib/db/section-config.ts`, which also
+validates input on write and fills defaults on read:
+
+| Kind | `config` keys |
 | --- | --- |
-| `hero` | `hero_section`, `hero_titles` |
-| `about` | `about_section`, `profile`, `contact_methods`, `profile_facts` |
-| `experience` | `experience_section`, `experiences`, `skills` |
-| `services` | `services` |
-| `projects` | `projects` |
-| `testimonials` | `testimonials` |
-| `contact` | `contact_section`, `contact_methods` |
+| `hero` | `location`, `subtitleOne`, `subtitleTwo`, `logoUrl` |
+| `about` | `buttonText`, `buttonUrl` |
+| `experience` | `buttonText`, `buttonUrl` |
+| `contact` | `formTitle`, `buttonText`, `buttonUrl` |
+| `services`, `projects`, `testimonials` | none |
 
-The schema also contains independent site-level tables: `social_links` and
-the singleton `site_config`, which stores footer and runtime configuration.
-No foreign keys currently connect these tables to each other.
+`hero_titles` belong to the `hero` section through `section_id`.
+
+## Content shown by each section
+
+| Section | Data returned with it |
+| --- | --- |
+| `hero` | `config`, `hero_titles` |
+| `about` | `config`, `profile`, `profile_facts`, contact methods linked to it |
+| `experience` | `config`, `experiences`, `skills` |
+| `services` | `services` |
+| `projects` | `projects`, `project_categories`, `project_roles`, `technologies` |
+| `testimonials` | `testimonials` |
+| `contact` | `config`, contact methods linked to it |
+
+Contact methods are shared records. `contact_method_sections` says which
+sections (`about`, `contact`, or both) display each method; a method linked to
+neither is hidden.
+
+## Projects
+
+- `projects.slug` is the stable public URL segment. It is generated from the
+  title on creation (with `-2`, `-3`, ... on collisions) and is not changed by
+  later title edits.
+- Categories are rows in `project_categories` (unique case-insensitive name and
+  unique slug). The admin form still takes a category name; it reuses the
+  matching category or creates one, and categories without projects are
+  removed.
+- Deleting a category that still has projects is rejected (`ON DELETE RESTRICT`).
+
+## Site-level tables
+
+`social_links` (unique `platform`, restricted to the platforms in
+`SOCIAL_PLATFORMS`) and the singleton `site_config` (footer text and runtime
+configuration) are independent of the section tables.
+
+## Migrations
+
+`drizzle/0000_baseline.sql` creates the whole schema for new databases. For
+databases created from the previous schema, `npm run db:upgrade` runs
+`scripts/sql/upgrade-section-config.sql`, which converts the data in place and
+fails without changes if anything does not fit the new constraints.

@@ -5,6 +5,7 @@ import * as schema from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
+import { optionalUrl } from '@/lib/validation'
 
 // =============================================
 // GET
@@ -27,7 +28,7 @@ export async function getTestimonials() {
 export async function createTestimonialItem(formData: FormData) {
   await requireAuth()
   
-  const imageUrl = formData.get('imageUrl') as string
+  const imageUrl = optionalUrl(formData.get('imageUrl'), 'Image URL', 'asset')
   const title = formData.get('title') as string
   const subtitle = formData.get('subtitle') as string
   const ratingValue = String(formData.get('rating') ?? '').trim()
@@ -45,7 +46,7 @@ export async function createTestimonialItem(formData: FormData) {
   
   const [item] = await db.insert(schema.testimonials)
     .values({
-      imageUrl: imageUrl || null,
+      imageUrl,
       title,
       subtitle: subtitle || null,
       rating,
@@ -63,7 +64,7 @@ export async function createTestimonialItem(formData: FormData) {
 export async function updateTestimonialItem(id: number, formData: FormData) {
   await requireAuth()
   
-  const imageUrl = formData.get('imageUrl') as string
+  const imageUrl = optionalUrl(formData.get('imageUrl'), 'Image URL', 'asset')
   const title = formData.get('title') as string
   const subtitle = formData.get('subtitle') as string
   const ratingValue = String(formData.get('rating') ?? '').trim()
@@ -75,7 +76,7 @@ export async function updateTestimonialItem(id: number, formData: FormData) {
   
   const [item] = await db.update(schema.testimonials)
     .set({
-      imageUrl: imageUrl || null,
+      imageUrl,
       title,
       subtitle: subtitle || null,
       rating,

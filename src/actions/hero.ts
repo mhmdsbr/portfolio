@@ -5,6 +5,12 @@ import * as schema from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
+import {
+  getSection,
+  requireSectionId,
+  updateSectionConfig,
+} from '@/lib/db/sections'
+import { requiredText } from '@/lib/validation'
 
 // =============================================
 // GET
@@ -13,23 +19,20 @@ import { requireAuth } from '@/lib/auth'
 export async function getHero() {
   await requireAuth()
 
-  const [hero] = await db.select()
-    .from(schema.heroSection)
-    .limit(1)
-
-  const titles = hero
+  const section = await getSection('hero')
+  const titles = section
     ? await db.select()
         .from(schema.heroTitles)
-        .where(eq(schema.heroTitles.heroSectionKey, hero.sectionKey))
+        .where(eq(schema.heroTitles.sectionId, section.id))
         .orderBy(asc(schema.heroTitles.sortOrder), asc(schema.heroTitles.id))
     : []
 
   return {
     id: 0,
-    location: hero?.location ?? null,
-    subtitleOne: hero?.subtitleOne ?? null,
-    subtitleTwo: hero?.subtitleTwo ?? null,
-    logoUrl: hero?.logoUrl ?? null,
+    location: section?.config.location ?? null,
+    subtitleOne: section?.config.subtitleOne ?? null,
+    subtitleTwo: section?.config.subtitleTwo ?? null,
+    logoUrl: section?.config.logoUrl ?? null,
     titles: titles.map(t => t.title),
   }
 }
@@ -41,36 +44,17 @@ export async function getHero() {
 export async function updateHero(formData: FormData) {
   await requireAuth()
 
-  const location = formData.get('location') as string
-  const subtitleOne = formData.get('subtitleOne') as string
-  const subtitleTwo = formData.get('subtitleTwo') as string
-  const logoUrl = formData.get('logoUrl') as string
-
-  const values = {
-    location: location || null,
-    subtitleOne: subtitleOne || null,
-    subtitleTwo: subtitleTwo || null,
-    logoUrl: logoUrl || null,
-  }
-
-  const [existingHero] = await db.select()
-    .from(schema.heroSection)
-    .where(eq(schema.heroSection.sectionKey, 'hero'))
-    .limit(1)
-
-  const [hero] = existingHero
-    ? await db.update(schema.heroSection)
-        .set(values)
-        .where(eq(schema.heroSection.sectionKey, existingHero.sectionKey))
-        .returning()
-    : await db.insert(schema.heroSection)
-        .values({ ...values, sectionKey: 'hero' })
-        .returning()
+  const { config } = await updateSectionConfig('hero', {
+    location: formData.get('location'),
+    subtitleOne: formData.get('subtitleOne'),
+    subtitleTwo: formData.get('subtitleTwo'),
+    logoUrl: formData.get('logoUrl'),
+  })
 
   revalidatePath('/admin/hero')
   revalidatePath('/api/all')
 
-  return hero
+  return config
 }
 
 // =============================================
@@ -80,24 +64,19 @@ export async function updateHero(formData: FormData) {
 export async function updateHeroTitles(titles: string[]) {
   await requireAuth()
 
+  const cleanTitles = titles.map((title) => requiredText(title, 'Hero title'))
+
   await db.transaction(async (transaction) => {
-    let [hero] = await transaction.select()
-      .from(schema.heroSection)
-      .where(eq(schema.heroSection.sectionKey, 'hero'))
-      .limit(1)
-    if (!hero) {
-      [hero] = await transaction.insert(schema.heroSection)
-        .values({ sectionKey: 'hero' })
-        .returning()
-    }
+    const sectionId = await requireSectionId('hero', transaction)
 
     await transaction.delete(schema.heroTitles)
-    if (titles.length > 0) {
+      .where(eq(schema.heroTitles.sectionId, sectionId))
+    if (cleanTitles.length > 0) {
       await transaction.insert(schema.heroTitles)
         .values(
-          titles.map((title, index) => ({
-            heroSectionKey: hero.sectionKey,
-            title: title.trim(),
+          cleanTitles.map((title, index) => ({
+            sectionId,
+            title,
             sortOrder: index,
           }))
         )

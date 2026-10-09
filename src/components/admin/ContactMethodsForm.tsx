@@ -9,7 +9,11 @@ import {
   reorderContactMethods,
 } from '@/actions/contact'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
-import type { ContactMethodKind } from '@/lib/db/schema'
+import {
+  CONTACT_METHOD_SECTION_KINDS,
+  type ContactMethodKind,
+  type ContactMethodSectionKind,
+} from '@/lib/db/constants'
 
 interface ContactMethod {
   id: number
@@ -17,6 +21,7 @@ interface ContactMethod {
   title: string
   value: string
   sortOrder: number | null
+  sections: ContactMethodSectionKind[]
 }
 
 interface ContactMethodsFormProps {
@@ -30,18 +35,31 @@ const methodKinds: Array<{ value: ContactMethodKind; label: string }> = [
   { value: 'other', label: 'Other' },
 ]
 
+const sectionLabels: Record<ContactMethodSectionKind, string> = {
+  about: 'About',
+  contact: 'Contact',
+}
+
 export default function ContactMethodsForm({ contactMethods }: ContactMethodsFormProps) {
   const [items, setItems] = useState(contactMethods)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editKind, setEditKind] = useState<ContactMethodKind>('other')
   const [editTitle, setEditTitle] = useState('')
   const [editContent, setEditContent] = useState('')
+  const [editSections, setEditSections] = useState<ContactMethodSectionKind[]>([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const router = useRouter()
   const setKindFromInput = (value: string) => {
     const kind = methodKinds.find((option) => option.value === value)
     if (kind) setEditKind(kind.value)
+  }
+  const toggleEditSection = (section: ContactMethodSectionKind) => {
+    setEditSections((current) =>
+      current.includes(section)
+        ? current.filter((item) => item !== section)
+        : [...current, section],
+    )
   }
 
   const handleCreate = async (formData: FormData) => {
@@ -67,6 +85,7 @@ export default function ContactMethodsForm({ contactMethods }: ContactMethodsFor
     formData.set('title', editTitle)
     formData.set('value', editContent)
     formData.set('kind', editKind)
+    editSections.forEach((section) => formData.append('sections', section))
     
     try {
       const method = await updateContactMethod(id, formData)
@@ -157,6 +176,15 @@ export default function ContactMethodsForm({ contactMethods }: ContactMethodsFor
             required
           />
         </div>
+        <fieldset className="flex gap-3 pb-2">
+          <legend className="sr-only">Shown in</legend>
+          {CONTACT_METHOD_SECTION_KINDS.map((section) => (
+            <label key={section} className="flex items-center gap-1 text-sm text-gray-300">
+              <input type="checkbox" name="sections" value={section} defaultChecked />
+              {sectionLabels[section]}
+            </label>
+          ))}
+        </fieldset>
         <button
           type="submit"
           disabled={loading}
@@ -219,6 +247,18 @@ export default function ContactMethodsForm({ contactMethods }: ContactMethodsFor
                             className="flex-1 px-2 py-1 bg-gray-700 border border-cyan-500 rounded text-white focus:outline-none"
                             placeholder="Content"
                           />
+                          <div className="flex gap-2">
+                            {CONTACT_METHOD_SECTION_KINDS.map((section) => (
+                              <label key={section} className="flex items-center gap-1 text-xs text-gray-300">
+                                <input
+                                  type="checkbox"
+                                  checked={editSections.includes(section)}
+                                  onChange={() => toggleEditSection(section)}
+                                />
+                                {sectionLabels[section]}
+                              </label>
+                            ))}
+                          </div>
                           <button
                             onClick={() => handleUpdate(item.id)}
                             disabled={loading}
@@ -241,12 +281,18 @@ export default function ContactMethodsForm({ contactMethods }: ContactMethodsFor
                           <span className="flex-1 text-gray-300">
                             {item.value}
                           </span>
+                          <span className="text-xs text-gray-500">
+                            {item.sections.length > 0
+                              ? item.sections.map((section) => sectionLabels[section]).join(' · ')
+                              : 'Hidden'}
+                          </span>
                           <button
                             onClick={() => {
                               setEditingId(item.id)
                               setEditKind(item.kind)
                               setEditTitle(item.title)
                               setEditContent(item.value)
+                              setEditSections(item.sections)
                             }}
                             className="text-cyan-400 hover:text-cyan-300 transition"
                           >

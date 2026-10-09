@@ -2,11 +2,17 @@
 
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { asc, eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
-
-const contactMethodKinds = schema.contactMethodKindEnum.enumValues
+import { CONTACT_METHOD_KINDS } from '@/lib/db/constants'
+import { getSection, updateSectionConfig } from '@/lib/db/sections'
+import {
+  getContactMethodsWithSections,
+  parseContactMethodSections,
+  setContactMethodSections,
+} from '@/lib/contact-methods'
+import { requiredText } from '@/lib/validation'
 
 // =============================================
 // GET
@@ -15,23 +21,16 @@ const contactMethodKinds = schema.contactMethodKindEnum.enumValues
 export async function getContact() {
   await requireAuth()
 
-  const [[contact], [section], contactMethods] = await Promise.all([
-    db.select().from(schema.contactSection).limit(1),
-    db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'contact')).limit(1),
-    db.select().from(schema.contactMethods).orderBy(
-      asc(schema.contactMethods.sortOrder),
-      asc(schema.contactMethods.id),
-    ),
+  const [section, contactMethods] = await Promise.all([
+    getSection('contact'),
+    getContactMethodsWithSections(),
   ])
 
   return {
-    ...(contact || {
-      id: 0,
-      formTitle: null,
-      buttonText: null,
-      buttonUrl: null,
-    }),
     id: 0,
+    formTitle: section?.config.formTitle ?? null,
+    buttonText: section?.config.buttonText ?? null,
+    buttonUrl: section?.config.buttonUrl ?? null,
     title: section?.title ?? null,
     contactMethods,
   }
@@ -44,78 +43,74 @@ export async function getContact() {
 export async function updateContact(formData: FormData) {
   await requireAuth()
 
-  const formTitle = formData.get('formTitle') as string
-  const buttonText = formData.get('buttonText') as string
-  const buttonUrl = formData.get('buttonUrl') as string
-
-  const values = {
-    formTitle: formTitle || null,
-    buttonText: buttonText || null,
-    buttonUrl: buttonUrl || null,
-  }
-  const [existingContact] = await db.select()
-    .from(schema.contactSection)
-    .where(eq(schema.contactSection.sectionKey, 'contact'))
-    .limit(1)
-  const [contact] = existingContact
-    ? await db.update(schema.contactSection).set(values)    .where(eq(schema.contactSection.sectionKey, existingContact.sectionKey)).returning()
-    : await db.insert(schema.contactSection)
-        .values({ ...values, sectionKey: 'contact' })
-        .returning()
+  const { config } = await updateSectionConfig('contact', {
+    formTitle: formData.get('formTitle'),
+    buttonText: formData.get('buttonText'),
+    buttonUrl: formData.get('buttonUrl'),
+  })
 
   revalidatePath('/admin/contact')
   revalidatePath('/api/all')
   revalidatePath('/api/contact')
 
-  return contact
+  return config
 }
 
 function getContactMethodKind(formData: FormData): schema.ContactMethodKind {
   const kind = formData.get('kind')
-  const validKind = contactMethodKinds.find((candidate) => candidate === kind)
+  const validKind = CONTACT_METHOD_KINDS.find((candidate) => candidate === kind)
   if (!validKind) {
     throw new Error('Invalid contact method kind')
   }
   return validKind
 }
 
+function parseContactMethodForm(formData: FormData) {
+  return {
+    kind: getContactMethodKind(formData),
+    title: requiredText(formData.get('title'), 'Contact method title'),
+    value: requiredText(formData.get('value'), 'Contact method value'),
+    sections: parseContactMethodSections(formData.getAll('sections')),
+  }
+}
+
 export async function createContactMethod(formData: FormData) {
   await requireAuth()
-  const kind = getContactMethodKind(formData)
-  const title = String(formData.get('title') ?? '').trim()
-  const value = String(formData.get('value') ?? '').trim()
-  if (!title || !value) throw new Error('Contact method title and value are required')
+  const { sections, ...values } = parseContactMethodForm(formData)
 
-  const existing = await db.select()
-    .from(schema.contactMethods)
-    .orderBy(asc(schema.contactMethods.sortOrder), asc(schema.contactMethods.id))
-  const sortOrder = existing.length > 0
-    ? (existing[existing.length - 1].sortOrder ?? -1) + 1
-    : 0
+  const method = await db.transaction(async (transaction) => {
+    const [last] = await transaction.select({ sortOrder: schema.contactMethods.sortOrder })
+      .from(schema.contactMethods)
+      .orderBy(desc(schema.contactMethods.sortOrder), desc(schema.contactMethods.id))
+      .limit(1)
 
-  const [method] = await db.insert(schema.contactMethods)
-    .values({ kind, title, value, sortOrder })
-    .returning()
+    const [created] = await transaction.insert(schema.contactMethods)
+      .values({ ...values, sortOrder: last ? last.sortOrder + 1 : 0 })
+      .returning()
+    await setContactMethodSections(transaction, created.id, sections)
+    return created
+  })
 
   revalidateContactMethods()
-  return method
+  return { ...method, sections }
 }
 
 export async function updateContactMethod(id: number, formData: FormData) {
   await requireAuth()
-  const kind = getContactMethodKind(formData)
-  const title = String(formData.get('title') ?? '').trim()
-  const value = String(formData.get('value') ?? '').trim()
-  if (!title || !value) throw new Error('Contact method title and value are required')
+  const { sections, ...values } = parseContactMethodForm(formData)
 
-  const [method] = await db.update(schema.contactMethods)
-    .set({ kind, title, value })
-    .where(eq(schema.contactMethods.id, id))
-    .returning()
-  if (!method) throw new Error('Contact method not found')
+  const method = await db.transaction(async (transaction) => {
+    const [updated] = await transaction.update(schema.contactMethods)
+      .set(values)
+      .where(eq(schema.contactMethods.id, id))
+      .returning()
+    if (!updated) throw new Error('Contact method not found')
+    await setContactMethodSections(transaction, id, sections)
+    return updated
+  })
 
   revalidateContactMethods()
-  return method
+  return { ...method, sections }
 }
 
 export async function deleteContactMethod(id: number) {

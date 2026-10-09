@@ -2,6 +2,12 @@
 // Response Types for New API
 // =============================================
 
+import type {
+  ContactMethodKind,
+  SectionKind,
+  ServiceIcon,
+} from '@/lib/db/constants';
+
 export interface Button {
   text: string | null;
   url: string | null;
@@ -26,7 +32,7 @@ export interface AboutResponse {
   description: string | null;
   button: Button;
   contact_information: Array<{
-    kind: 'email' | 'phone' | 'address' | 'other';
+    kind: ContactMethodKind;
     title: string;
     value: string;
   }>;
@@ -41,7 +47,7 @@ export interface ServicesResponse {
   items: Array<{
     title: string;
     description: string | null;
-    icon: string | null;
+    icon: ServiceIcon | null;
   }>;
 }
 
@@ -63,8 +69,10 @@ export interface SummaryResponse {
 
 export interface Project {
   id: number;
+  slug: string;
   title: string;
   category: string;
+  category_slug: string;
   description: string | null;
   image: string | null;
   link: string | null;
@@ -95,7 +103,7 @@ export interface ContactResponse {
   button: Button;
   methods: Array<{
     id: number;
-    kind: 'email' | 'phone' | 'address' | 'other';
+    kind: ContactMethodKind;
     title: string;
     value: string;
   }>;
@@ -107,10 +115,10 @@ export interface ConfigResponse {
 
 export interface PageSection {
   id: number;
-  sectionKey: string;
+  kind: SectionKind;
   navigationTitle: string;
   title: string | null;
-  sortOrder: number | null;
+  sortOrder: number;
   isEnabled: boolean;
 }
 

@@ -2,12 +2,30 @@
 
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { eq, sql } from 'drizzle-orm'
+import { eq, inArray, sql } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
-import { getProjectById, getProjects as getProjectsWithDetails } from '@/lib/projects'
+import {
+  createProjectSlug,
+  findOrCreateCategory,
+  getProjectById,
+  getProjects as getProjectsWithDetails,
+  pruneEmptyCategories,
+} from '@/lib/projects'
+import { optionalText, optionalUrl, requiredText } from '@/lib/validation'
 
 type ProjectTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
+function parseProjectForm(formData: FormData) {
+  return {
+    title: requiredText(formData.get('title'), 'Project title'),
+    category: requiredText(formData.get('category'), 'Project category'),
+    description: optionalText(formData.get('description')),
+    image: optionalUrl(formData.get('image'), 'Image', 'asset'),
+    link: optionalUrl(formData.get('link'), 'Link', 'web'),
+    githubUrl: optionalUrl(formData.get('githubUrl'), 'GitHub URL', 'web'),
+  }
+}
 
 function parseLines(value: FormDataEntryValue | null) {
   if (typeof value !== 'string') return []
@@ -55,10 +73,10 @@ async function replaceProjectDetails(
     id: schema.technologies.id,
     name: schema.technologies.name,
   }).from(schema.technologies)
-    .where(sql`lower(${schema.technologies.name}) IN ${sql.join(
-      technologyNames.map((name) => sql`${name.toLocaleLowerCase()}`),
-      sql`, `,
-    )}`)
+    .where(inArray(
+      sql`lower(${schema.technologies.name})`,
+      technologyNames.map((name) => name.toLocaleLowerCase()),
+    ))
   const technologyIds = new Map(
     technologies.map(({ id, name }) => [name.toLocaleLowerCase(), id]),
   )
@@ -89,25 +107,17 @@ export async function getProject(id: number) {
 // Create project
 export async function createProject(formData: FormData) {
   await requireAuth()
-  
-  const title = formData.get('title') as string
-  const category = formData.get('category') as string
-  const description = formData.get('description') as string
+
+  const { category, ...values } = parseProjectForm(formData)
   const roles = parseLines(formData.get('roles'))
-  const image = formData.get('image') as string
-  const link = formData.get('link') as string
-  const githubUrl = formData.get('githubUrl') as string
   const tech = parseTechnologies(formData.get('tech'))
 
   const project = await db.transaction(async (transaction) => {
     const [createdProject] = await transaction.insert(schema.projects)
       .values({
-        title,
-        category,
-        description: description || null,
-        image: image || null,
-        link: link || null,
-        githubUrl: githubUrl || null,
+        ...values,
+        slug: await createProjectSlug(transaction, values.title),
+        categoryId: await findOrCreateCategory(transaction, category),
       })
       .returning()
 
@@ -124,25 +134,16 @@ export async function createProject(formData: FormData) {
 // Update project
 export async function updateProject(id: number, formData: FormData) {
   await requireAuth()
-  
-  const title = formData.get('title') as string
-  const category = formData.get('category') as string
-  const description = formData.get('description') as string
+
+  const { category, ...values } = parseProjectForm(formData)
   const roles = parseLines(formData.get('roles'))
-  const image = formData.get('image') as string
-  const link = formData.get('link') as string
-  const githubUrl = formData.get('githubUrl') as string
   const tech = parseTechnologies(formData.get('tech'))
 
   const project = await db.transaction(async (transaction) => {
     const [updatedProject] = await transaction.update(schema.projects)
       .set({
-        title,
-        category,
-        description: description || null,
-        image: image || null,
-        link: link || null,
-        githubUrl: githubUrl || null,
+        ...values,
+        categoryId: await findOrCreateCategory(transaction, category),
       })
       .where(eq(schema.projects.id, id))
       .returning()
@@ -151,6 +152,7 @@ export async function updateProject(id: number, formData: FormData) {
       throw new Error(`Project ${id} was not found`)
     }
     await replaceProjectDetails(transaction, id, roles, tech)
+    await pruneEmptyCategories(transaction)
     return updatedProject
   })
   
@@ -163,9 +165,12 @@ export async function updateProject(id: number, formData: FormData) {
 // Delete project
 export async function deleteProject(id: number) {
   await requireAuth()
-  
-  await db.delete(schema.projects)
-    .where(eq(schema.projects.id, id))
+
+  await db.transaction(async (transaction) => {
+    await transaction.delete(schema.projects)
+      .where(eq(schema.projects.id, id))
+    await pruneEmptyCategories(transaction)
+  })
   
   revalidatePath('/admin/projects')
   revalidatePath('/api/all')
@@ -212,7 +217,7 @@ export async function updateProjectCategoriesAndTech(
       const [updatedProject] = await transaction
         .update(schema.projects)
         .set({
-          category: category.trim(),
+          categoryId: await findOrCreateCategory(transaction, category),
         })
         .where(eq(schema.projects.id, id))
         .returning({ id: schema.projects.id })
@@ -224,6 +229,7 @@ export async function updateProjectCategoriesAndTech(
       const normalizedTech = normalizeTechnologies(tech)
       await replaceProjectDetails(transaction, id, null, normalizedTech)
     }
+    await pruneEmptyCategories(transaction)
   })
 
   revalidatePath('/admin/projects')

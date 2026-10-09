@@ -1,5 +1,8 @@
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
+import type { SectionKind } from "@/lib/db/constants";
+import { readSectionConfig } from "@/lib/db/section-config";
+import { getContactMethodsWithSections } from "@/lib/contact-methods";
 import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import type { ApiResponse, AllDataResponse } from "@/types/api";
@@ -13,44 +16,30 @@ export async function GET(): Promise<
     // Fetch all data in parallel
     const [
       profileData,
-      socialData,
-      heroData,
       heroTitlesData,
-      aboutData,
       contactMethodsData,
       profileFactsData,
       servicesData,
-      summaryData,
       experiencesData,
       skillsData,
       testimonialsItemsData,
       projectsData,
       projectTechData,
       projectRolesData,
-      contactData,
       siteConfigData,
       pageSectionsData,
     ] = await Promise.all([
       db.select().from(schema.profile).limit(1),
       db
-        .select()
-        .from(schema.socialLinks)
-        .orderBy(asc(schema.socialLinks.sortOrder), asc(schema.socialLinks.id)),
-      db.select().from(schema.heroSection).limit(1),
-      db
         .select({ title: schema.heroTitles.title })
         .from(schema.heroTitles)
         .innerJoin(
-          schema.heroSection,
-          eq(schema.heroSection.sectionKey, schema.heroTitles.heroSectionKey),
+          schema.pageSections,
+          eq(schema.pageSections.id, schema.heroTitles.sectionId),
         )
-        .where(eq(schema.heroSection.sectionKey, 'hero'))
+        .where(eq(schema.pageSections.kind, "hero"))
         .orderBy(asc(schema.heroTitles.sortOrder), asc(schema.heroTitles.id)),
-      db.select().from(schema.aboutSection).limit(1),
-      db
-        .select()
-        .from(schema.contactMethods)
-        .orderBy(asc(schema.contactMethods.sortOrder), asc(schema.contactMethods.id)),
+      getContactMethodsWithSections(),
       db
         .select()
         .from(schema.profileFacts)
@@ -59,7 +48,6 @@ export async function GET(): Promise<
         .select()
         .from(schema.services)
         .orderBy(asc(schema.services.sortOrder), asc(schema.services.id)),
-      db.select().from(schema.experienceSection).limit(1),
       db
         .select()
         .from(schema.experiences)
@@ -73,10 +61,17 @@ export async function GET(): Promise<
         .from(schema.testimonials)
         .orderBy(asc(schema.testimonials.sortOrder), asc(schema.testimonials.id)),
       db
-        .select()
+        .select({
+          project: schema.projects,
+          category: schema.projectCategories.name,
+          categorySlug: schema.projectCategories.slug,
+        })
         .from(schema.projects)
+        .innerJoin(
+          schema.projectCategories,
+          eq(schema.projectCategories.id, schema.projects.categoryId),
+        )
         .orderBy(asc(schema.projects.sortOrder), asc(schema.projects.id)),
-      // tech links (normalized from projects.tech text[])
       db
         .select({
           projectId: schema.projectTechnologies.projectId,
@@ -93,7 +88,6 @@ export async function GET(): Promise<
           asc(schema.projectTechnologies.projectId),
           asc(schema.projectTechnologies.technologyId),
         ),
-      // role links (normalized from projects.roles text[])
       db
         .select({
           projectId: schema.projectRoles.projectId,
@@ -106,7 +100,6 @@ export async function GET(): Promise<
           asc(schema.projectRoles.projectId),
           asc(schema.projectRoles.role),
         ),
-      db.select().from(schema.contactSection).limit(1),
       db.select().from(schema.siteConfig).limit(1),
       db
         .select()
@@ -114,23 +107,20 @@ export async function GET(): Promise<
         .orderBy(asc(schema.pageSections.sortOrder), asc(schema.pageSections.id)),
     ]);
 
-    // Extract first records
     const profile = profileData[0];
-    const hero = heroData[0];
-    const about = aboutData[0];
-    const summary = summaryData[0];
-    const contact = contactData[0];
     const configRecord = siteConfigData[0];
-    const sectionMetadata = new Map(pageSectionsData.map((section) => [section.sectionKey, section]));
-
-    // Transform social media
-    const socialMediaMap = socialData.reduce<Record<string, string>>(
-      (acc, item) => {
-        acc[item.platform] = item.url;
-        return acc;
-      },
-      {},
+    const sectionsByKind = new Map(
+      pageSectionsData.map((section) => [section.kind, section]),
     );
+    const sectionTitle = (kind: SectionKind) =>
+      sectionsByKind.get(kind)?.title ?? null;
+    const sectionConfig = <K extends SectionKind>(kind: K) =>
+      readSectionConfig(kind, sectionsByKind.get(kind)?.config);
+
+    const hero = sectionConfig("hero");
+    const about = sectionConfig("about");
+    const summary = sectionConfig("experience");
+    const contact = sectionConfig("contact");
 
     // Group normalized tech + roles by projectId
     const techByProject = projectTechData.reduce<
@@ -146,24 +136,27 @@ export async function GET(): Promise<
       return acc;
     }, {});
 
+    const methodsFor = (kind: "about" | "contact") =>
+      contactMethodsData.filter((method) => method.sections.includes(kind));
+
     const response: AllDataResponse = {
       hero: {
         titles: heroTitlesData.map(({ title }) => title),
-        location: hero?.location ?? null,
-        subtitle_one: hero?.subtitleOne ?? null,
-        subtitle_two: hero?.subtitleTwo ?? null,
-        logo: hero?.logoUrl ?? null,
+        location: hero.location,
+        subtitle_one: hero.subtitleOne,
+        subtitle_two: hero.subtitleTwo,
+        logo: hero.logoUrl,
       },
       about: {
-        title: sectionMetadata.get("about")?.title ?? null,
+        title: sectionTitle("about"),
         name: profile?.name ?? null,
         job_title: profile?.jobTitle ?? null,
         description: profile?.biography ?? null,
         button: {
-          text: about?.buttonText ?? null,
-          url: about?.buttonUrl ?? null,
+          text: about.buttonText,
+          url: about.buttonUrl,
         },
-        contact_information: contactMethodsData.map((info) => ({
+        contact_information: methodsFor("about").map((info) => ({
           kind: info.kind,
           title: info.title,
           value: info.value,
@@ -174,7 +167,7 @@ export async function GET(): Promise<
         })),
       },
       services: {
-        title: sectionMetadata.get("services")?.title ?? null,
+        title: sectionTitle("services"),
         items: servicesData.map((item) => ({
           title: item.title,
           description: item.description ?? null,
@@ -182,10 +175,10 @@ export async function GET(): Promise<
         })),
       },
       summary: {
-        title: sectionMetadata.get("experience")?.title ?? null,
+        title: sectionTitle("experience"),
         button: {
-          text: summary?.buttonText ?? null,
-          url: summary?.buttonUrl ?? null,
+          text: summary.buttonText,
+          url: summary.buttonUrl,
         },
         jobs: experiencesData.map((job) => ({
           from: job.fromYear ?? null,
@@ -200,7 +193,7 @@ export async function GET(): Promise<
         })),
       },
       testimonials: {
-        title: sectionMetadata.get("testimonials")?.title ?? null,
+        title: sectionTitle("testimonials"),
         items: testimonialsItemsData.map((item) => ({
           image: item.imageUrl ?? null,
           title: item.title,
@@ -210,29 +203,31 @@ export async function GET(): Promise<
         })),
       },
       projects: {
-        title: sectionMetadata.get("projects")?.title ?? null,
-        items: projectsData.map((item) => ({
-          id: item.id,
-          title: item.title,
-          category: item.category,
-          description: item.description ?? null,
-          image: item.image ?? null,
-          link: item.link ?? null,
-          github_url: item.githubUrl ?? null,
+        title: sectionTitle("projects"),
+        items: projectsData.map(({ project, category, categorySlug }) => ({
+          id: project.id,
+          slug: project.slug,
+          title: project.title,
+          category,
+          category_slug: categorySlug,
+          description: project.description ?? null,
+          image: project.image ?? null,
+          link: project.link ?? null,
+          github_url: project.githubUrl ?? null,
           // reconstructed from project_technologies + technologies
-          tech: techByProject[item.id] ?? null,
+          tech: techByProject[project.id] ?? null,
           // reconstructed from project_roles
-          roles: rolesByProject[item.id] ?? null,
+          roles: rolesByProject[project.id] ?? null,
         })),
       },
       contact: {
-        title: sectionMetadata.get("contact")?.title ?? null,
-        form_title: contact?.formTitle ?? null,
+        title: sectionTitle("contact"),
+        form_title: contact.formTitle,
         button: {
-          text: contact?.buttonText ?? null,
-          url: contact?.buttonUrl ?? null,
+          text: contact.buttonText,
+          url: contact.buttonUrl,
         },
-        methods: contactMethodsData.map(({ id, kind, title, value }) => ({
+        methods: methodsFor("contact").map(({ id, kind, title, value }) => ({
           id,
           kind,
           title,
@@ -243,9 +238,14 @@ export async function GET(): Promise<
         recaptcha_site_key: configRecord?.recaptchaSiteKey ?? null,
       },
       header: {
-        sections: [...sectionMetadata.values()].sort(
-          (left, right) => left.sortOrder - right.sortOrder,
-        ),
+        sections: pageSectionsData.map((section) => ({
+          id: section.id,
+          kind: section.kind,
+          navigationTitle: section.navigationTitle,
+          title: section.title,
+          sortOrder: section.sortOrder,
+          isEnabled: section.isEnabled,
+        })),
         defaultTitle: null,
       },
       footer: {

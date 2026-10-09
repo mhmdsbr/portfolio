@@ -3,8 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/header";
 import { ApiDataProvider } from "@/providers/ApiDataProvider";
-import { getProjects } from "@/lib/projects";
-import { projectSlug } from "@/lib/project-slug";
+import { getProjectsByCategory } from "@/lib/projects";
 
 interface CategoryPageProps {
   params: Promise<{
@@ -16,10 +15,7 @@ export default async function ProjectCategoryPage({
   params,
 }: CategoryPageProps) {
   const { slug } = await params;
-  const allProjects = await getProjects();
-  const projects = allProjects.filter(
-    (project) => projectSlug(project.category) === slug,
-  );
+  const projects = await getProjectsByCategory(slug);
 
   if (projects.length === 0) {
     notFound();
@@ -94,7 +90,7 @@ export default async function ProjectCategoryPage({
                   )}
 
                   <Link
-                    href={`/projects/${projectSlug(project.title)}`}
+                    href={`/projects/${project.slug}`}
                     className="mt-6 inline-flex text-sm font-semibold text-cyan-400 transition hover:text-cyan-300"
                   >
                     View project →

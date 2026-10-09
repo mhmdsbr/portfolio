@@ -7,10 +7,11 @@ import {
   togglePortfolioSection,
   updatePageSection,
 } from '@/actions/header'
+import type { SectionKind } from '@/lib/db/constants'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 
 interface PageSection {
-  sectionKey: string
+  kind: SectionKind
   navigationTitle: string
   title: string | null
   sortOrder: number
@@ -21,7 +22,7 @@ interface HeaderFormProps {
   initialSections: PageSection[]
 }
 
-const sectionIcons: Record<string, string> = {
+const sectionIcons: Record<SectionKind, string> = {
   hero: '🏠',
   about: '👤',
   experience: '💼',
@@ -41,12 +42,12 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     setLoading(true)
     setMessage('')
     try {
-      const savedSection = await updatePageSection(section.sectionKey, {
+      const savedSection = await updatePageSection(section.kind, {
         navigationTitle: section.navigationTitle,
         title: section.title ?? '',
       })
       setSections((previous) => previous.map((item) =>
-        item.sectionKey === section.sectionKey
+        item.kind === section.kind
           ? {
               ...item,
               navigationTitle: savedSection.navigationTitle,
@@ -63,9 +64,9 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     }
   }
 
-  const updateSectionDraft = (sectionKey: string, field: 'navigationTitle' | 'title', value: string) => {
+  const updateSectionDraft = (kind: SectionKind, field: 'navigationTitle' | 'title', value: string) => {
     setSections((previous) => previous.map((section) =>
-      section.sectionKey === sectionKey ? { ...section, [field]: value } : section,
+      section.kind === kind ? { ...section, [field]: value } : section,
     ))
   }
 
@@ -73,9 +74,9 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     setLoading(true)
     setMessage('')
     try {
-      await togglePortfolioSection(section.sectionKey, !section.isEnabled)
+      await togglePortfolioSection(section.kind, !section.isEnabled)
       setSections((previous) => previous.map((item) =>
-        item.sectionKey === section.sectionKey ? { ...item, isEnabled: !item.isEnabled } : item,
+        item.kind === section.kind ? { ...item, isEnabled: !item.isEnabled } : item,
       ))
       setMessage('Portfolio layout updated.')
       router.refresh()
@@ -96,7 +97,7 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     setSections(reordered)
 
     try {
-      await reorderHeaderSections(reordered.map(({ sectionKey }) => sectionKey))
+      await reorderHeaderSections(reordered.map(({ kind }) => kind))
       router.refresh()
     } catch (error) {
       setSections(previousSections)
@@ -131,8 +132,8 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
               >
                 {sections.map((section, index) => (
                   <Draggable
-                    key={section.sectionKey}
-                    draggableId={section.sectionKey}
+                    key={section.kind}
+                    draggableId={section.kind}
                     index={index}
                   >
                     {(provided, snapshot) => (
@@ -147,11 +148,11 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
                           ⠿
                         </span>
                         <span className="self-start pt-2 text-xl" aria-hidden="true">
-                          {sectionIcons[section.sectionKey] || '📄'}
+                          {sectionIcons[section.kind] || '📄'}
                         </span>
                         <div className="min-w-0 flex-1 space-y-3">
                           <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm text-gray-400 font-mono">{section.sectionKey}</span>
+                            <span className="text-sm text-gray-400 font-mono">{section.kind}</span>
                             <span className="text-xs text-gray-500">#{index + 1}</span>
                           </div>
                           <div className="grid gap-3 md:grid-cols-3">
@@ -164,7 +165,7 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
                                 <input
                                   type="text"
                                   value={section[field] ?? ''}
-                                  onChange={(event) => updateSectionDraft(section.sectionKey, field, event.target.value)}
+                                  onChange={(event) => updateSectionDraft(section.kind, field, event.target.value)}
                                   disabled={loading}
                                   className="mt-1 w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                                 />

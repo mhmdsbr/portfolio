@@ -1,28 +1,23 @@
-import { db } from '@/lib/db'
-import * as schema from '@/lib/db/schema'
-import { asc, eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import { getSection } from '@/lib/db/sections'
+import { getContactMethodsForSection } from '@/lib/contact-methods'
 import type { ApiResponse, ContactResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<ContactResponse>>> {
   try {
-    const [contactData, sectionData, methodsData] = await Promise.all([
-      db.select().from(schema.contactSection),
-      db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'contact')),
-      db.select().from(schema.contactMethods).orderBy(
-        asc(schema.contactMethods.sortOrder),
-        asc(schema.contactMethods.id),
-      ),
+    const [section, methodsData] = await Promise.all([
+      getSection('contact'),
+      getContactMethodsForSection('contact'),
     ])
 
     const response: ContactResponse = {
-      title: sectionData[0]?.title ?? null,
-      form_title: contactData[0]?.formTitle ?? null,
+      title: section?.title ?? null,
+      form_title: section?.config.formTitle ?? null,
       button: {
-        text: contactData[0]?.buttonText ?? null,
-        url: contactData[0]?.buttonUrl ?? null,
+        text: section?.config.buttonText ?? null,
+        url: section?.config.buttonUrl ?? null,
       },
       methods: methodsData.map(({ id, kind, title, value }) => ({
         id,

@@ -1,15 +1,16 @@
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { asc, eq } from 'drizzle-orm'
+import { asc } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import { getSection } from '@/lib/db/sections'
 import type { ApiResponse, SummaryResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<SummaryResponse>>> {
   try {
-    const [summaryData, jobsData, experiencesData, sectionData] = await Promise.all([
-      db.select().from(schema.experienceSection),
+    const [section, jobsData, experiencesData] = await Promise.all([
+      getSection('experience'),
       db.select().from(schema.experiences).orderBy(
         asc(schema.experiences.sortOrder),
         asc(schema.experiences.id),
@@ -18,16 +19,13 @@ export async function GET(): Promise<NextResponse<ApiResponse<SummaryResponse>>>
         asc(schema.skills.sortOrder),
         asc(schema.skills.id),
       ),
-      db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'experience')),
     ])
 
-    const summary = summaryData[0]
-
     const response: SummaryResponse = {
-      title: sectionData[0]?.title ?? null,
+      title: section?.title ?? null,
       button: {
-        text: summary?.buttonText ?? null,
-        url: summary?.buttonUrl ?? null,
+        text: section?.config.buttonText ?? null,
+        url: section?.config.buttonUrl ?? null,
       },
       jobs: jobsData.map((job) => ({
         from: job.fromYear ?? null,

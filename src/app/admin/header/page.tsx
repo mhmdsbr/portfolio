@@ -12,9 +12,12 @@ export default async function HeaderPage() {
         presentation only; it does not delete portfolio content.
       </p>
       <HeaderForm 
-        initialSections={sections.map((section) => ({
-          ...section,
-          sortOrder: section.sortOrder ?? 0,
+        initialSections={sections.map(({ kind, navigationTitle, title, sortOrder, isEnabled }) => ({
+          kind,
+          navigationTitle,
+          title,
+          sortOrder,
+          isEnabled,
         }))}
       />
     </div>

@@ -22,21 +22,19 @@ const tables = [
   "page_sections",
   "profile",
   "social_links",
-  "hero_section",
   "hero_titles",
-  "about_section",
   "contact_methods",
+  "contact_method_sections",
   "profile_facts",
   "services",
-  "experience_section",
   "experiences",
   "skills",
   "testimonials",
+  "project_categories",
   "projects",
   "project_roles",
   "technologies",
   "project_technologies",
-  "contact_section",
   "site_config",
 ] as const;
 
@@ -97,8 +95,12 @@ async function syncProduction() {
       }
 
       for (const table of tables) {
+        // Join tables use composite keys and have no id column or sequence.
         const [{ sequence }] = await transaction<{ sequence: string | null }[]>`
-          SELECT pg_get_serial_sequence(${table}, 'id') AS sequence
+          SELECT CASE WHEN EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = ${table} AND column_name = 'id'
+          ) THEN pg_get_serial_sequence(${table}, 'id') END AS sequence
         `;
         if (!sequence) continue;
         await transaction.unsafe(

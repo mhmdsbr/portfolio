@@ -5,6 +5,16 @@ import * as schema from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
+import { SERVICE_ICONS, type ServiceIcon } from '@/lib/db/constants'
+import { optionalText, requiredText } from '@/lib/validation'
+
+function parseServiceIcon(value: FormDataEntryValue | null): ServiceIcon | null {
+  const icon = optionalText(value)
+  if (icon === null) return null
+  const validIcon = SERVICE_ICONS.find((candidate) => candidate === icon)
+  if (!validIcon) throw new Error('Invalid service icon')
+  return validIcon
+}
 
 // =============================================
 // GET
@@ -27,9 +37,9 @@ export async function getServices() {
 export async function createServiceItem(formData: FormData) {
   await requireAuth()
   
-  const title = formData.get('title') as string
+  const title = requiredText(formData.get('title'), 'Service title')
   const description = formData.get('description') as string
-  const icon = formData.get('icon') as string
+  const icon = parseServiceIcon(formData.get('icon'))
   
   const existing = await db.select()
     .from(schema.services)
@@ -41,7 +51,7 @@ export async function createServiceItem(formData: FormData) {
     .values({
       title,
       description: description || null,
-      icon: (icon || null) as schema.NewService['icon'],
+      icon,
       sortOrder,
     })
     .returning()
@@ -55,15 +65,15 @@ export async function createServiceItem(formData: FormData) {
 export async function updateServiceItem(id: number, formData: FormData) {
   await requireAuth()
   
-  const title = formData.get('title') as string
+  const title = requiredText(formData.get('title'), 'Service title')
   const description = formData.get('description') as string
-  const icon = formData.get('icon') as string
+  const icon = parseServiceIcon(formData.get('icon'))
   
   const [item] = await db.update(schema.services)
     .set({
       title,
       description: description || null,
-      icon: (icon || null) as schema.NewService['icon'],
+      icon,
     })
     .where(eq(schema.services.id, id))
     .returning()

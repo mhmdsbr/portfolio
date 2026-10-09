@@ -1,29 +1,27 @@
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { asc } from 'drizzle-orm'
+import { asc, eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import { getSection } from '@/lib/db/sections'
 import type { ApiResponse, HeroResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<HeroResponse>>> {
   try {
-    const [heroData, titlesData] = await Promise.all([
-      db.select().from(schema.heroSection),
-      db.select().from(schema.heroTitles).orderBy(
-        asc(schema.heroTitles.sortOrder),
-        asc(schema.heroTitles.id),
-      ),
-    ])
-
-    const hero = heroData[0]
+    const section = await getSection('hero')
+    const titlesData = section
+      ? await db.select().from(schema.heroTitles)
+          .where(eq(schema.heroTitles.sectionId, section.id))
+          .orderBy(asc(schema.heroTitles.sortOrder), asc(schema.heroTitles.id))
+      : []
 
     const response: HeroResponse = {
       titles: titlesData.map((t) => t.title),
-      location: hero?.location ?? null,
-      subtitle_one: hero?.subtitleOne ?? null,
-      subtitle_two: hero?.subtitleTwo ?? null,
-      logo: hero?.logoUrl ?? null,
+      location: section?.config.location ?? null,
+      subtitle_one: section?.config.subtitleOne ?? null,
+      subtitle_two: section?.config.subtitleTwo ?? null,
+      logo: section?.config.logoUrl ?? null,
     }
 
     return NextResponse.json({

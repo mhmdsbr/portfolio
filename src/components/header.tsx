@@ -21,7 +21,7 @@ export default function Header({ singleTitle }: HeaderProps) {
   const sections = useMemo(
     () =>
       headerData?.sections?.filter((section) => section.isEnabled).map((s) => ({
-        id: s.sectionKey,
+        id: s.kind,
         title: s.navigationTitle,
       })) || [],
     [headerData],

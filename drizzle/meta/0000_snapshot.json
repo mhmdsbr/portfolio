@@ -1,82 +1,9 @@
 {
-  "id": "384f1207-17f4-491f-b762-53a32d8fcfbc",
+  "id": "b3f7e927-6aa9-4045-b6a7-d83f943e7be5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.about_section": {
-      "name": "about_section",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "section_key": {
-          "name": "section_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "button_text": {
-          "name": "button_text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "button_url": {
-          "name": "button_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "about_section_section_key_page_sections_section_key_fk": {
-          "name": "about_section_section_key_page_sections_section_key_fk",
-          "tableFrom": "about_section",
-          "tableTo": "page_sections",
-          "columnsFrom": [
-            "section_key"
-          ],
-          "columnsTo": [
-            "section_key"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "about_section_section_key_unique": {
-          "name": "about_section_section_key_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "section_key"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.admin_email_verifications": {
       "name": "admin_email_verifications",
       "schema": "",
@@ -130,6 +57,12 @@
           "notNull": true,
           "default": 0
         },
+        "consumed_at": {
+          "name": "consumed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_by_user_id": {
           "name": "created_by_user_id",
           "type": "integer",
@@ -144,20 +77,20 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
       "indexes": {
-        "admin_email_verifications_email_purpose_uq": {
-          "name": "admin_email_verifications_email_purpose_uq",
+        "admin_email_verifications_email_purpose_active_uq": {
+          "name": "admin_email_verifications_email_purpose_active_uq",
           "columns": [
             {
-              "expression": "email",
-              "isExpression": false,
+              "expression": "lower(\"email\")",
               "asc": true,
+              "isExpression": true,
               "nulls": "last"
             },
             {
@@ -168,6 +101,22 @@
             }
           ],
           "isUnique": true,
+          "where": "\"admin_email_verifications\".\"consumed_at\" IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "admin_email_verifications_expires_at_idx": {
+          "name": "admin_email_verifications_expires_at_idx",
+          "columns": [
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -191,7 +140,16 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "admin_email_verifications_purpose_chk": {
+          "name": "admin_email_verifications_purpose_chk",
+          "value": "\"admin_email_verifications\".\"purpose\" IN ('initial', 'additional', 'password_reset', 'password_change')"
+        },
+        "admin_email_verifications_attempts_nonnegative_chk": {
+          "name": "admin_email_verifications_attempts_nonnegative_chk",
+          "value": "\"admin_email_verifications\".\"attempts\" >= 0"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.admin_profiles": {
@@ -225,16 +183,16 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -284,9 +242,9 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -296,6 +254,21 @@
           "columns": [
             {
               "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "admin_sessions_expires_at_idx": {
+          "name": "admin_sessions_expires_at_idx",
+          "columns": [
+            {
+              "expression": "expires_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -334,9 +307,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "admin_users_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "email": {
           "name": "email",
@@ -359,78 +343,117 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "admin_users_email_unique": {
-          "name": "admin_users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.app_config": {
-      "name": "app_config",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
           "notNull": true,
-          "default": 1
-        },
-        "recaptcha_site_key": {
-          "name": "recaptcha_site_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "admin_users_email_lower_uq": {
+          "name": "admin_users_email_lower_uq",
+          "columns": [
+            {
+              "expression": "lower(\"email\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {
-        "config_singleton": {
-          "name": "config_singleton",
-          "value": "\"app_config\".\"id\" = 1"
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.contact_method_sections": {
+      "name": "contact_method_sections",
+      "schema": "",
+      "columns": {
+        "contact_method_id": {
+          "name": "contact_method_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "section_id": {
+          "name": "section_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         }
       },
+      "indexes": {
+        "contact_method_sections_section_id_idx": {
+          "name": "contact_method_sections_section_id_idx",
+          "columns": [
+            {
+              "expression": "section_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "contact_method_sections_contact_method_id_contact_methods_id_fk": {
+          "name": "contact_method_sections_contact_method_id_contact_methods_id_fk",
+          "tableFrom": "contact_method_sections",
+          "tableTo": "contact_methods",
+          "columnsFrom": [
+            "contact_method_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "contact_method_sections_section_id_page_sections_id_fk": {
+          "name": "contact_method_sections_section_id_page_sections_id_fk",
+          "tableFrom": "contact_method_sections",
+          "tableTo": "page_sections",
+          "columnsFrom": [
+            "section_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "contact_method_sections_pk": {
+          "name": "contact_method_sections_pk",
+          "columns": [
+            "contact_method_id",
+            "section_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.contact_methods": {
@@ -439,14 +462,24 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "contact_methods_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "kind": {
           "name": "kind",
-          "type": "contact_method_kind_enum",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'other'"
@@ -467,21 +500,21 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -490,159 +523,12 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.contact_section": {
-      "name": "contact_section",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "section_key": {
-          "name": "section_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "form_title": {
-          "name": "form_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "button_text": {
-          "name": "button_text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "button_url": {
-          "name": "button_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+      "checkConstraints": {
+        "contact_methods_kind_chk": {
+          "name": "contact_methods_kind_chk",
+          "value": "\"contact_methods\".\"kind\" IN ('email', 'phone', 'address', 'other')"
         }
       },
-      "indexes": {},
-      "foreignKeys": {
-        "contact_section_section_key_page_sections_section_key_fk": {
-          "name": "contact_section_section_key_page_sections_section_key_fk",
-          "tableFrom": "contact_section",
-          "tableTo": "page_sections",
-          "columnsFrom": [
-            "section_key"
-          ],
-          "columnsTo": [
-            "section_key"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "contact_section_section_key_unique": {
-          "name": "contact_section_section_key_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "section_key"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.experience_section": {
-      "name": "experience_section",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "section_key": {
-          "name": "section_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "button_text": {
-          "name": "button_text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "button_url": {
-          "name": "button_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "experience_section_section_key_page_sections_section_key_fk": {
-          "name": "experience_section_section_key_page_sections_section_key_fk",
-          "tableFrom": "experience_section",
-          "tableTo": "page_sections",
-          "columnsFrom": [
-            "section_key"
-          ],
-          "columnsTo": [
-            "section_key"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "experience_section_section_key_unique": {
-          "name": "experience_section_section_key_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "section_key"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.experiences": {
@@ -651,9 +537,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "experiences_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "from_year": {
           "name": "from_year",
@@ -689,86 +586,21 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.footer": {
-      "name": "footer",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
           "notNull": true,
-          "default": 1
-        },
-        "company_name": {
-          "name": "company_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'Your Company'"
-        },
-        "privacy_policy": {
-          "name": "privacy_policy",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "terms_of_service": {
-          "name": "terms_of_service",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "disclaimer": {
-          "name": "disclaimer",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "copyright_text": {
-          "name": "copyright_text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -778,142 +610,11 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "footer_singleton": {
-          "name": "footer_singleton",
-          "value": "\"footer\".\"id\" = 1"
+        "experiences_year_range_chk": {
+          "name": "experiences_year_range_chk",
+          "value": "\"experiences\".\"from_year\" BETWEEN 1900 AND 2100 AND (\"experiences\".\"to_year\" IS NULL OR \"experiences\".\"to_year\" BETWEEN \"experiences\".\"from_year\" AND 2100)"
         }
       },
-      "isRLSEnabled": false
-    },
-    "public.header_settings": {
-      "name": "header_settings",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "default": 1
-        },
-        "default_title": {
-          "name": "default_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'Welcome'"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "header_settings_singleton": {
-          "name": "header_settings_singleton",
-          "value": "\"header_settings\".\"id\" = 1"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.hero_section": {
-      "name": "hero_section",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "section_key": {
-          "name": "section_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "location": {
-          "name": "location",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "subtitle_one": {
-          "name": "subtitle_one",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "subtitle_two": {
-          "name": "subtitle_two",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "logo_url": {
-          "name": "logo_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "hero_section_section_key_page_sections_section_key_fk": {
-          "name": "hero_section_section_key_page_sections_section_key_fk",
-          "tableFrom": "hero_section",
-          "tableTo": "page_sections",
-          "columnsFrom": [
-            "section_key"
-          ],
-          "columnsTo": [
-            "section_key"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "hero_section_section_key_unique": {
-          "name": "hero_section_section_key_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "section_key"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.hero_titles": {
@@ -922,12 +623,23 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "hero_titles_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
-        "hero_section_id": {
-          "name": "hero_section_id",
+        "section_id": {
+          "name": "section_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -942,32 +654,48 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "hero_titles_section_id_idx": {
+          "name": "hero_titles_section_id_idx",
+          "columns": [
+            {
+              "expression": "section_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "hero_titles_hero_section_id_hero_section_id_fk": {
-          "name": "hero_titles_hero_section_id_hero_section_id_fk",
+        "hero_titles_section_id_page_sections_id_fk": {
+          "name": "hero_titles_section_id_page_sections_id_fk",
           "tableFrom": "hero_titles",
-          "tableTo": "hero_section",
+          "tableTo": "page_sections",
           "columnsFrom": [
-            "hero_section_id"
+            "section_id"
           ],
           "columnsTo": [
             "id"
@@ -988,12 +716,23 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "page_sections_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
-        "section_key": {
-          "name": "section_key",
+        "kind": {
+          "name": "kind",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -1010,17 +749,11 @@
           "primaryKey": false,
           "notNull": false
         },
-        "overlay_title": {
-          "name": "overlay_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "sort_order": {
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "is_enabled": {
@@ -1030,39 +763,63 @@
           "notNull": true,
           "default": true
         },
+        "config": {
+          "name": "config",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "page_sections_section_key_unique": {
-          "name": "page_sections_section_key_unique",
-          "nullsNotDistinct": false,
+      "indexes": {
+        "page_sections_kind_uq": {
+          "name": "page_sections_kind_uq",
           "columns": [
-            "section_key"
-          ]
+            {
+              "expression": "kind",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "page_sections_kind_chk": {
+          "name": "page_sections_kind_chk",
+          "value": "\"page_sections\".\"kind\" IN ('hero', 'about', 'experience', 'services', 'projects', 'testimonials', 'contact')"
+        },
+        "page_sections_config_object_chk": {
+          "name": "page_sections_config_object_chk",
+          "value": "jsonb_typeof(\"page_sections\".\"config\") = 'object'"
+        }
+      },
       "isRLSEnabled": false
     },
-    "public.portfolio_profile": {
-      "name": "portfolio_profile",
+    "public.profile": {
+      "name": "profile",
       "schema": "",
       "columns": {
         "id": {
@@ -1092,16 +849,16 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -1111,9 +868,9 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "portfolio_profile_singleton": {
-          "name": "portfolio_profile_singleton",
-          "value": "\"portfolio_profile\".\"id\" = 1"
+        "profile_singleton_chk": {
+          "name": "profile_singleton_chk",
+          "value": "\"profile\".\"id\" = 1"
         }
       },
       "isRLSEnabled": false
@@ -1124,9 +881,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "profile_facts_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "number": {
           "name": "number",
@@ -1144,21 +912,21 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -1168,6 +936,98 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.project_categories": {
+      "name": "project_categories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "project_categories_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "project_categories_slug_uq": {
+          "name": "project_categories_slug_uq",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "project_categories_name_lower_uq": {
+          "name": "project_categories_name_lower_uq",
+          "columns": [
+            {
+              "expression": "lower(\"name\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "project_categories_slug_chk": {
+          "name": "project_categories_slug_chk",
+          "value": "\"project_categories\".\"slug\" ~ '^[a-z0-9]+(-[a-z0-9]+)*$'"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.project_roles": {
@@ -1190,49 +1050,11 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
         }
       },
-      "indexes": {
-        "project_roles_project_id_idx": {
-          "name": "project_roles_project_id_idx",
-          "columns": [
-            {
-              "expression": "project_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "project_roles_role_idx": {
-          "name": "project_roles_role_idx",
-          "columns": [
-            {
-              "expression": "role",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "project_roles_project_id_projects_id_fk": {
           "name": "project_roles_project_id_projects_id_fk",
@@ -1282,33 +1104,11 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
         }
       },
       "indexes": {
-        "project_technologies_project_id_idx": {
-          "name": "project_technologies_project_id_idx",
-          "columns": [
-            {
-              "expression": "project_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "project_technologies_technology_id_idx": {
           "name": "project_technologies_technology_id_idx",
           "columns": [
@@ -1373,8 +1173,25 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "projects_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true
         },
         "title": {
@@ -1383,9 +1200,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "category": {
-          "name": "category",
-          "type": "text",
+        "category_id": {
+          "name": "category_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -1417,30 +1234,92 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
+      "indexes": {
+        "projects_slug_uq": {
+          "name": "projects_slug_uq",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "projects_category_id_idx": {
+          "name": "projects_category_id_idx",
+          "columns": [
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "projects_category_id_project_categories_id_fk": {
+          "name": "projects_category_id_project_categories_id_fk",
+          "tableFrom": "projects",
+          "tableTo": "project_categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "projects_slug_chk": {
+          "name": "projects_slug_chk",
+          "value": "\"projects\".\"slug\" ~ '^[a-z0-9]+(-[a-z0-9]+)*$'"
+        },
+        "projects_image_chk": {
+          "name": "projects_image_chk",
+          "value": "\"projects\".\"image\" ~ '^(https?://|/)\\S+$'"
+        },
+        "projects_link_chk": {
+          "name": "projects_link_chk",
+          "value": "\"projects\".\"link\" ~ '^https?://\\S+$'"
+        },
+        "projects_github_url_chk": {
+          "name": "projects_github_url_chk",
+          "value": "\"projects\".\"github_url\" ~ '^https?://\\S+$'"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.services": {
@@ -1449,9 +1328,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "services_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "title": {
           "name": "title",
@@ -1467,8 +1357,7 @@
         },
         "icon": {
           "name": "icon",
-          "type": "icon_enum",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -1476,73 +1365,21 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.sidebar": {
-      "name": "sidebar",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
           "notNull": true,
-          "default": 1
-        },
-        "profile_image_url": {
-          "name": "profile_image_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "profile_image_alt": {
-          "name": "profile_image_alt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "profile_title": {
-          "name": "profile_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -1552,15 +1389,15 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "sidebar_singleton": {
-          "name": "sidebar_singleton",
-          "value": "\"sidebar\".\"id\" = 1"
+        "services_icon_chk": {
+          "name": "services_icon_chk",
+          "value": "\"services\".\"icon\" IN ('palette', 'desktop', 'pen-ruler', 'paintbrush', 'chart-area', 'bullhorn')"
         }
       },
       "isRLSEnabled": false
     },
-    "public.site_settings": {
-      "name": "site_settings",
+    "public.site_config": {
+      "name": "site_config",
       "schema": "",
       "columns": {
         "id": {
@@ -1570,30 +1407,55 @@
           "notNull": true,
           "default": 1
         },
-        "portfolio_title": {
-          "name": "portfolio_title",
+        "company_name": {
+          "name": "company_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Your Company'"
+        },
+        "privacy_policy": {
+          "name": "privacy_policy",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "portfolio_overlay_title": {
-          "name": "portfolio_overlay_title",
+        "terms_of_service": {
+          "name": "terms_of_service",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "disclaimer": {
+          "name": "disclaimer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "copyright_text": {
+          "name": "copyright_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recaptcha_site_key": {
+          "name": "recaptcha_site_key",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -1603,9 +1465,9 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "general_settings_singleton": {
-          "name": "general_settings_singleton",
-          "value": "\"site_settings\".\"id\" = 1"
+        "site_config_singleton_chk": {
+          "name": "site_config_singleton_chk",
+          "value": "\"site_config\".\"id\" = 1"
         }
       },
       "isRLSEnabled": false
@@ -1616,9 +1478,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "skills_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "skill": {
           "name": "skill",
@@ -1636,21 +1509,21 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -1659,7 +1532,12 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "skills_level_range_chk": {
+          "name": "skills_level_range_chk",
+          "value": "\"skills\".\"level\" IS NULL OR \"skills\".\"level\" BETWEEN 0 AND 100"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.social_links": {
@@ -1668,9 +1546,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "social_links_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "platform": {
           "name": "platform",
@@ -1688,30 +1577,55 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "social_links_platform_uq": {
+          "name": "social_links_platform_uq",
+          "columns": [
+            {
+              "expression": "platform",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "social_links_platform_chk": {
+          "name": "social_links_platform_chk",
+          "value": "\"social_links\".\"platform\" IN ('behance', 'dribbble', 'facebook', 'github', 'instagram', 'linkedin', 'mail', 'medium', 'telegram', 'twitter', 'whatsapp', 'youtube')"
+        },
+        "social_links_url_chk": {
+          "name": "social_links_url_chk",
+          "value": "\"social_links\".\"url\" ~ '^(https?://|/|#|mailto:|tel:)\\S+$'"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.technologies": {
@@ -1720,9 +1634,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "technologies_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "name": {
           "name": "name",
@@ -1732,20 +1657,20 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
       "indexes": {
-        "technologies_name_idx": {
-          "name": "technologies_name_idx",
+        "technologies_name_lower_uq": {
+          "name": "technologies_name_lower_uq",
           "columns": [
             {
-              "expression": "name",
-              "isExpression": false,
+              "expression": "lower(\"name\")",
               "asc": true,
+              "isExpression": true,
               "nulls": "last"
             }
           ],
@@ -1768,9 +1693,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "testimonials_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "image_url": {
           "name": "image_url",
@@ -1806,21 +1742,21 @@
           "name": "sort_order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -1833,35 +1769,16 @@
         "testimonials_rating_range": {
           "name": "testimonials_rating_range",
           "value": "\"testimonials\".\"rating\" BETWEEN 1 AND 5"
+        },
+        "testimonials_image_url_chk": {
+          "name": "testimonials_image_url_chk",
+          "value": "\"testimonials\".\"image_url\" ~ '^(https?://|/)\\S+$'"
         }
       },
       "isRLSEnabled": false
     }
   },
-  "enums": {
-    "public.contact_method_kind_enum": {
-      "name": "contact_method_kind_enum",
-      "schema": "public",
-      "values": [
-        "email",
-        "phone",
-        "address",
-        "other"
-      ]
-    },
-    "public.icon_enum": {
-      "name": "icon_enum",
-      "schema": "public",
-      "values": [
-        "palette",
-        "desktop",
-        "pen-ruler",
-        "paintbrush",
-        "chart-area",
-        "bullhorn"
-      ]
-    }
-  },
+  "enums": {},
   "schemas": {},
   "sequences": {},
   "roles": {},

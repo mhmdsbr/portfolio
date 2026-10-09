@@ -3,55 +3,92 @@ import {
   text,
   integer,
   timestamp,
-  pgEnum,
   boolean,
   jsonb,
   index,
   uniqueIndex,
   primaryKey,
   check,
+  type AnyPgColumn,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
+import {
+  ADMIN_VERIFICATION_PURPOSES,
+  ASSET_URL_PATTERN,
+  CONTACT_METHOD_KINDS,
+  LINK_URL_PATTERN,
+  SECTION_KINDS,
+  SERVICE_ICONS,
+  SLUG_PATTERN,
+  SOCIAL_PLATFORMS,
+  WEB_URL_PATTERN,
+  YEAR_MAX,
+  YEAR_MIN,
+  type AdminVerificationPurpose,
+  type ContactMethodKind,
+  type SectionKind,
+  type ServiceIcon,
+  type SocialPlatform,
+} from './constants'
+import type { AnySectionConfig } from './section-config'
+
+export type {
+  AdminVerificationPurpose,
+  ContactMethodKind,
+  SectionKind,
+  ServiceIcon,
+  SocialPlatform,
+}
 
 // =============================================
-// ENUMS
+// SHARED COLUMN HELPERS
 // =============================================
-export const iconEnum = pgEnum('icon_enum', [
-  'palette',
-  'desktop',
-  'pen-ruler',
-  'paintbrush',
-  'chart-area',
-  'bullhorn',
-])
+const createdAt = () =>
+  timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 
-export const contactMethodKindEnum = pgEnum('contact_method_kind_enum', [
-  'email',
-  'phone',
-  'address',
-  'other',
-])
-
-export const adminVerificationPurposeEnum = pgEnum(
-  'admin_verification_purpose_enum',
-  ['initial', 'additional', 'password_reset', 'password_change'],
-)
-
-// =============================================
-// 01. PAGE SECTIONS (hub — defined first so FKs resolve)
-// =============================================
-export const pageSections = pgTable('page_sections', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  sectionKey: text('section_key')
+const timestamps = () => ({
+  createdAt: createdAt(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
-    .unique('page_sections_section_key_uq'),
-  navigationTitle: text('navigation_title').notNull(),
-  title: text('title'),
-  sortOrder: integer('sort_order').notNull().default(0),
-  isEnabled: boolean('is_enabled').notNull().default(true),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 })
+
+// The value sets and patterns below are code constants, never user input.
+const oneOf = (column: AnyPgColumn, values: readonly string[]) =>
+  sql`${column} IN (${sql.raw(values.map((value) => `'${value}'`).join(', '))})`
+
+const matches = (column: AnyPgColumn, pattern: string) =>
+  sql`${column} ~ ${sql.raw(`'${pattern}'`)}`
+
+// =============================================
+// 01. PAGE SECTIONS (one row per section kind, with its settings)
+// =============================================
+export const pageSections = pgTable(
+  'page_sections',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    kind: text('kind').$type<SectionKind>().notNull(),
+    navigationTitle: text('navigation_title').notNull(),
+    title: text('title'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isEnabled: boolean('is_enabled').notNull().default(true),
+    // Section-specific settings; shape is defined per kind in section-config.ts.
+    config: jsonb('config')
+      .$type<AnySectionConfig>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    ...timestamps(),
+  },
+  (table) => [
+    uniqueIndex('page_sections_kind_uq').on(table.kind),
+    check('page_sections_kind_chk', oneOf(table.kind, SECTION_KINDS)),
+    check(
+      'page_sections_config_object_chk',
+      sql`jsonb_typeof(${table.config}) = 'object'`,
+    ),
+  ],
+)
 
 export type PageSection = typeof pageSections.$inferSelect
 export type NewPageSection = typeof pageSections.$inferInsert
@@ -66,8 +103,7 @@ export const profile = pgTable(
     name: text('name'),
     jobTitle: text('job_title'),
     biography: text('biography'),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+    ...timestamps(),
   },
   (table) => [check('profile_singleton_chk', sql`${table.id} = 1`)],
 )
@@ -78,224 +114,244 @@ export type NewProfile = typeof profile.$inferInsert
 // =============================================
 // 03. SOCIAL LINKS
 // =============================================
-export const socialLinks = pgTable('social_links', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  platform: text('platform').notNull(),
-  url: text('url').notNull(),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-})
+export const socialLinks = pgTable(
+  'social_links',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    platform: text('platform').$type<SocialPlatform>().notNull(),
+    url: text('url').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps(),
+  },
+  (table) => [
+    uniqueIndex('social_links_platform_uq').on(table.platform),
+    check('social_links_platform_chk', oneOf(table.platform, SOCIAL_PLATFORMS)),
+    check('social_links_url_chk', matches(table.url, LINK_URL_PATTERN)),
+  ],
+)
 
 export type SocialLink = typeof socialLinks.$inferSelect
 export type NewSocialLink = typeof socialLinks.$inferInsert
 
 // =============================================
-// 04. HERO SECTION
+// 04. HERO TITLES (rotating headlines of the hero section)
 // =============================================
-export const heroSection = pgTable('hero_section', {
-  sectionKey: text('section_key')
-    .primaryKey()
-    .notNull()
-    .references(() => pageSections.sectionKey, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  location: text('location'),
-  subtitleOne: text('subtitle_one'),
-  subtitleTwo: text('subtitle_two'),
-  logoUrl: text('logo_url'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-})
-
-export type HeroSection = typeof heroSection.$inferSelect
-export type NewHeroSection = typeof heroSection.$inferInsert
-
-// =============================================
-// 05. HERO TITLES
-// =============================================
-export const heroTitles = pgTable('hero_titles', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  heroSectionKey: text('hero_section_key')
-    .notNull()
-    .references(() => heroSection.sectionKey, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  title: text('title').notNull(),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-}, (table) => [
-  index('hero_titles_hero_section_key_idx').on(table.heroSectionKey),
-])
+export const heroTitles = pgTable(
+  'hero_titles',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    sectionId: integer('section_id')
+      .notNull()
+      .references(() => pageSections.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps(),
+  },
+  (table) => [index('hero_titles_section_id_idx').on(table.sectionId)],
+)
 
 export type HeroTitle = typeof heroTitles.$inferSelect
 export type NewHeroTitle = typeof heroTitles.$inferInsert
 
 // =============================================
-// 06. ABOUT SECTION
+// 05. CONTACT METHODS (+ the sections that display them)
 // =============================================
-export const aboutSection = pgTable('about_section', {
-  sectionKey: text('section_key')
-    .primaryKey()
-    .notNull()
-    .references(() => pageSections.sectionKey, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  buttonText: text('button_text'),
-  buttonUrl: text('button_url'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-})
-
-export type AboutSection = typeof aboutSection.$inferSelect
-export type NewAboutSection = typeof aboutSection.$inferInsert
-
-// =============================================
-// 07. CONTACT METHODS
-// =============================================
-export const contactMethods = pgTable('contact_methods', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  kind: contactMethodKindEnum('kind').notNull().default('other'),
-  title: text('title').notNull(),
-  value: text('value').notNull(),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-})
+export const contactMethods = pgTable(
+  'contact_methods',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    kind: text('kind').$type<ContactMethodKind>().notNull().default('other'),
+    title: text('title').notNull(),
+    value: text('value').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps(),
+  },
+  (table) => [
+    check('contact_methods_kind_chk', oneOf(table.kind, CONTACT_METHOD_KINDS)),
+  ],
+)
 
 export type ContactMethod = typeof contactMethods.$inferSelect
 export type NewContactMethod = typeof contactMethods.$inferInsert
-export type ContactMethodKind = (typeof contactMethodKindEnum.enumValues)[number]
+
+export const contactMethodSections = pgTable(
+  'contact_method_sections',
+  {
+    contactMethodId: integer('contact_method_id')
+      .notNull()
+      .references(() => contactMethods.id, { onDelete: 'cascade' }),
+    sectionId: integer('section_id')
+      .notNull()
+      .references(() => pageSections.id, { onDelete: 'cascade' }),
+  },
+  (table) => [
+    primaryKey({
+      name: 'contact_method_sections_pk',
+      columns: [table.contactMethodId, table.sectionId],
+    }),
+    index('contact_method_sections_section_id_idx').on(table.sectionId),
+  ],
+)
+
+export type ContactMethodSection = typeof contactMethodSections.$inferSelect
 
 // =============================================
-// 08. PROFILE FACTS
+// 06. PROFILE FACTS
 // =============================================
 export const profileFacts = pgTable('profile_facts', {
   id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
   number: integer('number').notNull(),
   title: text('title').notNull(),
   sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  ...timestamps(),
 })
 
 export type ProfileFact = typeof profileFacts.$inferSelect
 export type NewProfileFact = typeof profileFacts.$inferInsert
 
 // =============================================
-// 09. SERVICES SECTION
+// 07. SERVICES
 // =============================================
-export const services = pgTable('services', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  title: text('title').notNull(),
-  description: text('description'),
-  icon: iconEnum('icon'),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-})
+export const services = pgTable(
+  'services',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    title: text('title').notNull(),
+    description: text('description'),
+    icon: text('icon').$type<ServiceIcon>(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps(),
+  },
+  (table) => [check('services_icon_chk', oneOf(table.icon, SERVICE_ICONS))],
+)
 
 export type Service = typeof services.$inferSelect
 export type NewService = typeof services.$inferInsert
 
 // =============================================
-// 10. EXPERIENCE SECTION SETTINGS
+// 08. EXPERIENCES
 // =============================================
-export const experienceSection = pgTable('experience_section', {
-  sectionKey: text('section_key')
-    .primaryKey()
-    .notNull()
-    .references(() => pageSections.sectionKey, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  buttonText: text('button_text'),
-  buttonUrl: text('button_url'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-})
-
-export type ExperienceSection = typeof experienceSection.$inferSelect
-export type NewExperienceSection = typeof experienceSection.$inferInsert
-
-// =============================================
-// 11. EXPERIENCES
-// =============================================
-export const experiences = pgTable('experiences', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  fromYear: integer('from_year').notNull(),
-  toYear: integer('to_year'),
-  jobTitle: text('job_title').notNull(),
-  company: text('company').notNull(),
-  description: text('description'),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-}, (table) => [
-  check(
-    'experiences_year_range_chk',
-    sql`${table.toYear} IS NULL OR ${table.toYear} >= ${table.fromYear}`,
-  ),
-])
+export const experiences = pgTable(
+  'experiences',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    fromYear: integer('from_year').notNull(),
+    toYear: integer('to_year'),
+    jobTitle: text('job_title').notNull(),
+    company: text('company').notNull(),
+    description: text('description'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps(),
+  },
+  (table) => [
+    check(
+      'experiences_year_range_chk',
+      sql`${table.fromYear} BETWEEN ${sql.raw(String(YEAR_MIN))} AND ${sql.raw(String(YEAR_MAX))} AND (${table.toYear} IS NULL OR ${table.toYear} BETWEEN ${table.fromYear} AND ${sql.raw(String(YEAR_MAX))})`,
+    ),
+  ],
+)
 
 export type Experience = typeof experiences.$inferSelect
 export type NewExperience = typeof experiences.$inferInsert
 
 // =============================================
-// 12. SKILLS
+// 09. SKILLS
 // =============================================
-export const skills = pgTable('skills', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  skill: text('skill').notNull(),
-  level: integer('level'),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-}, (table) => [
-  check(
-    'skills_level_range_chk',
-    sql`${table.level} IS NULL OR ${table.level} BETWEEN 0 AND 100`,
-  ),
-])
+export const skills = pgTable(
+  'skills',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    skill: text('skill').notNull(),
+    level: integer('level'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps(),
+  },
+  (table) => [
+    check(
+      'skills_level_range_chk',
+      sql`${table.level} IS NULL OR ${table.level} BETWEEN 0 AND 100`,
+    ),
+  ],
+)
 
 export type Skill = typeof skills.$inferSelect
 export type NewSkill = typeof skills.$inferInsert
 
 // =============================================
-// 13. TESTIMONIALS SECTION
+// 10. TESTIMONIALS
 // =============================================
-export const testimonials = pgTable('testimonials', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  imageUrl: text('image_url'),
-  title: text('title').notNull(),
-  subtitle: text('subtitle'),
-  rating: integer('rating'),
-  body: text('body'),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-}, (table) => [
-  check(
-    'testimonials_rating_range',
-    sql`${table.rating} BETWEEN 1 AND 5`,
-  ),
-])
+export const testimonials = pgTable(
+  'testimonials',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    imageUrl: text('image_url'),
+    title: text('title').notNull(),
+    subtitle: text('subtitle'),
+    rating: integer('rating'),
+    body: text('body'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps(),
+  },
+  (table) => [
+    check('testimonials_rating_range', sql`${table.rating} BETWEEN 1 AND 5`),
+    check('testimonials_image_url_chk', matches(table.imageUrl, ASSET_URL_PATTERN)),
+  ],
+)
 
 export type Testimonial = typeof testimonials.$inferSelect
 export type NewTestimonial = typeof testimonials.$inferInsert
 
 // =============================================
-// 14. PROJECTS SECTION
+// 11. PROJECTS (+ categories, roles, technologies)
 // =============================================
-export const projects = pgTable('projects', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  title: text('title').notNull(),
-  category: text('category').notNull(),
-  description: text('description'),
-  image: text('image'),
-  link: text('link'),
-  githubUrl: text('github_url'),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-})
+export const projectCategories = pgTable(
+  'project_categories',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    name: text('name').notNull(),
+    slug: text('slug').notNull(),
+    ...timestamps(),
+  },
+  (table) => [
+    uniqueIndex('project_categories_slug_uq').on(table.slug),
+    uniqueIndex('project_categories_name_lower_uq').on(sql`lower(${table.name})`),
+    check('project_categories_slug_chk', matches(table.slug, SLUG_PATTERN)),
+  ],
+)
+
+export type ProjectCategory = typeof projectCategories.$inferSelect
+export type NewProjectCategory = typeof projectCategories.$inferInsert
+
+export const projects = pgTable(
+  'projects',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    // Stable public URL segment; generated on create and not changed by title edits.
+    slug: text('slug').notNull(),
+    title: text('title').notNull(),
+    categoryId: integer('category_id')
+      .notNull()
+      .references(() => projectCategories.id, { onDelete: 'restrict' }),
+    description: text('description'),
+    image: text('image'),
+    link: text('link'),
+    githubUrl: text('github_url'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps(),
+  },
+  (table) => [
+    uniqueIndex('projects_slug_uq').on(table.slug),
+    index('projects_category_id_idx').on(table.categoryId),
+    check('projects_slug_chk', matches(table.slug, SLUG_PATTERN)),
+    check('projects_image_chk', matches(table.image, ASSET_URL_PATTERN)),
+    check('projects_link_chk', matches(table.link, WEB_URL_PATTERN)),
+    check('projects_github_url_chk', matches(table.githubUrl, WEB_URL_PATTERN)),
+  ],
+)
 
 export type Project = typeof projects.$inferSelect
 export type NewProject = typeof projects.$inferInsert
 
-// #8: normalized roles (was text[].roles)
 export const projectRoles = pgTable(
   'project_roles',
   {
@@ -310,20 +366,18 @@ export const projectRoles = pgTable(
       name: 'project_roles_project_id_role_pk',
       columns: [table.projectId, table.role],
     }),
-    index('project_roles_role_idx').on(table.role),
   ],
 )
 
 export type ProjectRole = typeof projectRoles.$inferSelect
 export type NewProjectRole = typeof projectRoles.$inferInsert
 
-// #8: normalized tech stack (was text[].tech)
 export const technologies = pgTable(
   'technologies',
   {
     id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
     name: text('name').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: createdAt(),
   },
   (table) => [
     uniqueIndex('technologies_name_lower_uq').on(sql`lower(${table.name})`),
@@ -342,7 +396,7 @@ export const projectTechnologies = pgTable(
     technologyId: integer('technology_id')
       .notNull()
       .references(() => technologies.id, { onDelete: 'cascade' }),
-      sortOrder: integer('sort_order').notNull().default(0),
+    sortOrder: integer('sort_order').notNull().default(0),
   },
   (table) => [
     primaryKey({
@@ -357,25 +411,7 @@ export type ProjectTechnology = typeof projectTechnologies.$inferSelect
 export type NewProjectTechnology = typeof projectTechnologies.$inferInsert
 
 // =============================================
-// 15. CONTACT SECTION
-// =============================================
-export const contactSection = pgTable('contact_section', {
-  sectionKey: text('section_key')
-    .primaryKey()
-    .notNull()
-    .references(() => pageSections.sectionKey, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  formTitle: text('form_title'),
-  buttonText: text('button_text'),
-  buttonUrl: text('button_url'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-})
-
-export type ContactSection = typeof contactSection.$inferSelect
-export type NewContactSection = typeof contactSection.$inferInsert
-
-// =============================================
-// 16. SITE CONFIGURATION (singleton)
+// 12. SITE CONFIGURATION (singleton)
 // =============================================
 export const siteConfig = pgTable(
   'site_config',
@@ -387,8 +423,7 @@ export const siteConfig = pgTable(
     disclaimer: text('disclaimer'),
     copyrightText: text('copyright_text'),
     recaptchaSiteKey: text('recaptcha_site_key'),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+    ...timestamps(),
   },
   (table) => [check('site_config_singleton_chk', sql`${table.id} = 1`)],
 )
@@ -397,18 +432,21 @@ export type SiteConfig = typeof siteConfig.$inferSelect
 export type NewSiteConfig = typeof siteConfig.$inferInsert
 
 // =============================================
-// 17. ADMIN IDENTITY, PROFILES, AND SESSIONS
+// 13. ADMIN IDENTITY, PROFILES, AND SESSIONS
 // =============================================
-export const adminUsers = pgTable('admin_users', {
-  id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  email: text('email').notNull(),
-  passwordHash: text('password_hash').notNull(),
-  isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-}, (table) => [
-  uniqueIndex('admin_users_email_lower_uq').on(sql`lower(${table.email})`),
-])
+export const adminUsers = pgTable(
+  'admin_users',
+  {
+    id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+    email: text('email').notNull(),
+    passwordHash: text('password_hash').notNull(),
+    isActive: boolean('is_active').notNull().default(true),
+    ...timestamps(),
+  },
+  (table) => [
+    uniqueIndex('admin_users_email_lower_uq').on(sql`lower(${table.email})`),
+  ],
+)
 
 export const adminProfiles = pgTable('admin_profiles', {
   userId: integer('user_id')
@@ -420,8 +458,7 @@ export const adminProfiles = pgTable('admin_profiles', {
     .$type<Record<string, unknown>>()
     .notNull()
     .default({}),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  ...timestamps(),
 })
 
 export const adminSessions = pgTable(
@@ -432,7 +469,7 @@ export const adminSessions = pgTable(
       .notNull()
       .references(() => adminUsers.id, { onDelete: 'cascade' }),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: createdAt(),
   },
   (table) => [
     index('admin_sessions_user_id_idx').on(table.userId),
@@ -440,12 +477,12 @@ export const adminSessions = pgTable(
   ],
 )
 
-// Prevent duplicate pending verifications for the same email and purpose.
+// At most one pending (unconsumed) verification per email and purpose.
 export const adminEmailVerifications = pgTable(
   'admin_email_verifications',
   {
     id: text('id').primaryKey(),
-    purpose: adminVerificationPurposeEnum('purpose').notNull(),
+    purpose: text('purpose').$type<AdminVerificationPurpose>().notNull(),
     email: text('email').notNull(),
     displayName: text('display_name').notNull(),
     passwordHash: text('password_hash').notNull(),
@@ -458,13 +495,17 @@ export const adminEmailVerifications = pgTable(
       { onDelete: 'cascade' },
     ),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: createdAt(),
   },
   (table) => [
     uniqueIndex('admin_email_verifications_email_purpose_active_uq')
       .on(sql`lower(${table.email})`, table.purpose)
       .where(sql`${table.consumedAt} IS NULL`),
     index('admin_email_verifications_expires_at_idx').on(table.expiresAt),
+    check(
+      'admin_email_verifications_purpose_chk',
+      oneOf(table.purpose, ADMIN_VERIFICATION_PURPOSES),
+    ),
     check(
       'admin_email_verifications_attempts_nonnegative_chk',
       sql`${table.attempts} >= 0`,

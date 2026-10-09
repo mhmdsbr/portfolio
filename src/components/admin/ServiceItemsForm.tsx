@@ -10,12 +10,13 @@ import {
   FiPieChart, 
   FiBox
 } from 'react-icons/fi'
+import { SERVICE_ICONS, type ServiceIcon } from '@/lib/db/constants'
 
 interface ServiceItem {
   id: number
   title: string
   description: string | null
-  icon: string | null
+  icon: ServiceIcon | null
   sortOrder: number | null
 }
 
@@ -23,14 +24,17 @@ interface ServiceItemsFormProps {
   items: ServiceItem[]
 }
 
-const iconOptions = [
-  { value: 'palette', label: 'Palette', icon: FiMonitor },
-  { value: 'desktop', label: 'Desktop', icon: FiMonitor },
-  { value: 'pen-ruler', label: 'Pencil Ruler', icon: FiPenTool },
-  { value: 'paintbrush', label: 'Paint Brush', icon: FiPenTool },
-  { value: 'chart-area', label: 'Chart Area', icon: FiPieChart },
-  { value: 'bullhorn', label: 'Bull Horn', icon: FiPieChart },
-]
+// Typed so a new ServiceIcon value fails to compile until it is listed here.
+const iconDetails: Record<ServiceIcon, { label: string; icon: typeof FiMonitor }> = {
+  palette: { label: 'Palette', icon: FiMonitor },
+  desktop: { label: 'Desktop', icon: FiMonitor },
+  'pen-ruler': { label: 'Pencil Ruler', icon: FiPenTool },
+  paintbrush: { label: 'Paint Brush', icon: FiPenTool },
+  'chart-area': { label: 'Chart Area', icon: FiPieChart },
+  bullhorn: { label: 'Bull Horn', icon: FiPieChart },
+}
+
+const iconOptions = SERVICE_ICONS.map((value) => ({ value, ...iconDetails[value] }))
 
 export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
   const [serviceItems, setServiceItems] = useState(items)

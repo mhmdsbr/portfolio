@@ -5,6 +5,8 @@ import * as schema from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/lib/auth";
+import { YEAR_MAX, YEAR_MIN } from "@/lib/db/constants";
+import { getSection, updateSectionConfig } from "@/lib/db/sections";
 
 // =============================================
 // GET
@@ -13,28 +15,22 @@ import { requireAuth } from "@/lib/auth";
 export async function getExperienceSectionData() {
   await requireAuth();
 
-  const [[summary], [section]] = await Promise.all([
-    db.select().from(schema.experienceSection).limit(1),
+  const [section, jobs, experiences] = await Promise.all([
+    getSection("experience"),
     db
       .select()
-      .from(schema.pageSections)
-      .where(eq(schema.pageSections.sectionKey, "experience"))
-      .limit(1),
+      .from(schema.experiences)
+      .orderBy(asc(schema.experiences.sortOrder), asc(schema.experiences.id)),
+    db
+      .select()
+      .from(schema.skills)
+      .orderBy(asc(schema.skills.sortOrder), asc(schema.skills.id)),
   ]);
 
-  const jobs = await db
-    .select()
-    .from(schema.experiences)
-    .orderBy(asc(schema.experiences.sortOrder), asc(schema.experiences.id));
-
-  const experiences = await db
-    .select()
-    .from(schema.skills)
-    .orderBy(asc(schema.skills.sortOrder), asc(schema.skills.id));
-
   return {
-    ...summary,
     id: 0,
+    buttonText: section?.config.buttonText ?? null,
+    buttonUrl: section?.config.buttonUrl ?? null,
     title: section?.title ?? null,
     jobs,
     experiences,
@@ -48,33 +44,40 @@ export async function getExperienceSectionData() {
 export async function updateExperienceSection(formData: FormData) {
   await requireAuth();
 
-  const buttonText = formData.get("buttonText") as string;
-  const buttonUrl = formData.get("buttonUrl") as string;
-
-  const values = {
-    buttonText: buttonText || null,
-    buttonUrl: buttonUrl || null,
-  };
-  const [existingSummary] = await db
-    .select()
-    .from(schema.experienceSection)
-    .where(eq(schema.experienceSection.sectionKey, "experience"))
-    .limit(1);
-  const [summary] = existingSummary
-    ? await db
-        .update(schema.experienceSection)
-        .set(values)
-        .where(eq(schema.experienceSection.sectionKey, existingSummary.sectionKey))
-        .returning()
-    : await db
-        .insert(schema.experienceSection)
-        .values({ ...values, sectionKey: "experience" })
-        .returning();
+  const { config } = await updateSectionConfig("experience", {
+    buttonText: formData.get("buttonText"),
+    buttonUrl: formData.get("buttonUrl"),
+  });
 
   revalidatePath("/admin/experience");
   revalidatePath("/api/all");
 
-  return summary;
+  return config;
+}
+
+function parseJobYears(formData: FormData) {
+  const fromYearInput = String(formData.get("fromYear") ?? "").trim();
+  const fromYear = Number(fromYearInput);
+  if (
+    !fromYearInput ||
+    !Number.isInteger(fromYear) ||
+    fromYear < YEAR_MIN ||
+    fromYear > YEAR_MAX
+  ) {
+    throw new Error("Start year must be a valid year");
+  }
+  const toYearInput = String(formData.get("toYear") ?? "").trim();
+  const toYear =
+    toYearInput.toLowerCase() === "present" || toYearInput === ""
+      ? null
+      : Number(toYearInput);
+  if (
+    toYear !== null &&
+    (!Number.isInteger(toYear) || toYear < fromYear || toYear > YEAR_MAX)
+  ) {
+    throw new Error("End year must be a valid year, not before the start year, or Present");
+  }
+  return { fromYear, toYear };
 }
 
 // =============================================
@@ -84,19 +87,7 @@ export async function updateExperienceSection(formData: FormData) {
 export async function createJob(formData: FormData) {
   await requireAuth();
 
-  const fromYearInput = String(formData.get("fromYear") ?? "").trim();
-  const fromYear = Number(fromYearInput);
-  if (!fromYearInput || !Number.isInteger(fromYear) || fromYear < 0) {
-    throw new Error("Start year must be a valid year");
-  }
-  const toYearInput = String(formData.get("toYear") ?? "").trim();
-  const toYear =
-    toYearInput.toLowerCase() === "present" || toYearInput === ""
-      ? null
-      : Number(toYearInput);
-  if (toYear !== null && (!Number.isInteger(toYear) || toYear < 0)) {
-    throw new Error("End year must be a valid year or Present");
-  }
+  const { fromYear, toYear } = parseJobYears(formData);
   const jobTitle = formData.get("jobTitle") as string;
   const company = formData.get("company") as string;
   const description = formData.get("description") as string;
@@ -130,19 +121,7 @@ export async function createJob(formData: FormData) {
 export async function updateJob(id: number, formData: FormData) {
   await requireAuth();
 
-  const fromYearInput = String(formData.get("fromYear") ?? "").trim();
-  const fromYear = Number(fromYearInput);
-  if (!fromYearInput || !Number.isInteger(fromYear) || fromYear < 0) {
-    throw new Error("Start year must be a valid year");
-  }
-  const toYearInput = String(formData.get("toYear") ?? "").trim();
-  const toYear =
-    toYearInput.toLowerCase() === "present" || toYearInput === ""
-      ? null
-      : Number(toYearInput);
-  if (toYear !== null && (!Number.isInteger(toYear) || toYear < 0)) {
-    throw new Error("End year must be a valid year or Present");
-  }
+  const { fromYear, toYear } = parseJobYears(formData);
   const jobTitle = formData.get("jobTitle") as string;
   const company = formData.get("company") as string;
   const description = formData.get("description") as string;

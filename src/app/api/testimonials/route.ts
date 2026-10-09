@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(): Promise<NextResponse<ApiResponse<TestimonialsResponse>>> {
   try {
     const [sectionData, itemsData] = await Promise.all([
-      db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'testimonials')),
+      db.select().from(schema.pageSections).where(eq(schema.pageSections.kind, 'testimonials')),
       db.select().from(schema.testimonials).orderBy(
         asc(schema.testimonials.sortOrder),
         asc(schema.testimonials.id),

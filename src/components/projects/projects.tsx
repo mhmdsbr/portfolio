@@ -7,8 +7,10 @@ import ProjectCard from "./ProjectCard";
 
 interface Project {
   id: number;
+  slug: string;
   title: string;
   category: string;
+  category_slug: string;
   description: string | null;
   image: string | null;
   link?: string | null;
@@ -21,9 +23,7 @@ export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
 
   const { data: allData } = useAllData();
-  const sectionId =
-    allData?.header?.sections.find((section) => section.sortOrder === 4)
-      ?.sectionKey ?? "projects";
+  const sectionId = "projects";
 
   const allProjects: Project[] = useMemo(() => {
     return allData?.projects?.items || [];

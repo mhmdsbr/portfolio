@@ -2,10 +2,11 @@
 
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { eq, asc } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 import { orderBySortOrder } from '@/lib/db/order'
+import { getSection, updateSectionConfig } from '@/lib/db/sections'
 
 // =============================================
 // GET
@@ -14,18 +15,18 @@ import { orderBySortOrder } from '@/lib/db/order'
 export async function getAbout() {
   await requireAuth()
   
-  const [[about], [profile], [section], details] = await Promise.all([
-    db.select().from(schema.aboutSection).limit(1),
+  const [[profile], section, details] = await Promise.all([
     db.select().from(schema.profile).limit(1),
-    db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'about')).limit(1),
+    getSection('about'),
     db.select().from(schema.profileFacts).orderBy(
       ...orderBySortOrder(schema.profileFacts.sortOrder, schema.profileFacts.id),
     ),
   ])
   
   return {
-    ...about,
     id: 0,
+    buttonText: section?.config.buttonText ?? null,
+    buttonUrl: section?.config.buttonUrl ?? null,
     title: section?.title ?? null,
     name: profile?.name ?? null,
     jobTitle: profile?.jobTitle ?? null,
@@ -47,29 +48,17 @@ export async function updateAbout(formData: FormData) {
   const buttonText = formData.get('buttonText') as string
   const buttonUrl = formData.get('buttonUrl') as string
   
-  const aboutValues = {
-    buttonText: buttonText || null,
-    buttonUrl: buttonUrl || null,
-  }
   const profileValues = {
     name: name || null,
     jobTitle: jobTitle || null,
     biography: description || null,
   }
-  const [about] = await db.transaction(async (transaction) => {
-    const [existingAbout] = await transaction
-      .select()
-      .from(schema.aboutSection)
-      .where(eq(schema.aboutSection.sectionKey, 'about'))
-      .limit(1)
-    const [updatedAbout] = existingAbout
-      ? await transaction.update(schema.aboutSection)
-          .set(aboutValues)
-          .where(eq(schema.aboutSection.sectionKey, existingAbout.sectionKey))
-          .returning()
-      : await transaction.insert(schema.aboutSection)
-          .values({ ...aboutValues, sectionKey: 'about' })
-          .returning()
+  const about = await db.transaction(async (transaction) => {
+    const { config } = await updateSectionConfig(
+      'about',
+      { buttonText, buttonUrl },
+      transaction,
+    )
 
     const [existingProfile] = await transaction
       .select()
@@ -83,7 +72,7 @@ export async function updateAbout(formData: FormData) {
       await transaction.insert(schema.profile).values(profileValues)
     }
 
-    return [updatedAbout]
+    return config
   })
   
   revalidatePath('/admin/about')

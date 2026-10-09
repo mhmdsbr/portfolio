@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(): Promise<NextResponse<ApiResponse<ProjectsResponse>>> {
   try {
     const [sectionData, itemsData] = await Promise.all([
-      db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'projects')),
+      db.select().from(schema.pageSections).where(eq(schema.pageSections.kind, 'projects')),
       getProjects(),
     ])
 
@@ -18,8 +18,10 @@ export async function GET(): Promise<NextResponse<ApiResponse<ProjectsResponse>>
       title: sectionData[0]?.title ?? null,
       items: itemsData.map((item) => ({
         id: item.id,
+        slug: item.slug,
         title: item.title,
         category: item.category,
+        category_slug: item.categorySlug,
         description: item.description ?? null,
         image: item.image ?? null,
         link: item.link ?? null,

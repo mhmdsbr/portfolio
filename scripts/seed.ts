@@ -2,26 +2,35 @@ import "dotenv/config";
 import { sql } from "drizzle-orm";
 import { db } from "../src/lib/db/index.js";
 import * as schema from "../src/lib/db/schema.js";
+import type { ContactMethodSectionKind } from "../src/lib/db/constants.js";
+import { SECTION_CONFIG_DEFAULTS } from "../src/lib/db/section-config.js";
+import { uniqueSlug } from "../src/lib/project-slug.js";
+
+type SeedSection = Omit<schema.NewPageSection, "id">;
 
 interface SeedConfig {
   profile: schema.NewProfile;
   socialLinks: schema.NewSocialLink[];
-  hero: Omit<schema.NewHeroSection, "id" | "sectionKey">;
-  heroTitles: Omit<schema.NewHeroTitle, "id">[];
-  about: Omit<schema.NewAboutSection, "id" | "sectionKey">;
-  contactMethods: Omit<schema.NewContactMethod, "id">[];
+  heroTitles: string[];
+  contactMethods: Array<
+    Omit<schema.NewContactMethod, "id"> & {
+      sections: ContactMethodSectionKind[];
+    }
+  >;
   profileFacts: Omit<schema.NewProfileFact, "id">[];
   serviceRecords: Omit<schema.NewService, "id">[];
-  experienceSection: Omit<schema.NewExperienceSection, "id" | "sectionKey">;
   experiences: Omit<schema.NewExperience, "id">[];
   skills: Omit<schema.NewSkill, "id">[];
   testimonialRecords: Omit<schema.NewTestimonial, "id">[];
-  contactSection: Omit<schema.NewContactSection, "id" | "sectionKey">;
   appConfig: schema.NewSiteConfig;
   projectRecords: Array<
-    Omit<schema.NewProject, "id"> & { roles: string[]; tech: string[] }
+    Omit<schema.NewProject, "id" | "slug" | "categoryId"> & {
+      category: string;
+      roles: string[];
+      tech: string[];
+    }
   >;
-  pageSections: Omit<schema.NewPageSection, "id">[];
+  pageSections: SeedSection[];
   footer: Omit<schema.NewSiteConfig, "id" | "recaptchaSiteKey">;
 }
 
@@ -40,39 +49,28 @@ const seedData: SeedConfig = {
     },
     { platform: "mail", url: "mailto:saaber.mohamad@gmail.com", sortOrder: 1 },
   ],
-  hero: {
-    location: "Berlin, Germany",
-    subtitleOne: "Frontend Developer",
-    subtitleTwo: "JavaScript, React & CMS",
-    logoUrl: "https://your-logo.svg",
-  },
-  heroTitles: [
-    { heroSectionKey: "hero", title: "Creative", sortOrder: 0 },
-    { heroSectionKey: "hero", title: "Developer", sortOrder: 1 },
-    { heroSectionKey: "hero", title: "Designer", sortOrder: 2 },
-  ],
-  about: {
-    buttonText: "Download CV",
-    buttonUrl: "/cv.pdf",
-  },
+  heroTitles: ["Creative", "Developer", "Designer"],
   contactMethods: [
     {
       kind: "phone",
       title: "Phone",
       value: "+4917659232759",
       sortOrder: 0,
+      sections: ["about", "contact"],
     },
     {
       kind: "email",
       title: "Email",
       value: "saaber.mohamad@gmail.com",
       sortOrder: 1,
+      sections: ["about", "contact"],
     },
     {
       kind: "address",
       title: "Location",
       value: "Berlin, Germany",
       sortOrder: 2,
+      sections: ["about", "contact"],
     },
   ],
   profileFacts: [
@@ -100,10 +98,6 @@ const seedData: SeedConfig = {
       sortOrder: 2,
     },
   ],
-  experienceSection: {
-    buttonText: "Download Resume",
-    buttonUrl: "/resume.pdf",
-  },
   experiences: [
     {
       fromYear: 2025,
@@ -452,63 +446,72 @@ const seedData: SeedConfig = {
       sortOrder: 15,
     },
   ],
-  contactSection: {
-    formTitle: "Send me a message",
-    buttonText: "Send Message",
-    buttonUrl: "#contact",
-  },
   appConfig: {
     recaptchaSiteKey: "your-recaptcha-key",
   },
   pageSections: [
     {
-      sectionKey: "hero",
+      kind: "hero",
       navigationTitle: "Welcome",
       title: null,
       sortOrder: 0,
       isEnabled: true,
+      config: {
+        ...SECTION_CONFIG_DEFAULTS.hero,
+        location: "Berlin, Germany",
+        subtitleOne: "Frontend Developer",
+        subtitleTwo: "JavaScript, React & CMS",
+        logoUrl: "https://your-logo.svg",
+      },
     },
     {
-      sectionKey: "about",
+      kind: "about",
       navigationTitle: "Know me more.",
       title: "About Me",
       sortOrder: 1,
       isEnabled: true,
+      config: { buttonText: "Download CV", buttonUrl: "/cv.pdf" },
     },
     {
-      sectionKey: "experience",
+      kind: "experience",
       navigationTitle: "What I've done so far!",
       title: "Summary",
       sortOrder: 2,
       isEnabled: true,
+      config: { buttonText: "Download Resume", buttonUrl: "/resume.pdf" },
     },
     {
-      sectionKey: "services",
+      kind: "services",
       navigationTitle: "I can help you with:",
       title: "Services",
       sortOrder: 3,
       isEnabled: true,
     },
     {
-      sectionKey: "projects",
+      kind: "projects",
       navigationTitle: "Here is my portfolio",
       title: "Key Projects",
       sortOrder: 4,
       isEnabled: true,
     },
     {
-      sectionKey: "testimonials",
+      kind: "testimonials",
       navigationTitle: "What people say",
       title: "Testimonials",
       sortOrder: 5,
       isEnabled: true,
     },
     {
-      sectionKey: "contact",
+      kind: "contact",
       navigationTitle: "Let's talk more",
       title: "Contact stuff",
       sortOrder: 6,
       isEnabled: true,
+      config: {
+        formTitle: "Send me a message",
+        buttonText: "Send Message",
+        buttonUrl: "#contact",
+      },
     },
   ],
   footer: {
@@ -531,49 +534,81 @@ async function seed() {
     // Insert social links.
     await db.insert(schema.socialLinks).values(seedData.socialLinks);
 
-    // Insert site settings.
+    // Insert page sections (each carries its own settings in `config`).
+    const sections = await db
+      .insert(schema.pageSections)
+      .values(seedData.pageSections)
+      .returning({ id: schema.pageSections.id, kind: schema.pageSections.kind });
+    const sectionIds = new Map(sections.map(({ id, kind }) => [kind, id]));
+    const requireSectionId = (kind: string) => {
+      const id = sectionIds.get(kind as schema.SectionKind);
+      if (id === undefined) throw new Error(`Missing seeded section "${kind}"`);
+      return id;
+    };
 
-    // Insert page sections before their section-specific settings.
-    await db.insert(schema.pageSections).values(seedData.pageSections);
-
-    // Insert hero settings and titles.
-    const [hero] = await db
-      .insert(schema.heroSection)
-      .values({ ...seedData.hero, sectionKey: "hero" })
-      .returning({ sectionKey: schema.heroSection.sectionKey });
-
+    // Insert hero titles.
     await db.insert(schema.heroTitles).values(
-      seedData.heroTitles.map((title) => ({
-        ...title,
-        heroSectionKey: hero.sectionKey,
+      seedData.heroTitles.map((title, sortOrder) => ({
+        sectionId: requireSectionId("hero"),
+        title,
+        sortOrder,
       })),
     );
 
-    // Insert about settings and portfolio-owned content.
-    await db
-      .insert(schema.aboutSection)
-      .values({ ...seedData.about, sectionKey: "about" });
-    await db.insert(schema.contactMethods).values(seedData.contactMethods);
+    // Insert contact methods and link them to the sections that show them.
+    for (const { sections: methodSections, ...method } of seedData.contactMethods) {
+      const [created] = await db
+        .insert(schema.contactMethods)
+        .values(method)
+        .returning({ id: schema.contactMethods.id });
+      if (methodSections.length > 0) {
+        await db.insert(schema.contactMethodSections).values(
+          methodSections.map((kind) => ({
+            contactMethodId: created.id,
+            sectionId: requireSectionId(kind),
+          })),
+        );
+      }
+    }
     await db.insert(schema.profileFacts).values(seedData.profileFacts);
 
     // Insert services.
     await db.insert(schema.services).values(seedData.serviceRecords);
 
-    // Insert experience settings and portfolio entities.
-    await db
-      .insert(schema.experienceSection)
-      .values({ ...seedData.experienceSection, sectionKey: "experience" });
+    // Insert experience and skills.
     await db.insert(schema.experiences).values(seedData.experiences);
     await db.insert(schema.skills).values(seedData.skills);
 
     // Insert testimonials.
     await db.insert(schema.testimonials).values(seedData.testimonialRecords);
 
-    // Insert projects and their normalized roles and technology links.
-    for (const { roles, tech, ...projectValues } of seedData.projectRecords) {
+    // Insert categories, projects and their normalized roles and technology links.
+    const categoryIds = new Map<string, number>();
+    const categorySlugs = new Set<string>();
+    const projectSlugs = new Set<string>();
+    for (const {
+      roles,
+      tech,
+      category,
+      ...projectValues
+    } of seedData.projectRecords) {
+      let categoryId = categoryIds.get(category.toLocaleLowerCase());
+      if (categoryId === undefined) {
+        const slug = uniqueSlug(category, categorySlugs, "category");
+        categorySlugs.add(slug);
+        const [createdCategory] = await db
+          .insert(schema.projectCategories)
+          .values({ name: category, slug })
+          .returning({ id: schema.projectCategories.id });
+        categoryId = createdCategory.id;
+        categoryIds.set(category.toLocaleLowerCase(), categoryId);
+      }
+
+      const slug = uniqueSlug(projectValues.title, projectSlugs, "project");
+      projectSlugs.add(slug);
       const [project] = await db
         .insert(schema.projects)
-        .values(projectValues)
+        .values({ ...projectValues, slug, categoryId })
         .returning({ id: schema.projects.id });
 
       const uniqueRoles = [...new Set(roles)];
@@ -619,18 +654,11 @@ async function seed() {
       }
     }
 
-    // Insert contact settings.
-    await db
-      .insert(schema.contactSection)
-      .values({ ...seedData.contactSection, sectionKey: "contact" });
-
     // Insert footer and application configuration.
     await db.insert(schema.siteConfig).values({
       ...seedData.footer,
       ...seedData.appConfig,
     });
-
-    // Insert header settings.
 
     console.log("✅ Database seeded successfully!");
     console.log(`📊 Inserted:`, {

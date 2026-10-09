@@ -2,9 +2,13 @@
 
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
+import { SECTION_KINDS, type SectionKind } from '@/lib/db/constants'
 import { asc, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
+
+const isSectionKind = (value: unknown): value is SectionKind =>
+  typeof value === 'string' && (SECTION_KINDS as readonly string[]).includes(value)
 
 export async function getHeader() {
   await requireAuth()
@@ -19,13 +23,13 @@ export async function getHeader() {
 }
 
 export async function updatePageSection(
-  sectionKey: string,
+  kind: SectionKind,
   values: { navigationTitle: string; title: string },
 ) {
   await requireAuth()
 
   if (
-    !sectionKey ||
+    !isSectionKind(kind) ||
     !values ||
     typeof values.navigationTitle !== 'string' ||
     typeof values.title !== 'string'
@@ -43,7 +47,7 @@ export async function updatePageSection(
 
   const [section] = await db.update(schema.pageSections)
     .set(normalizedValues)
-    .where(eq(schema.pageSections.sectionKey, sectionKey))
+    .where(eq(schema.pageSections.kind, kind))
     .returning()
 
   if (!section) throw new Error('Portfolio section not found')
@@ -55,24 +59,24 @@ export async function updatePageSection(
   return section
 }
 
-export async function togglePortfolioSection(sectionKey: string, isEnabled: boolean) {
+export async function togglePortfolioSection(kind: SectionKind, isEnabled: boolean) {
   await requireAuth()
 
-  if (!sectionKey || typeof isEnabled !== 'boolean') {
+  if (!isSectionKind(kind) || typeof isEnabled !== 'boolean') {
     throw new Error('Invalid portfolio section update')
   }
 
   await db.transaction(async (transaction) => {
     const [section] = await transaction.select()
       .from(schema.pageSections)
-      .where(eq(schema.pageSections.sectionKey, sectionKey))
+      .where(eq(schema.pageSections.kind, kind))
       .limit(1)
     if (!section) {
       throw new Error('Portfolio section not found')
     }
 
     if (!isEnabled) {
-      const enabledSections = await transaction.select({ sectionKey: schema.pageSections.sectionKey })
+      const enabledSections = await transaction.select({ id: schema.pageSections.id })
         .from(schema.pageSections)
         .where(eq(schema.pageSections.isEnabled, true))
       if (section.isEnabled && enabledSections.length <= 1) {
@@ -82,36 +86,36 @@ export async function togglePortfolioSection(sectionKey: string, isEnabled: bool
 
     await transaction.update(schema.pageSections)
       .set({ isEnabled })
-      .where(eq(schema.pageSections.sectionKey, sectionKey))
+      .where(eq(schema.pageSections.kind, kind))
   })
 
   revalidatePath('/')
   revalidatePath('/api/all')
 }
 
-export async function reorderHeaderSections(sectionKeys: string[]) {
+export async function reorderHeaderSections(kinds: SectionKind[]) {
   await requireAuth()
 
   if (
-    sectionKeys.length === 0 ||
-    sectionKeys.some((sectionKey) => !sectionKey) ||
-    new Set(sectionKeys).size !== sectionKeys.length
+    kinds.length === 0 ||
+    !kinds.every(isSectionKind) ||
+    new Set(kinds).size !== kinds.length
   ) {
     throw new Error('Invalid portfolio section order')
   }
 
   await db.transaction(async (transaction) => {
-    const existingSections = await transaction.select({ sectionKey: schema.pageSections.sectionKey })
+    const existingSections = await transaction.select({ kind: schema.pageSections.kind })
       .from(schema.pageSections)
-    const existingKeys = new Set(existingSections.map(({ sectionKey }) => sectionKey))
-    if (sectionKeys.some((sectionKey) => !existingKeys.has(sectionKey)) || existingKeys.size !== sectionKeys.length) {
+    const existingKinds = new Set<string>(existingSections.map(({ kind }) => kind))
+    if (kinds.some((kind) => !existingKinds.has(kind)) || existingKinds.size !== kinds.length) {
       throw new Error('Portfolio section order does not match the configured sections')
     }
 
-    await Promise.all(sectionKeys.map((sectionKey, index) =>
+    await Promise.all(kinds.map((kind, index) =>
       transaction.update(schema.pageSections)
         .set({ sortOrder: index })
-        .where(eq(schema.pageSections.sectionKey, sectionKey)),
+        .where(eq(schema.pageSections.kind, kind)),
     ))
   })
 

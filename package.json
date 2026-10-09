@@ -15,7 +15,8 @@
     "db:seed": "tsx scripts/seed.ts",
     "db:clear": "tsx scripts/clear.ts --confirm",
     "db:sync:prod": "tsx scripts/sync-production.ts --confirm",
-    "db:reset": "drizzle-kit drop && drizzle-kit generate && drizzle-kit migrate"
+    "db:reset": "drizzle-kit drop && drizzle-kit generate && drizzle-kit migrate",
+    "db:upgrade": "tsx scripts/upgrade-db.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",

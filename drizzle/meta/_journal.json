@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1791367362209,
-      "tag": "0000_simple_toro",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1791370000000,
-      "tag": "0001_schema_cleanup",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1791371000000,
-      "tag": "0002_section_config_refactor",
+      "when": 1791547689142,
+      "tag": "0000_baseline",
       "breakpoints": true
     }
   ]

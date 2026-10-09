@@ -1,38 +1,35 @@
 import { db } from '@/lib/db'
 import * as schema from '@/lib/db/schema'
-import { asc, eq } from 'drizzle-orm'
+import { asc } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import { getSection } from '@/lib/db/sections'
+import { getContactMethodsForSection } from '@/lib/contact-methods'
 import type { ApiResponse, AboutResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<AboutResponse>>> {
   try {
-    const [aboutData, profileData, contactInfoData, detailsData, sectionData] = await Promise.all([
-      db.select().from(schema.aboutSection),
+    const [section, profileData, contactInfoData, detailsData] = await Promise.all([
+      getSection('about'),
       db.select().from(schema.profile),
-      db.select().from(schema.contactMethods).orderBy(
-        asc(schema.contactMethods.sortOrder),
-        asc(schema.contactMethods.id),
-      ),
+      getContactMethodsForSection('about'),
       db.select().from(schema.profileFacts).orderBy(
         asc(schema.profileFacts.sortOrder),
         asc(schema.profileFacts.id),
       ),
-      db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'about')),
     ])
 
-    const about = aboutData[0]
     const profile = profileData[0]
 
     const response: AboutResponse = {
-      title: sectionData[0]?.title ?? null,
+      title: section?.title ?? null,
       name: profile?.name ?? null,
       job_title: profile?.jobTitle ?? null,
       description: profile?.biography ?? null,
       button: {
-        text: about?.buttonText ?? null,
-        url: about?.buttonUrl ?? null,
+        text: section?.config.buttonText ?? null,
+        url: section?.config.buttonUrl ?? null,
       },
       contact_information: contactInfoData.map((info) => ({
         kind: info.kind,
