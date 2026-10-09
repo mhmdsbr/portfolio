@@ -12,7 +12,6 @@ erDiagram
         text section_key UK
         text navigation_title
         text title
-        text overlay_title
         int sort_order
         boolean is_enabled
     }
@@ -225,13 +224,13 @@ by foreign keys:
 | Page section | Data returned with that section |
 | --- | --- |
 | `hero` | `hero_section`, `hero_titles` |
-| `about` | `about_section`, `portfolio_profile`, `contact_methods`, `profile_facts` |
+| `about` | `about_section`, `profile`, `contact_methods`, `profile_facts` |
 | `experience` | `experience_section`, `experiences`, `skills` |
 | `services` | `services` |
 | `projects` | `projects` |
 | `testimonials` | `testimonials` |
 | `contact` | `contact_section`, `contact_methods` |
 
-The schema also contains independent site-level tables: `sidebar`,
-`social_links`, `footer`, and `app_config`.
+The schema also contains independent site-level tables: `social_links` and
+the singleton `site_config`, which stores footer and runtime configuration.
 No foreign keys currently connect these tables to each other.

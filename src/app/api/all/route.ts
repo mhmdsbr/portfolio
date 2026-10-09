@@ -3,7 +3,6 @@ import * as schema from "@/lib/db/schema";
 import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import type { ApiResponse, AllDataResponse } from "@/types/api";
-import { isPortfolioSectionKey, PORTFOLIO_SECTIONS } from "@/lib/portfolio-sections";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +12,6 @@ export async function GET(): Promise<
   try {
     // Fetch all data in parallel
     const [
-      sidebarData,
       profileData,
       socialData,
       heroData,
@@ -30,12 +28,10 @@ export async function GET(): Promise<
       projectTechData,
       projectRolesData,
       contactData,
-      configData,
+      siteConfigData,
       pageSectionsData,
-      footerData,
     ] = await Promise.all([
-      db.select().from(schema.sidebar).limit(1),
-      db.select().from(schema.portfolioProfile).limit(1),
+      db.select().from(schema.profile).limit(1),
       db
         .select()
         .from(schema.socialLinks)
@@ -46,7 +42,7 @@ export async function GET(): Promise<
         .from(schema.heroTitles)
         .innerJoin(
           schema.heroSection,
-          eq(schema.heroSection.id, schema.heroTitles.heroSectionId),
+          eq(schema.heroSection.sectionKey, schema.heroTitles.heroSectionKey),
         )
         .where(eq(schema.heroSection.sectionKey, 'hero'))
         .orderBy(asc(schema.heroTitles.sortOrder), asc(schema.heroTitles.id)),
@@ -111,49 +107,21 @@ export async function GET(): Promise<
           asc(schema.projectRoles.role),
         ),
       db.select().from(schema.contactSection).limit(1),
-      db.select().from(schema.appConfig).limit(1),
+      db.select().from(schema.siteConfig).limit(1),
       db
         .select()
         .from(schema.pageSections)
         .orderBy(asc(schema.pageSections.sortOrder), asc(schema.pageSections.id)),
-      db.select().from(schema.footer).limit(1),
     ]);
 
     // Extract first records
-    const sidebar = sidebarData[0];
     const profile = profileData[0];
     const hero = heroData[0];
     const about = aboutData[0];
     const summary = summaryData[0];
     const contact = contactData[0];
-    const configRecord = configData[0];
-    const footerRecord = footerData[0];
-
-    const savedSections = new Map(
-      pageSectionsData
-        .filter((section) => isPortfolioSectionKey(section.sectionKey))
-        .map((section) => [section.sectionKey, section]),
-    );
-    const sectionMetadata = new Map(
-      PORTFOLIO_SECTIONS.map((section, sortOrder) => {
-        const savedSection = savedSections.get(section.key);
-        return [
-          section.key,
-          {
-            id: savedSection?.id ?? -(sortOrder + 1),
-            sectionKey: section.key,
-            navigationTitle:
-              savedSection?.navigationTitle ?? section.navigationTitle,
-            title: savedSection ? savedSection.title : section.title,
-            overlayTitle: savedSection
-              ? savedSection.overlayTitle
-              : section.overlayTitle,
-            sortOrder: savedSection?.sortOrder ?? sortOrder,
-            isEnabled: savedSection?.isEnabled ?? true,
-          },
-        ];
-      }),
-    );
+    const configRecord = siteConfigData[0];
+    const sectionMetadata = new Map(pageSectionsData.map((section) => [section.sectionKey, section]));
 
     // Transform social media
     const socialMediaMap = socialData.reduce<Record<string, string>>(
@@ -179,14 +147,6 @@ export async function GET(): Promise<
     }, {});
 
     const response: AllDataResponse = {
-      sidebar: {
-        profile_image: sidebar?.profileImageUrl ?? null,
-        profile_image_alt: sidebar?.profileImageAlt ?? null,
-        profile_title: sidebar?.profileTitle ?? null,
-        social_media: socialMediaMap,
-        portfolio_title: profile?.name ?? null,
-        portfolio_overlay_title: profile?.jobTitle ?? null,
-      },
       hero: {
         titles: heroTitlesData.map(({ title }) => title),
         location: hero?.location ?? null,
@@ -196,7 +156,6 @@ export async function GET(): Promise<
       },
       about: {
         title: sectionMetadata.get("about")?.title ?? null,
-        overlay_title: sectionMetadata.get("about")?.overlayTitle ?? null,
         name: profile?.name ?? null,
         job_title: profile?.jobTitle ?? null,
         description: profile?.biography ?? null,
@@ -216,7 +175,6 @@ export async function GET(): Promise<
       },
       services: {
         title: sectionMetadata.get("services")?.title ?? null,
-        overlay_title: sectionMetadata.get("services")?.overlayTitle ?? null,
         items: servicesData.map((item) => ({
           title: item.title,
           description: item.description ?? null,
@@ -225,7 +183,6 @@ export async function GET(): Promise<
       },
       summary: {
         title: sectionMetadata.get("experience")?.title ?? null,
-        overlay_title: sectionMetadata.get("experience")?.overlayTitle ?? null,
         button: {
           text: summary?.buttonText ?? null,
           url: summary?.buttonUrl ?? null,
@@ -244,7 +201,6 @@ export async function GET(): Promise<
       },
       testimonials: {
         title: sectionMetadata.get("testimonials")?.title ?? null,
-        overlay_title: sectionMetadata.get("testimonials")?.overlayTitle ?? null,
         items: testimonialsItemsData.map((item) => ({
           image: item.imageUrl ?? null,
           title: item.title,
@@ -255,7 +211,6 @@ export async function GET(): Promise<
       },
       projects: {
         title: sectionMetadata.get("projects")?.title ?? null,
-        overlay_title: sectionMetadata.get("projects")?.overlayTitle ?? null,
         items: projectsData.map((item) => ({
           id: item.id,
           title: item.title,
@@ -272,7 +227,6 @@ export async function GET(): Promise<
       },
       contact: {
         title: sectionMetadata.get("contact")?.title ?? null,
-        overlay_title: sectionMetadata.get("contact")?.overlayTitle ?? null,
         form_title: contact?.formTitle ?? null,
         button: {
           text: contact?.buttonText ?? null,
@@ -292,13 +246,13 @@ export async function GET(): Promise<
         sections: [...sectionMetadata.values()].sort(
           (left, right) => left.sortOrder - right.sortOrder,
         ),
-        defaultTitle: "Welcome",
+        defaultTitle: null,
       },
       footer: {
-        companyName: footerRecord?.companyName || "Your Company",
-        privacyPolicy: footerRecord?.privacyPolicy || null,
-        termsOfService: footerRecord?.termsOfService || null,
-        copyrightText: footerRecord?.copyrightText || null,
+        companyName: configRecord?.companyName || "Your Company",
+        privacyPolicy: configRecord?.privacyPolicy || null,
+        termsOfService: configRecord?.termsOfService || null,
+        copyrightText: configRecord?.copyrightText || null,
       },
     };
 

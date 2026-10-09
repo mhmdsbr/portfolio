@@ -25,7 +25,6 @@ export async function GET(): Promise<NextResponse<ApiResponse<SummaryResponse>>>
 
     const response: SummaryResponse = {
       title: sectionData[0]?.title ?? null,
-      overlay_title: sectionData[0]?.overlayTitle ?? null,
       button: {
         text: summary?.buttonText ?? null,
         url: summary?.buttonUrl ?? null,

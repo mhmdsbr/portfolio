@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<ConfigResponse>>> {
   try {
-    const [configData] = await db.select().from(schema.appConfig)
+    const [configData] = await db.select().from(schema.siteConfig)
 
     const response: ConfigResponse = {
       recaptcha_site_key: configData?.recaptchaSiteKey ?? null,

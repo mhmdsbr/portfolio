@@ -15,6 +15,13 @@
       "when": 1791370000000,
       "tag": "0001_schema_cleanup",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791371000000,
+      "tag": "0002_section_config_refactor",
+      "breakpoints": true
     }
   ]
 }

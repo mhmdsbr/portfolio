@@ -10,11 +10,9 @@ import {
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 
 interface PageSection {
-  id: number
   sectionKey: string
   navigationTitle: string
   title: string | null
-  overlayTitle: string | null
   sortOrder: number
   isEnabled: boolean
 }
@@ -43,18 +41,16 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     setLoading(true)
     setMessage('')
     try {
-      const savedSection = await updatePageSection(section.id, {
+      const savedSection = await updatePageSection(section.sectionKey, {
         navigationTitle: section.navigationTitle,
         title: section.title ?? '',
-        overlayTitle: section.overlayTitle ?? '',
       })
       setSections((previous) => previous.map((item) =>
-        item.id === section.id
+        item.sectionKey === section.sectionKey
           ? {
               ...item,
               navigationTitle: savedSection.navigationTitle,
               title: savedSection.title,
-              overlayTitle: savedSection.overlayTitle,
             }
           : item,
       ))
@@ -67,9 +63,9 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     }
   }
 
-  const updateSectionDraft = (id: number, field: 'navigationTitle' | 'title' | 'overlayTitle', value: string) => {
+  const updateSectionDraft = (sectionKey: string, field: 'navigationTitle' | 'title', value: string) => {
     setSections((previous) => previous.map((section) =>
-      section.id === id ? { ...section, [field]: value } : section,
+      section.sectionKey === sectionKey ? { ...section, [field]: value } : section,
     ))
   }
 
@@ -77,9 +73,9 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     setLoading(true)
     setMessage('')
     try {
-      await togglePortfolioSection(section.id, !section.isEnabled)
+      await togglePortfolioSection(section.sectionKey, !section.isEnabled)
       setSections((previous) => previous.map((item) =>
-        item.id === section.id ? { ...item, isEnabled: !item.isEnabled } : item,
+        item.sectionKey === section.sectionKey ? { ...item, isEnabled: !item.isEnabled } : item,
       ))
       setMessage('Portfolio layout updated.')
       router.refresh()
@@ -100,7 +96,7 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     setSections(reordered)
 
     try {
-      await reorderHeaderSections(reordered.map(({ id }) => id))
+      await reorderHeaderSections(reordered.map(({ sectionKey }) => sectionKey))
       router.refresh()
     } catch (error) {
       setSections(previousSections)
@@ -135,8 +131,8 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
               >
                 {sections.map((section, index) => (
                   <Draggable
-                    key={section.id}
-                    draggableId={String(section.id)}
+                    key={section.sectionKey}
+                    draggableId={section.sectionKey}
                     index={index}
                   >
                     {(provided, snapshot) => (
@@ -162,14 +158,13 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
                             {([
                               ['navigationTitle', 'Navigation label'],
                               ['title', 'Section title'],
-                              ['overlayTitle', 'Overlay title'],
                             ] as const).map(([field, label]) => (
                               <label key={field} className="block text-xs text-gray-400">
                                 {label}
                                 <input
                                   type="text"
                                   value={section[field] ?? ''}
-                                  onChange={(event) => updateSectionDraft(section.id, field, event.target.value)}
+                                  onChange={(event) => updateSectionDraft(section.sectionKey, field, event.target.value)}
                                   disabled={loading}
                                   className="mt-1 w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                                 />

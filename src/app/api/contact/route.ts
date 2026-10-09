@@ -19,7 +19,6 @@ export async function GET(): Promise<NextResponse<ApiResponse<ContactResponse>>>
 
     const response: ContactResponse = {
       title: sectionData[0]?.title ?? null,
-      overlay_title: sectionData[0]?.overlayTitle ?? null,
       form_title: contactData[0]?.formTitle ?? null,
       button: {
         text: contactData[0]?.buttonText ?? null,

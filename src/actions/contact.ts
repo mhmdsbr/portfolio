@@ -5,7 +5,6 @@ import * as schema from '@/lib/db/schema'
 import { asc, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
-import { ensurePortfolioSections } from '@/lib/db/portfolio-sections'
 
 const contactMethodKinds = schema.contactMethodKindEnum.enumValues
 
@@ -32,8 +31,8 @@ export async function getContact() {
       buttonText: null,
       buttonUrl: null,
     }),
+    id: 0,
     title: section?.title ?? null,
-    overlayTitle: section?.overlayTitle ?? null,
     contactMethods,
   }
 }
@@ -44,7 +43,6 @@ export async function getContact() {
 
 export async function updateContact(formData: FormData) {
   await requireAuth()
-  await ensurePortfolioSections()
 
   const formTitle = formData.get('formTitle') as string
   const buttonText = formData.get('buttonText') as string
@@ -60,7 +58,7 @@ export async function updateContact(formData: FormData) {
     .where(eq(schema.contactSection.sectionKey, 'contact'))
     .limit(1)
   const [contact] = existingContact
-    ? await db.update(schema.contactSection).set(values).where(eq(schema.contactSection.id, existingContact.id)).returning()
+    ? await db.update(schema.contactSection).set(values)    .where(eq(schema.contactSection.sectionKey, existingContact.sectionKey)).returning()
     : await db.insert(schema.contactSection)
         .values({ ...values, sectionKey: 'contact' })
         .returning()

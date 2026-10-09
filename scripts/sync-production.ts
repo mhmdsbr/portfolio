@@ -20,8 +20,7 @@ if (!process.argv.includes("--confirm")) {
 
 const tables = [
   "page_sections",
-  "sidebar",
-  "portfolio_profile",
+  "profile",
   "social_links",
   "hero_section",
   "hero_titles",
@@ -38,8 +37,7 @@ const tables = [
   "technologies",
   "project_technologies",
   "contact_section",
-  "footer",
-  "app_config",
+  "site_config",
 ] as const;
 
 const quoteIdentifier = (identifier: string) =>

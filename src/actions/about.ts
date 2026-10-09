@@ -5,7 +5,7 @@ import * as schema from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
-import { ensurePortfolioSections } from '@/lib/db/portfolio-sections'
+import { orderBySortOrder } from '@/lib/db/order'
 
 // =============================================
 // GET
@@ -16,18 +16,17 @@ export async function getAbout() {
   
   const [[about], [profile], [section], details] = await Promise.all([
     db.select().from(schema.aboutSection).limit(1),
-    db.select().from(schema.portfolioProfile).limit(1),
+    db.select().from(schema.profile).limit(1),
     db.select().from(schema.pageSections).where(eq(schema.pageSections.sectionKey, 'about')).limit(1),
     db.select().from(schema.profileFacts).orderBy(
-      asc(schema.profileFacts.sortOrder),
-      asc(schema.profileFacts.id),
+      ...orderBySortOrder(schema.profileFacts.sortOrder, schema.profileFacts.id),
     ),
   ])
   
   return {
     ...about,
+    id: 0,
     title: section?.title ?? null,
-    overlayTitle: section?.overlayTitle ?? null,
     name: profile?.name ?? null,
     jobTitle: profile?.jobTitle ?? null,
     description: profile?.biography ?? null,
@@ -41,7 +40,6 @@ export async function getAbout() {
 
 export async function updateAbout(formData: FormData) {
   await requireAuth()
-  await ensurePortfolioSections()
   
   const name = formData.get('name') as string
   const jobTitle = formData.get('jobTitle') as string
@@ -67,7 +65,7 @@ export async function updateAbout(formData: FormData) {
     const [updatedAbout] = existingAbout
       ? await transaction.update(schema.aboutSection)
           .set(aboutValues)
-          .where(eq(schema.aboutSection.id, existingAbout.id))
+          .where(eq(schema.aboutSection.sectionKey, existingAbout.sectionKey))
           .returning()
       : await transaction.insert(schema.aboutSection)
           .values({ ...aboutValues, sectionKey: 'about' })
@@ -75,14 +73,14 @@ export async function updateAbout(formData: FormData) {
 
     const [existingProfile] = await transaction
       .select()
-      .from(schema.portfolioProfile)
+      .from(schema.profile)
       .limit(1)
     if (existingProfile) {
-      await transaction.update(schema.portfolioProfile)
+      await transaction.update(schema.profile)
         .set(profileValues)
-        .where(eq(schema.portfolioProfile.id, existingProfile.id))
+        .where(eq(schema.profile.id, existingProfile.id))
     } else {
-      await transaction.insert(schema.portfolioProfile).values(profileValues)
+      await transaction.insert(schema.profile).values(profileValues)
     }
 
     return [updatedAbout]
@@ -107,7 +105,7 @@ export async function createDetail(formData: FormData) {
   
   const existing = await db.select()
     .from(schema.profileFacts)
-    .orderBy(asc(schema.profileFacts.sortOrder), asc(schema.profileFacts.id))
+    .orderBy(...orderBySortOrder(schema.profileFacts.sortOrder, schema.profileFacts.id))
   
   const sortOrder = existing.length > 0 ? existing[existing.length - 1].sortOrder! + 1 : 0
   

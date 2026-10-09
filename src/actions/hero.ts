@@ -5,7 +5,6 @@ import * as schema from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
-import { ensurePortfolioSections } from '@/lib/db/portfolio-sections'
 
 // =============================================
 // GET
@@ -21,12 +20,12 @@ export async function getHero() {
   const titles = hero
     ? await db.select()
         .from(schema.heroTitles)
-        .where(eq(schema.heroTitles.heroSectionId, hero.id))
+        .where(eq(schema.heroTitles.heroSectionKey, hero.sectionKey))
         .orderBy(asc(schema.heroTitles.sortOrder), asc(schema.heroTitles.id))
     : []
 
   return {
-    id: hero?.id ?? 0,
+    id: 0,
     location: hero?.location ?? null,
     subtitleOne: hero?.subtitleOne ?? null,
     subtitleTwo: hero?.subtitleTwo ?? null,
@@ -41,7 +40,6 @@ export async function getHero() {
 
 export async function updateHero(formData: FormData) {
   await requireAuth()
-  await ensurePortfolioSections()
 
   const location = formData.get('location') as string
   const subtitleOne = formData.get('subtitleOne') as string
@@ -63,7 +61,7 @@ export async function updateHero(formData: FormData) {
   const [hero] = existingHero
     ? await db.update(schema.heroSection)
         .set(values)
-        .where(eq(schema.heroSection.id, existingHero.id))
+        .where(eq(schema.heroSection.sectionKey, existingHero.sectionKey))
         .returning()
     : await db.insert(schema.heroSection)
         .values({ ...values, sectionKey: 'hero' })
@@ -81,7 +79,6 @@ export async function updateHero(formData: FormData) {
 
 export async function updateHeroTitles(titles: string[]) {
   await requireAuth()
-  await ensurePortfolioSections()
 
   await db.transaction(async (transaction) => {
     let [hero] = await transaction.select()
@@ -99,7 +96,7 @@ export async function updateHeroTitles(titles: string[]) {
       await transaction.insert(schema.heroTitles)
         .values(
           titles.map((title, index) => ({
-            heroSectionId: hero.id,
+            heroSectionKey: hero.sectionKey,
             title: title.trim(),
             sortOrder: index,
           }))

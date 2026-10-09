@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<FooterResponse>>> {
   try {
-    const [footerData] = await db.select().from(schema.footer).limit(1)
+    const [footerData] = await db.select().from(schema.siteConfig).limit(1)
 
     const response: FooterResponse = {
       companyName: footerData?.companyName ?? null,

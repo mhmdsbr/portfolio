@@ -2,8 +2,6 @@
 // Response Types for New API
 // =============================================
 
-import type { PortfolioSectionKey } from '@/lib/portfolio-sections'
-
 export interface Button {
   text: string | null;
   url: string | null;
@@ -11,15 +9,6 @@ export interface Button {
 
 export interface SocialMediaMap {
   [key: string]: string;
-}
-
-export interface SidebarResponse {
-  profile_image: string | null;
-  profile_image_alt: string | null;
-  profile_title: string | null;
-  social_media: SocialMediaMap;
-  portfolio_title: string | null;
-  portfolio_overlay_title: string | null;
 }
 
 export interface HeroResponse {
@@ -32,7 +21,6 @@ export interface HeroResponse {
 
 export interface AboutResponse {
   title: string | null;
-  overlay_title: string | null;
   name: string | null;
   job_title: string | null;
   description: string | null;
@@ -50,7 +38,6 @@ export interface AboutResponse {
 
 export interface ServicesResponse {
   title: string | null;
-  overlay_title: string | null;
   items: Array<{
     title: string;
     description: string | null;
@@ -60,7 +47,6 @@ export interface ServicesResponse {
 
 export interface SummaryResponse {
   title: string | null;
-  overlay_title: string | null;
   button: Button;
   jobs: Array<{
     from: number | null;
@@ -89,13 +75,11 @@ export interface Project {
 
 export interface ProjectsResponse {
   title: string | null;
-  overlay_title: string | null;
   items: Project[];
 }
 
 export interface TestimonialsResponse {
   title: string | null;
-  overlay_title: string | null;
   items: Array<{
     image: string | null;
     title: string;
@@ -107,7 +91,6 @@ export interface TestimonialsResponse {
 
 export interface ContactResponse {
   title: string | null;
-  overlay_title: string | null;
   form_title: string | null;
   button: Button;
   methods: Array<{
@@ -124,10 +107,9 @@ export interface ConfigResponse {
 
 export interface PageSection {
   id: number;
-  sectionKey: PortfolioSectionKey;
+  sectionKey: string;
   navigationTitle: string;
   title: string | null;
-  overlayTitle: string | null;
   sortOrder: number | null;
   isEnabled: boolean;
 }
@@ -149,7 +131,6 @@ export interface FooterResponse {
 // =============================================
 
 export interface AllDataResponse {
-  sidebar: SidebarResponse;
   hero: HeroResponse;
   about: AboutResponse;
   services: ServicesResponse;
@@ -179,7 +160,6 @@ export type ApiResponse<T> = ApiResponseWrapper<T>;
 // =============================================
 
 export interface EndpointMap {
-  'api/sidebar': ApiResponseWrapper<SidebarResponse>;
   'api/hero': ApiResponseWrapper<HeroResponse>;
   'api/about': ApiResponseWrapper<AboutResponse>;
   'api/services': ApiResponseWrapper<ServicesResponse>;

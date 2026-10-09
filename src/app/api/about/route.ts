@@ -10,7 +10,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<AboutResponse>>> {
   try {
     const [aboutData, profileData, contactInfoData, detailsData, sectionData] = await Promise.all([
       db.select().from(schema.aboutSection),
-      db.select().from(schema.portfolioProfile),
+      db.select().from(schema.profile),
       db.select().from(schema.contactMethods).orderBy(
         asc(schema.contactMethods.sortOrder),
         asc(schema.contactMethods.id),
@@ -27,7 +27,6 @@ export async function GET(): Promise<NextResponse<ApiResponse<AboutResponse>>> {
 
     const response: AboutResponse = {
       title: sectionData[0]?.title ?? null,
-      overlay_title: sectionData[0]?.overlayTitle ?? null,
       name: profile?.name ?? null,
       job_title: profile?.jobTitle ?? null,
       description: profile?.biography ?? null,

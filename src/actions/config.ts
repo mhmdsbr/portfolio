@@ -9,7 +9,7 @@ import { requireAuth } from '@/lib/auth'
 export async function getGeneralSettings() {
   await requireAuth()
 
-  const [config] = await db.select().from(schema.appConfig).limit(1)
+  const [config] = await db.select().from(schema.siteConfig).limit(1)
 
   return {
     recaptchaSiteKey: config?.recaptchaSiteKey ?? null,
@@ -19,7 +19,7 @@ export async function getGeneralSettings() {
 export async function updateGeneralSettings(formData: FormData) {
   await requireAuth()
 
-  const [existingConfig] = await db.select().from(schema.appConfig).limit(1)
+  const [existingConfig] = await db.select().from(schema.siteConfig).limit(1)
   const values = {
     recaptchaSiteKey:
       String(formData.get('recaptchaSiteKey') ?? '').trim() || null,
@@ -27,11 +27,11 @@ export async function updateGeneralSettings(formData: FormData) {
 
   if (existingConfig) {
     await db
-      .update(schema.appConfig)
+      .update(schema.siteConfig)
       .set(values)
-      .where(eq(schema.appConfig.id, existingConfig.id))
+      .where(eq(schema.siteConfig.id, existingConfig.id))
   } else {
-    await db.insert(schema.appConfig).values(values)
+    await db.insert(schema.siteConfig).values(values)
   }
 
   revalidatePath('/admin/general-settings')

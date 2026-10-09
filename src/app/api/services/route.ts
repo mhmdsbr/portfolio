@@ -18,7 +18,6 @@ export async function GET(): Promise<NextResponse<ApiResponse<ServicesResponse>>
 
     const response: ServicesResponse = {
       title: sectionData[0]?.title ?? null,
-      overlay_title: sectionData[0]?.overlayTitle ?? null,
       items: itemsData.map((item) => ({
         title: item.title,
         description: item.description ?? null,

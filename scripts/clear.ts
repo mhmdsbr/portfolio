@@ -35,10 +35,8 @@ const portfolioTables = [
   "experience_section",
   "contact_section",
   "page_sections",
-  "sidebar",
-  "portfolio_profile",
-  "footer",
-  "app_config",
+  "profile",
+  "site_config",
 ] as const;
 
 const client = postgres(connectionString, {

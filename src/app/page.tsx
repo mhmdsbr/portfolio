@@ -12,10 +12,9 @@ import BackgroundGradient from "@/components/backgroundGradient";
 import { ApiDataProvider } from "@/providers/ApiDataProvider";
 import Testimonials from "@/components/testimonials/testimonials";
 import { useAllData } from "@/hooks/useAllData";
-import { PORTFOLIO_SECTIONS, type PortfolioSectionKey } from "@/lib/portfolio-sections";
 import type { ComponentType } from "react";
 
-const sectionComponents: Record<PortfolioSectionKey, ComponentType> = {
+const sectionComponents: Record<string, ComponentType> = {
   hero: Hero,
   about: About,
   experience: Experience,
@@ -27,17 +26,7 @@ const sectionComponents: Record<PortfolioSectionKey, ComponentType> = {
 
 function ConfiguredSections() {
   const { data } = useAllData();
-  const sections = data?.header.sections.length
-    ? data.header.sections.filter((section) => section.isEnabled)
-    : PORTFOLIO_SECTIONS.map((section, sortOrder) => ({
-        id: sortOrder,
-        sectionKey: section.key,
-        navigationTitle: section.navigationTitle,
-        title: section.title,
-        overlayTitle: section.overlayTitle,
-        sortOrder,
-        isEnabled: true,
-      }));
+  const sections = data?.header.sections.filter((section) => section.isEnabled) ?? [];
 
   return sections.map((section) => {
     const Section = sectionComponents[section.sectionKey];

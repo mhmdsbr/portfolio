@@ -4,10 +4,10 @@ import { db } from "../src/lib/db/index.js";
 import * as schema from "../src/lib/db/schema.js";
 
 interface SeedConfig {
-  profile: schema.NewPortfolioProfile;
+  profile: schema.NewProfile;
   socialLinks: schema.NewSocialLink[];
   hero: Omit<schema.NewHeroSection, "id" | "sectionKey">;
-  heroTitles: Omit<schema.NewHeroTitle, "id" | "heroSectionId">[];
+  heroTitles: Omit<schema.NewHeroTitle, "id">[];
   about: Omit<schema.NewAboutSection, "id" | "sectionKey">;
   contactMethods: Omit<schema.NewContactMethod, "id">[];
   profileFacts: Omit<schema.NewProfileFact, "id">[];
@@ -17,12 +17,12 @@ interface SeedConfig {
   skills: Omit<schema.NewSkill, "id">[];
   testimonialRecords: Omit<schema.NewTestimonial, "id">[];
   contactSection: Omit<schema.NewContactSection, "id" | "sectionKey">;
-  appConfig: schema.NewAppConfig;
+  appConfig: schema.NewSiteConfig;
   projectRecords: Array<
     Omit<schema.NewProject, "id"> & { roles: string[]; tech: string[] }
   >;
   pageSections: Omit<schema.NewPageSection, "id">[];
-  footer: schema.NewFooter;
+  footer: Omit<schema.NewSiteConfig, "id" | "recaptchaSiteKey">;
 }
 
 const seedData: SeedConfig = {
@@ -47,9 +47,9 @@ const seedData: SeedConfig = {
     logoUrl: "https://your-logo.svg",
   },
   heroTitles: [
-    { title: "Creative", sortOrder: 0 },
-    { title: "Developer", sortOrder: 1 },
-    { title: "Designer", sortOrder: 2 },
+    { heroSectionKey: "hero", title: "Creative", sortOrder: 0 },
+    { heroSectionKey: "hero", title: "Developer", sortOrder: 1 },
+    { heroSectionKey: "hero", title: "Designer", sortOrder: 2 },
   ],
   about: {
     buttonText: "Download CV",
@@ -465,7 +465,6 @@ const seedData: SeedConfig = {
       sectionKey: "hero",
       navigationTitle: "Welcome",
       title: null,
-      overlayTitle: null,
       sortOrder: 0,
       isEnabled: true,
     },
@@ -473,7 +472,6 @@ const seedData: SeedConfig = {
       sectionKey: "about",
       navigationTitle: "Know me more.",
       title: "About Me",
-      overlayTitle: "About",
       sortOrder: 1,
       isEnabled: true,
     },
@@ -481,7 +479,6 @@ const seedData: SeedConfig = {
       sectionKey: "experience",
       navigationTitle: "What I've done so far!",
       title: "Summary",
-      overlayTitle: "Resume",
       sortOrder: 2,
       isEnabled: true,
     },
@@ -489,7 +486,6 @@ const seedData: SeedConfig = {
       sectionKey: "services",
       navigationTitle: "I can help you with:",
       title: "Services",
-      overlayTitle: "What I Do",
       sortOrder: 3,
       isEnabled: true,
     },
@@ -497,7 +493,6 @@ const seedData: SeedConfig = {
       sectionKey: "projects",
       navigationTitle: "Here is my portfolio",
       title: "Key Projects",
-      overlayTitle: "My Work",
       sortOrder: 4,
       isEnabled: true,
     },
@@ -505,7 +500,6 @@ const seedData: SeedConfig = {
       sectionKey: "testimonials",
       navigationTitle: "What people say",
       title: "Testimonials",
-      overlayTitle: "What People Say",
       sortOrder: 5,
       isEnabled: true,
     },
@@ -513,7 +507,6 @@ const seedData: SeedConfig = {
       sectionKey: "contact",
       navigationTitle: "Let's talk more",
       title: "Contact stuff",
-      overlayTitle: "Contact",
       sortOrder: 6,
       isEnabled: true,
     },
@@ -533,7 +526,7 @@ async function seed() {
 
   try {
     // 2. Insert the portfolio profile
-    await db.insert(schema.portfolioProfile).values(seedData.profile);
+    await db.insert(schema.profile).values(seedData.profile);
 
     // Insert social links.
     await db.insert(schema.socialLinks).values(seedData.socialLinks);
@@ -547,12 +540,12 @@ async function seed() {
     const [hero] = await db
       .insert(schema.heroSection)
       .values({ ...seedData.hero, sectionKey: "hero" })
-      .returning({ id: schema.heroSection.id });
+      .returning({ sectionKey: schema.heroSection.sectionKey });
 
     await db.insert(schema.heroTitles).values(
       seedData.heroTitles.map((title) => ({
         ...title,
-        heroSectionId: hero.id,
+        heroSectionKey: hero.sectionKey,
       })),
     );
 
@@ -632,8 +625,10 @@ async function seed() {
       .values({ ...seedData.contactSection, sectionKey: "contact" });
 
     // Insert footer and application configuration.
-    await db.insert(schema.footer).values(seedData.footer);
-    await db.insert(schema.appConfig).values(seedData.appConfig);
+    await db.insert(schema.siteConfig).values({
+      ...seedData.footer,
+      ...seedData.appConfig,
+    });
 
     // Insert header settings.
 

@@ -5,7 +5,6 @@ import * as schema from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/lib/auth";
-import { ensurePortfolioSections } from "@/lib/db/portfolio-sections";
 
 // =============================================
 // GET
@@ -35,8 +34,8 @@ export async function getExperienceSectionData() {
 
   return {
     ...summary,
+    id: 0,
     title: section?.title ?? null,
-    overlayTitle: section?.overlayTitle ?? null,
     jobs,
     experiences,
   };
@@ -48,7 +47,6 @@ export async function getExperienceSectionData() {
 
 export async function updateExperienceSection(formData: FormData) {
   await requireAuth();
-  await ensurePortfolioSections();
 
   const buttonText = formData.get("buttonText") as string;
   const buttonUrl = formData.get("buttonUrl") as string;
@@ -66,7 +64,7 @@ export async function updateExperienceSection(formData: FormData) {
     ? await db
         .update(schema.experienceSection)
         .set(values)
-        .where(eq(schema.experienceSection.id, existingSummary.id))
+        .where(eq(schema.experienceSection.sectionKey, existingSummary.sectionKey))
         .returning()
     : await db
         .insert(schema.experienceSection)
