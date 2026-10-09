@@ -1,5 +1,8 @@
 # Database schema
 
+For data flow, write paths, and enforcement layers, see
+[database-architecture.md](./database-architecture.md).
+
 This diagram describes the Drizzle schema in `src/lib/db/schema.ts`. Solid
 relations are enforced foreign keys. Value sets (section kinds, icons, contact
 kinds, social platforms, verification purposes) and URL/slug patterns live in
@@ -7,6 +10,7 @@ kinds, social platforms, verification purposes) and URL/slug patterns live in
 TypeScript types and the database cannot drift apart.
 
 ```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','edgeLabelBackground':'#e2e8f0','attributeBackgroundColorOdd':'#f8fafc','attributeBackgroundColorEven':'#e2e8f0','tertiaryColor':'#f1f5f9'}}}%%
 erDiagram
     PAGE_SECTIONS {
         int id PK
@@ -34,8 +38,8 @@ erDiagram
     }
 
     CONTACT_METHOD_SECTIONS {
-        int contact_method_id PK_FK
-        int section_id PK_FK
+        int contact_method_id PK, FK
+        int section_id PK, FK
     }
 
     PROFILE {
@@ -96,7 +100,7 @@ erDiagram
     }
 
     PROJECT_ROLES {
-        int project_id PK_FK
+        int project_id PK, FK
         text role PK
         int sort_order
     }
@@ -107,8 +111,8 @@ erDiagram
     }
 
     PROJECT_TECHNOLOGIES {
-        int project_id PK_FK
-        int technology_id PK_FK
+        int project_id PK, FK
+        int technology_id PK, FK
         int sort_order
     }
 
@@ -147,7 +151,7 @@ erDiagram
     }
 
     ADMIN_PROFILES {
-        int user_id PK_FK
+        int user_id PK, FK
         text display_name
         text bio
         jsonb preferences
