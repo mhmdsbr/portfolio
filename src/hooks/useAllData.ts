@@ -8,6 +8,6 @@ export const useAllData = () => {
     data: data as AllDataResponse | null,
     isLoading,
     error,
-    mutate, // <- This allows us to update cache instantly
+    mutate,
   }
 }

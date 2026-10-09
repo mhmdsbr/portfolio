@@ -52,7 +52,9 @@ export default function ProjectsTable({ projects, categories }: ProjectsTablePro
     
     setDeletingId(id)
     try {
-      await deleteProject(id)
+      const result = await deleteProject(id)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
+      setMessage('✅ Project deleted successfully!')
       router.refresh()
     } catch (error) {
       console.error('Delete error:', error)
@@ -74,12 +76,13 @@ export default function ProjectsTable({ projects, categories }: ProjectsTablePro
       setItems(reorderedItems)
       setMessage('')
 
-      await reorderProjects(reorderedItems.map((item) => item.id))
+      const actionResult = await reorderProjects(reorderedItems.map((item) => item.id))
+      if (!actionResult.success) { setItems(previousItems); setMessage(`❌ ${actionResult.error}`); return }
       setMessage('✅ Project order saved successfully!')
       router.refresh()
     } catch (error) {
       setItems(previousItems)
-      setMessage('❌ Failed to save project order')
+      setMessage(`❌ ${error instanceof Error ? error.message : 'Failed to save project order'}`)
       console.error('Error reordering projects:', error)
     }
   }
@@ -125,7 +128,8 @@ export default function ProjectsTable({ projects, categories }: ProjectsTablePro
     setMessage('')
 
     try {
-      await updateProjectCategoriesAndTech(updates)
+      const result = await updateProjectCategoriesAndTech(updates)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
       setItems((currentItems) =>
         currentItems.map((project) => ({
           ...project,
@@ -137,7 +141,7 @@ export default function ProjectsTable({ projects, categories }: ProjectsTablePro
       setMessage('✅ Project categories and technologies saved successfully!')
       router.refresh()
     } catch (error) {
-      setMessage('❌ Failed to save project categories and technologies.')
+      setMessage(`❌ ${error instanceof Error ? error.message : 'Failed to save project categories and technologies.'}`)
       console.error('Error updating project details:', error)
     } finally {
       setSavingCategories(false)

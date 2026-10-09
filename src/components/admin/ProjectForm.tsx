@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import CategorySelect from '@/components/admin/CategorySelect'
+import type { ActionResult } from '@/server/action-result'
 
 interface ProjectFormProps {
   initialData?: {
@@ -17,18 +18,9 @@ interface ProjectFormProps {
     githubUrl: string | null
     tech: string[] | null
   }
-  onSubmit: (formData: FormData) => Promise<unknown>
+  onSubmit: (formData: FormData) => Promise<ActionResult<{ id: number }>>
   submitLabel: string
   categories: string[]
-}
-
-function hasProjectId(result: unknown): result is { id: number } {
-  return (
-    typeof result === 'object' &&
-    result !== null &&
-    'id' in result &&
-    typeof result.id === 'number'
-  )
 }
 
 export default function ProjectForm({ initialData, onSubmit, submitLabel, categories }: ProjectFormProps) {
@@ -43,15 +35,16 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel, catego
     setLoading(true)
     setMessage('')
     try {
-      const savedProject = await onSubmit(formData)
+      const result = await onSubmit(formData)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
       setMessage('✅ Project saved successfully!')
       router.refresh()
 
-      if (!initialData?.id && hasProjectId(savedProject)) {
-        router.replace(`/admin/projects/${savedProject.id}`)
+      if (!initialData?.id && result.data) {
+        router.replace(`/admin/projects/${result.data.id}`)
       }
     } catch (error) {
-      setMessage('❌ Failed to save project')
+      setMessage(`❌ ${error instanceof Error ? error.message : 'Failed to save project'}`)
       console.error('Error submitting form:', error)
     } finally {
       setLoading(false)
@@ -61,7 +54,7 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel, catego
   return (
     <form action={handleSubmit} className="space-y-6 max-w-3xl">
       {message && (
-        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+        <div className={`p-3 rounded ${!message.startsWith('✅') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
           {message}
         </div>
       )}

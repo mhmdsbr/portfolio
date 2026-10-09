@@ -1,4 +1,3 @@
-import { requiredText } from '@/lib/validation'
 import { runInTransaction } from '@/server/repos/executor'
 import { listHeroTitles, replaceHeroTitles } from '@/server/repos/hero-titles'
 import { findSectionId } from '@/server/repos/page-sections'
@@ -12,18 +11,17 @@ export async function getHero() {
 }
 
 export async function updateHeroSettings(input: {
-  location: unknown
-  subtitleOne: unknown
-  subtitleTwo: unknown
-  logoUrl: unknown
+  location: string | null
+  subtitleOne: string | null
+  subtitleTwo: string | null
+  logoUrl: string | null
 }) {
   const { config } = await updateSectionConfig('hero', input)
   return config
 }
 
-export async function replaceTitles(titles: unknown) {
-  if (!Array.isArray(titles)) throw new Error('Hero titles must be a list')
-  const cleanTitles = titles.map((title) => requiredText(title, 'Hero title'))
+export async function replaceTitles(titles: string[]) {
+  const cleanTitles = titles
 
   await runInTransaction(async (transaction) => {
     const sectionId = assertFound(

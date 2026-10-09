@@ -1,23 +1,14 @@
-import { db } from '@/lib/db'
-import * as schema from '@/lib/db/schema'
 import { NextResponse } from 'next/server'
+import { getPublicFooter } from '@/server/services/public-content'
 import type { ApiResponse, FooterResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<FooterResponse>>> {
   try {
-    const [footerData] = await db.select().from(schema.siteConfig).limit(1)
-
-    const response: FooterResponse = {
-      companyName: footerData?.companyName ?? null,
-      privacyPolicy: footerData?.privacyPolicy ?? null,
-      termsOfService: footerData?.termsOfService ?? null,
-      copyrightText: footerData?.copyrightText ?? null,
-    }
-
+    const data = await getPublicFooter()
     return NextResponse.json({
-      data: response,
+      data,
       timestamp: new Date().toISOString(),
     })
   } catch (error) {

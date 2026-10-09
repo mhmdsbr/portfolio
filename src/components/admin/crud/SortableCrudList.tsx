@@ -68,7 +68,7 @@ export default function SortableCrudList<T extends { id: number }>({
     <div className="space-y-4">
       {message && (
         <div
-          className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}
+          className={`p-3 rounded ${!message.startsWith('✅') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}
         >
           {message}
         </div>

@@ -8,9 +8,12 @@ Diagrams use [Mermaid](https://mermaid.js.org/) and render on GitHub and in VS C
 
 ## 1. System overview
 
-Every read and write goes through Drizzle (`src/lib/db`). Admin changes are
-Next.js server actions guarded by `requireAuth()`. The public site reads a single
-JSON payload from `/api/all`.
+Every read and write goes through Drizzle (`src/lib/db`), accessed only through
+repositories in `src/server/repos`. Admin changes are Next.js server actions
+guarded by `requireAuth()`, while public API routes use the public read-model
+service in `src/server/services/public-content.ts`. ESLint prevents direct DB
+client imports outside the repository and explicitly permitted setup files. The
+public site reads a single JSON payload from `/api/all`.
 
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','secondaryColor':'#e0f2fe','tertiaryColor':'#f1f5f9','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','clusterBkg':'#f1f5f9','clusterBorder':'#94a3b8','titleColor':'#0f172a','edgeLabelBackground':'#e2e8f0'}}}%%
@@ -25,7 +28,7 @@ flowchart LR
         UI["Components<br/>useAllData() via SWR"]
         API["Public API routes<br/>/api/all, /api/hero, /api/about, ...<br/>(read only)"]
         ACT["Server actions (controllers)<br/>src/actions/*<br/>requireAuth, FormData to input,<br/>revalidate"]
-        SVC["Services<br/>src/server/services/*<br/>validation, rules, transactions"]
+        SVC["Services<br/>src/server/services/*<br/>public read models, validation, rules, transactions"]
         LIB["Repositories<br/>src/server/repos/*<br/>the only layer that queries the DB"]
         AUTH["Auth<br/>src/server/auth/*<br/>passwords, sessions, cookies<br/>(src/lib/auth.ts is a facade)"]
         DRZ["Drizzle ORM<br/>src/lib/db/schema.ts"]
@@ -37,10 +40,9 @@ flowchart LR
     A -->|forms / FormData| ACT
     A -->|login, signup| AUTH
     ACT --> SVC --> LIB
-    API --> LIB
+    API --> SVC --> LIB
     ACT --> AUTH
     LIB --> DRZ
-    API --> DRZ
     AUTH --> LIB
     SVC --> AUTH
     DRZ --> PG

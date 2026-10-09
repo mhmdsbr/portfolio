@@ -16,10 +16,10 @@ export async function getFooter() {
 }
 
 export async function saveFooter(input: {
-  companyName: unknown
-  privacyPolicy: unknown
-  termsOfService: unknown
-  copyrightText: unknown
+  companyName: string | null
+  privacyPolicy: string | null
+  termsOfService: string | null
+  copyrightText: string | null
 }) {
   return siteConfigRepo.save({
     companyName: optionalText(input.companyName) ?? DEFAULT_COMPANY_NAME,
@@ -34,6 +34,6 @@ export async function getGeneralSettings() {
   return { recaptchaSiteKey: config?.recaptchaSiteKey ?? null }
 }
 
-export async function saveGeneralSettings(input: { recaptchaSiteKey: unknown }) {
+export async function saveGeneralSettings(input: { recaptchaSiteKey: string | null }) {
   await siteConfigRepo.save({ recaptchaSiteKey: optionalText(input.recaptchaSiteKey) })
 }

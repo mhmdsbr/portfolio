@@ -34,11 +34,12 @@ export default function FooterForm({ initialData }: FooterFormProps) {
     formData.set('copyrightText', copyrightText)
 
     try {
-      await updateFooter(formData)
+      const result = await updateFooter(formData)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
       setMessage('✅ Footer settings updated successfully!')
       router.refresh()
     } catch (error) {
-      setMessage('❌ Failed to update footer settings')
+      setMessage(`❌ ${error instanceof Error ? error.message : 'Failed to update footer settings'}`)
       console.error('Error updating footer:', error)
     } finally {
       setLoading(false)
@@ -48,7 +49,7 @@ export default function FooterForm({ initialData }: FooterFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
       {message && (
-        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+        <div className={`p-3 rounded ${!message.startsWith('✅') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
           {message}
         </div>
       )}

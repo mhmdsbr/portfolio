@@ -1,38 +1,14 @@
-import { db } from '@/lib/db'
-import * as schema from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import { getPublicProjects } from '@/server/services/public-content'
 import type { ApiResponse, ProjectsResponse } from '@/types/api'
-import { getProjects } from '@/server/repos/projects'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<ProjectsResponse>>> {
   try {
-    const [sectionData, itemsData] = await Promise.all([
-      db.select().from(schema.pageSections).where(eq(schema.pageSections.kind, 'projects')),
-      getProjects(),
-    ])
-
-    const response: ProjectsResponse = {
-      title: sectionData[0]?.title ?? null,
-      items: itemsData.map((item) => ({
-        id: item.id,
-        slug: item.slug,
-        title: item.title,
-        category: item.category,
-        category_slug: item.categorySlug,
-        description: item.description ?? null,
-        image: item.image ?? null,
-        link: item.link ?? null,
-        github_url: item.githubUrl ?? null,
-        tech: item.tech.length > 0 ? item.tech : null,
-        roles: item.roles.length > 0 ? item.roles : null,
-      })),
-    }
-
+    const data = await getPublicProjects()
     return NextResponse.json({
-      data: response,
+      data,
       timestamp: new Date().toISOString(),
     })
   } catch (error) {

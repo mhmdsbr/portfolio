@@ -1,78 +1,77 @@
-'use server'
-
-import { requireAuth } from '@/lib/auth'
-import { revalidateContent } from '@/server/revalidate'
-import * as service from '@/server/services/experience'
-
-function readExperience(formData: FormData) {
-  return {
-    fromYear: formData.get('fromYear'),
-    toYear: formData.get('toYear'),
-    jobTitle: formData.get('jobTitle'),
-    company: formData.get('company'),
-    description: formData.get('description'),
-  }
-}
-
-function readSkill(formData: FormData) {
-  return { skill: formData.get('skill'), level: formData.get('level') }
-}
-
-const PAGE = '/admin/experience'
-
+"use server";
+import { requireAuth } from "@/lib/auth";
+import { withAuthAction } from "@/server/action-result";
+import {
+  idListSchema,
+  parseForm,
+  parseInput,
+  positiveId,
+} from "@/server/schemas/common";
+import { experienceSchema, skillSchema } from "@/server/schemas/experience";
+import { revalidateContent } from "@/server/revalidate";
+import * as service from "@/server/services/experience";
+const PAGE = "/admin/experience";
 export async function getExperience() {
-  await requireAuth()
-  return service.getExperience()
+  await requireAuth();
+  return service.getExperience();
 }
-
 export async function createExperience(formData: FormData) {
-  await requireAuth()
-  const experience = await service.createExperience(readExperience(formData))
-  revalidateContent(PAGE)
-  return experience
+  return withAuthAction(async () => {
+    const row = await service.createExperience(
+      parseForm(experienceSchema, formData),
+    );
+    revalidateContent(PAGE);
+    return row;
+  })();
 }
-
 export async function updateExperience(id: number, formData: FormData) {
-  await requireAuth()
-  const experience = await service.updateExperience(id, readExperience(formData))
-  revalidateContent(PAGE)
-  return experience
+  return withAuthAction(async () => {
+    const row = await service.updateExperience(
+      parseInput(positiveId, id),
+      parseForm(experienceSchema, formData),
+    );
+    revalidateContent(PAGE);
+    return row;
+  })();
 }
-
 export async function deleteExperience(id: number) {
-  await requireAuth()
-  await service.deleteExperience(id)
-  revalidateContent(PAGE)
+  return withAuthAction(async () => {
+    await service.deleteExperience(parseInput(positiveId, id));
+    revalidateContent(PAGE);
+  })();
 }
-
 export async function reorderExperiences(ids: number[]) {
-  await requireAuth()
-  await service.reorderExperiences(ids)
-  revalidateContent(PAGE)
+  return withAuthAction(async () => {
+    await service.reorderExperiences(parseInput(idListSchema, ids));
+    revalidateContent(PAGE);
+  })();
 }
-
 export async function createSkill(formData: FormData) {
-  await requireAuth()
-  const skill = await service.createSkill(readSkill(formData))
-  revalidateContent(PAGE)
-  return skill
+  return withAuthAction(async () => {
+    const row = await service.createSkill(parseForm(skillSchema, formData));
+    revalidateContent(PAGE);
+    return row;
+  })();
 }
-
 export async function updateSkill(id: number, formData: FormData) {
-  await requireAuth()
-  const skill = await service.updateSkill(id, readSkill(formData))
-  revalidateContent(PAGE)
-  return skill
+  return withAuthAction(async () => {
+    const row = await service.updateSkill(
+      parseInput(positiveId, id),
+      parseForm(skillSchema, formData),
+    );
+    revalidateContent(PAGE);
+    return row;
+  })();
 }
-
 export async function deleteSkill(id: number) {
-  await requireAuth()
-  await service.deleteSkill(id)
-  revalidateContent(PAGE)
+  return withAuthAction(async () => {
+    await service.deleteSkill(parseInput(positiveId, id));
+    revalidateContent(PAGE);
+  })();
 }
-
 export async function reorderSkills(ids: number[]) {
-  await requireAuth()
-  await service.reorderSkills(ids)
-  revalidateContent(PAGE)
+  return withAuthAction(async () => {
+    await service.reorderSkills(parseInput(idListSchema, ids));
+    revalidateContent(PAGE);
+  })();
 }

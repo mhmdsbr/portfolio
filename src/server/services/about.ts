@@ -1,4 +1,3 @@
-import { optionalText, parseIdList, requiredInteger, requiredText } from '@/lib/validation'
 import { profileFactRepo } from '@/server/repos/collections'
 import { getContactMethodsWithSections } from '@/server/repos/contact-methods'
 import { profileRepo } from '@/server/repos/singletons'
@@ -26,34 +25,28 @@ export async function getAbout() {
 }
 
 export async function saveProfile(input: {
-  name: unknown
-  jobTitle: unknown
-  biography: unknown
+  name: string | null
+  jobTitle: string | null
+  biography: string | null
 }) {
   await profileRepo.save({
-    name: optionalText(input.name),
-    jobTitle: optionalText(input.jobTitle),
-    biography: optionalText(input.biography),
+    name: input.name,
+    jobTitle: input.jobTitle,
+    biography: input.biography,
   })
 }
 
-function parseDetail(input: { number: unknown; title: unknown }) {
-  return {
-    number: requiredInteger(input.number, 'Detail number'),
-    title: requiredText(input.title, 'Detail title'),
-  }
-}
 
-export async function createDetail(input: { number: unknown; title: unknown }) {
-  return profileFactRepo.append(parseDetail(input))
+export async function createDetail(input: { number: number; title: string }) {
+  return profileFactRepo.append(input)
 }
 
 export async function updateDetail(
   id: number,
-  input: { number: unknown; title: unknown },
+  input: { number: number; title: string },
 ) {
   return assertFound(
-    await profileFactRepo.update(id, parseDetail(input)),
+    await profileFactRepo.update(id, input),
     'Detail',
   )
 }
@@ -62,6 +55,6 @@ export async function deleteDetail(id: number) {
   await profileFactRepo.remove(id)
 }
 
-export async function reorderDetails(ids: unknown) {
-  return profileFactRepo.reorder(parseIdList(ids))
+export async function reorderDetails(ids: number[]) {
+  return profileFactRepo.reorder(ids)
 }

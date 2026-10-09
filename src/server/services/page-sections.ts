@@ -4,7 +4,7 @@ import { requiredText } from '@/lib/validation'
 import { runInTransaction, type DbExecutor } from '@/server/repos/executor'
 import * as sections from '@/server/repos/page-sections'
 import type { SectionMeta, SectionWithConfig } from '@/server/repos/page-sections'
-import { assertFound } from './shared'
+import { assertFound, ValidationError } from './shared'
 
 export type { SectionMeta }
 
@@ -12,7 +12,7 @@ export const isSectionKind = (value: unknown): value is SectionKind =>
   typeof value === 'string' && (SECTION_KINDS as readonly string[]).includes(value)
 
 function assertSectionKind(kind: unknown): asserts kind is SectionKind {
-  if (!isSectionKind(kind)) throw new Error('Invalid portfolio section')
+  if (!isSectionKind(kind)) throw new ValidationError('Invalid portfolio section')
 }
 
 /** Admin-facing section data: shared metadata plus the typed config. */
@@ -55,18 +55,18 @@ export async function listSections() {
 
 export async function updatePresentation(
   kind: unknown,
-  values: { navigationTitle: unknown; title: unknown },
+  values: { navigationTitle: string; title: string | null },
 ) {
   assertSectionKind(kind)
   if (
     !values ||
     typeof values.navigationTitle !== 'string' ||
-    typeof values.title !== 'string'
+    (values.title !== null && typeof values.title !== 'string')
   ) {
-    throw new Error('Invalid page section metadata')
+    throw new ValidationError('Invalid page section metadata')
   }
   const navigationTitle = requiredText(values.navigationTitle, 'Navigation title')
-  const title = values.title.trim() || null
+  const title = values.title?.trim() || null
 
   return assertFound(
     await sections.savePresentation(kind, { navigationTitle, title }),
@@ -74,10 +74,10 @@ export async function updatePresentation(
   )
 }
 
-export async function setSectionEnabled(kind: unknown, isEnabled: unknown) {
+export async function setSectionEnabled(kind: SectionKind, isEnabled: boolean) {
   assertSectionKind(kind)
   if (typeof isEnabled !== 'boolean') {
-    throw new Error('Invalid portfolio section update')
+    throw new ValidationError('Invalid portfolio section update')
   }
 
   await runInTransaction(async (transaction) => {
@@ -88,20 +88,20 @@ export async function setSectionEnabled(kind: unknown, isEnabled: unknown) {
     )
     const enabledCount = states.filter((state) => state.isEnabled).length
     if (!isEnabled && current.isEnabled && enabledCount <= 1) {
-      throw new Error('At least one portfolio section must remain visible')
+      throw new ValidationError('At least one portfolio section must remain visible')
     }
     await sections.saveEnabled(kind, isEnabled, transaction)
   })
 }
 
-export async function reorderSections(kinds: unknown) {
+export async function reorderSections(kinds: SectionKind[]) {
   if (
     !Array.isArray(kinds) ||
     kinds.length === 0 ||
     !kinds.every(isSectionKind) ||
     new Set(kinds).size !== kinds.length
   ) {
-    throw new Error('Invalid portfolio section order')
+    throw new ValidationError('Invalid portfolio section order')
   }
 
   await runInTransaction(async (transaction) => {
@@ -109,7 +109,7 @@ export async function reorderSections(kinds: unknown) {
       (await sections.listSectionStates(transaction)).map(({ kind }) => kind),
     )
     if (kinds.length !== existing.size || kinds.some((kind) => !existing.has(kind))) {
-      throw new Error('Portfolio section order does not match the configured sections')
+      throw new ValidationError('Portfolio section order does not match the configured sections')
     }
     for (const [index, kind] of kinds.entries()) {
       await sections.saveSortOrder(kind, index, transaction)

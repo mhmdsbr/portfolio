@@ -1,50 +1,60 @@
-'use server'
+"use server";
 
-import { requireAuth } from '@/lib/auth'
-import { revalidateContent } from '@/server/revalidate'
-import * as service from '@/server/services/about'
-
-function readDetail(formData: FormData) {
-  return { number: formData.get('number'), title: formData.get('title') }
-}
+import { requireAuth } from "@/lib/auth";
+import { withAuthAction } from "@/server/action-result";
+import {
+  idListSchema,
+  parseForm,
+  parseInput,
+  positiveId,
+} from "@/server/schemas/common";
+import { detailSchema, profileSchema } from "@/server/schemas/about";
+import { revalidateContent } from "@/server/revalidate";
+import * as service from "@/server/services/about";
 
 export async function getAbout() {
-  await requireAuth()
-  return service.getAbout()
+  await requireAuth();
+  return service.getAbout();
 }
-
 export async function updateAbout(formData: FormData) {
-  await requireAuth()
-  await service.saveProfile({
-    name: formData.get('name'),
-    jobTitle: formData.get('jobTitle'),
-    biography: formData.get('description'),
-  })
-  revalidateContent('/admin/about', '/')
+  return withAuthAction(async () => {
+    const input = parseForm(profileSchema, formData);
+    await service.saveProfile({
+      name: input.name,
+      jobTitle: input.jobTitle,
+      biography: input.description,
+    });
+    revalidateContent("/admin/about", "/");
+  })();
 }
-
 export async function createDetail(formData: FormData) {
-  await requireAuth()
-  const detail = await service.createDetail(readDetail(formData))
-  revalidateContent('/admin/about')
-  return detail
+  return withAuthAction(async () => {
+    const detail = await service.createDetail(
+      parseForm(detailSchema, formData),
+    );
+    revalidateContent("/admin/about");
+    return detail;
+  })();
 }
-
 export async function updateDetail(id: number, formData: FormData) {
-  await requireAuth()
-  const detail = await service.updateDetail(id, readDetail(formData))
-  revalidateContent('/admin/about')
-  return detail
+  return withAuthAction(async () => {
+    const detail = await service.updateDetail(
+      parseInput(positiveId, id),
+      parseForm(detailSchema, formData),
+    );
+    revalidateContent("/admin/about");
+    return detail;
+  })();
 }
-
 export async function deleteDetail(id: number) {
-  await requireAuth()
-  await service.deleteDetail(id)
-  revalidateContent('/admin/about')
+  return withAuthAction(async () => {
+    await service.deleteDetail(parseInput(positiveId, id));
+    revalidateContent("/admin/about");
+  })();
 }
-
 export async function reorderDetails(ids: number[]) {
-  await requireAuth()
-  await service.reorderDetails(ids)
-  revalidateContent('/admin/about')
+  return withAuthAction(async () => {
+    await service.reorderDetails(parseInput(idListSchema, ids));
+    revalidateContent("/admin/about");
+  })();
 }

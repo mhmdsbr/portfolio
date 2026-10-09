@@ -1,80 +1,77 @@
-'use server'
-
-import { requireAuth } from '@/lib/auth'
+"use server";
+import { requireAuth } from "@/lib/auth";
+import { withAuthAction } from "@/server/action-result";
+import {
+  idListSchema,
+  parseForm,
+  parseInput,
+  positiveId,
+} from "@/server/schemas/common";
+import {
+  projectClassificationsSchema,
+  projectSchema,
+} from "@/server/schemas/projects";
 import {
   revalidateContent,
   revalidateProjectCategoryPages,
-} from '@/server/revalidate'
-import * as service from '@/server/services/projects'
-
-const PAGE = '/admin/projects'
-
-function readForm(formData: FormData) {
-  return {
-    title: formData.get('title'),
-    category: formData.get('category'),
-    description: formData.get('description'),
-    image: formData.get('image'),
-    link: formData.get('link'),
-    githubUrl: formData.get('githubUrl'),
-    roles: formData.get('roles'),
-    tech: formData.get('tech'),
-  }
-}
-
+} from "@/server/revalidate";
+import * as service from "@/server/services/projects";
+const PAGE = "/admin/projects";
 export async function getProjects() {
-  await requireAuth()
-  return service.listProjects()
+  await requireAuth();
+  return service.listProjects();
 }
-
-// Projects page data: the section settings, projects and existing categories
 export async function getProjectsOverview() {
-  await requireAuth()
-  return service.getProjectsOverview()
+  await requireAuth();
+  return service.getProjectsOverview();
 }
-
-// Existing category names for the category picker
 export async function getProjectCategories() {
-  await requireAuth()
-  return service.listCategories()
+  await requireAuth();
+  return service.listCategories();
 }
-
 export async function getProject(id: number) {
-  await requireAuth()
-  return service.getProject(id)
+  await requireAuth();
+  return service.getProject(id);
 }
-
 export async function createProject(formData: FormData) {
-  await requireAuth()
-  const project = await service.createProject(readForm(formData))
-  revalidateContent(PAGE)
-  return project
+  return withAuthAction(async () => {
+    const project = await service.createProject(
+      parseForm(projectSchema, formData),
+    );
+    revalidateContent(PAGE);
+    return project;
+  })();
 }
-
 export async function updateProject(id: number, formData: FormData) {
-  await requireAuth()
-  const project = await service.updateProject(id, readForm(formData))
-  revalidateContent(PAGE)
-  return project
+  return withAuthAction(async () => {
+    const project = await service.updateProject(
+      parseInput(positiveId, id),
+      parseForm(projectSchema, formData),
+    );
+    revalidateContent(PAGE);
+    return project;
+  })();
 }
-
 export async function deleteProject(id: number) {
-  await requireAuth()
-  await service.deleteProject(id)
-  revalidateContent(PAGE)
+  return withAuthAction(async () => {
+    await service.deleteProject(parseInput(positiveId, id));
+    revalidateContent(PAGE);
+  })();
 }
-
 export async function reorderProjects(ids: number[]) {
-  await requireAuth()
-  await service.reorderProjects(ids)
-  revalidateContent(PAGE)
+  return withAuthAction(async () => {
+    await service.reorderProjects(parseInput(idListSchema, ids));
+    revalidateContent(PAGE);
+  })();
 }
-
 export async function updateProjectCategoriesAndTech(
   updates: { id: number; category: string; tech: string[] }[],
 ) {
-  await requireAuth()
-  await service.classifyProjects(updates)
-  revalidateContent(PAGE, '/')
-  revalidateProjectCategoryPages()
+  return withAuthAction(async () => {
+    await service.classifyProjects(
+      parseInput(projectClassificationsSchema, updates),
+    );
+    revalidateContent(PAGE, "/");
+    revalidateProjectCategoryPages();
+  })();
 }

@@ -1,20 +1,18 @@
-import { optionalText, optionalUrl, parseIdList, requiredText } from '@/lib/validation'
+
 import { runInTransaction } from '@/server/repos/executor'
 import * as projects from '@/server/repos/projects'
 import { requireSection } from './page-sections'
-import { assertFound } from './shared'
+import { assertFound, ValidationError } from './shared'
 
 export interface ProjectInput {
-  title: unknown
-  category: unknown
-  description: unknown
-  image: unknown
-  link: unknown
-  githubUrl: unknown
-  /** One role per line. */
-  roles: unknown
-  /** Comma-separated technology names. */
-  tech: unknown
+  title: string
+  category: string
+  description: string | null
+  image: string | null
+  link: string | null
+  githubUrl: string | null
+  roles: string[]
+  tech: string[]
 }
 
 export interface ProjectClassification {
@@ -23,37 +21,8 @@ export interface ProjectClassification {
   tech: string[]
 }
 
-function parseLines(value: unknown) {
-  if (typeof value !== 'string') return []
-  return [...new Set(value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean))]
-}
-
 function normalizeTechnologies(values: string[]) {
-  return [
-    ...new Map(
-      values
-        .map((item) => item.trim())
-        .filter(Boolean)
-        .map((name) => [name.toLocaleLowerCase(), name]),
-    ).values(),
-  ]
-}
-
-function parseProject(input: ProjectInput) {
-  return {
-    category: requiredText(input.category, 'Project category'),
-    fields: {
-      title: requiredText(input.title, 'Project title'),
-      description: optionalText(input.description),
-      image: optionalUrl(input.image, 'Image', 'asset'),
-      link: optionalUrl(input.link, 'Link', 'web'),
-      githubUrl: optionalUrl(input.githubUrl, 'GitHub URL', 'web'),
-    },
-    roles: parseLines(input.roles),
-    tech: normalizeTechnologies(
-      typeof input.tech === 'string' ? input.tech.split(',') : [],
-    ),
-  }
+  return [...new Map(values.map((item) => item.trim()).filter(Boolean).map((name) => [name.toLocaleLowerCase(), name])).values()]
 }
 
 export async function listProjects() {
@@ -78,7 +47,8 @@ export async function getProjectsOverview() {
 }
 
 export async function createProject(input: ProjectInput) {
-  const { category, fields, roles, tech } = parseProject(input)
+  const { category, title, description, image, link, githubUrl, roles, tech } = input
+  const fields = { title, description, image, link, githubUrl }
 
   return runInTransaction(async (transaction) => {
     const categoryId = await projects.findOrCreateCategory(transaction, category)
@@ -90,7 +60,8 @@ export async function createProject(input: ProjectInput) {
 }
 
 export async function updateProject(id: number, input: ProjectInput) {
-  const { category, fields, roles, tech } = parseProject(input)
+  const { category, title, description, image, link, githubUrl, roles, tech } = input
+  const fields = { title, description, image, link, githubUrl }
 
   return runInTransaction(async (transaction) => {
     const categoryId = await projects.findOrCreateCategory(transaction, category)
@@ -112,12 +83,12 @@ export async function deleteProject(id: number) {
   })
 }
 
-export async function reorderProjects(ids: unknown) {
-  const order = parseIdList(ids)
+export async function reorderProjects(ids: number[]) {
+  const order = ids
   await runInTransaction(async (transaction) => {
     const existing = new Set(await projects.listProjectIds(transaction))
     if (order.some((id) => !existing.has(id))) {
-      throw new Error('Order contains items that do not exist')
+      throw new ValidationError('Order contains items that do not exist')
     }
     await projects.setProjectOrder(transaction, order)
   })
@@ -139,7 +110,7 @@ export async function classifyProjects(updates: ProjectClassification[]) {
     ) ||
     new Set(updates.map(({ id }) => id)).size !== updates.length
   ) {
-    throw new Error('Invalid project category or technology updates')
+    throw new ValidationError('Invalid project category or technology updates')
   }
 
   await runInTransaction(async (transaction) => {

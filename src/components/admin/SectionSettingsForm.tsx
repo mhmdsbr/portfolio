@@ -25,9 +25,11 @@ export default function SectionSettingsForm({ section }: SectionSettingsFormProp
     setMessage('')
 
     try {
-      await updatePageSection(section.kind, { navigationTitle, title })
+      const saved = await updatePageSection(section.kind, { navigationTitle, title })
+      if (!saved.success) { setMessage(`❌ ${saved.error}`); return }
       if (isEnabled !== section.isEnabled) {
-        await togglePortfolioSection(section.kind, isEnabled)
+        const toggled = await togglePortfolioSection(section.kind, isEnabled)
+        if (!toggled.success) { setMessage(`❌ ${toggled.error}`); return }
       }
       setMessage('✅ Section settings saved!')
       router.refresh()

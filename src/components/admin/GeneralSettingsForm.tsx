@@ -31,11 +31,12 @@ export default function GeneralSettingsForm({
     formData.set('recaptchaSiteKey', recaptchaSiteKey)
 
     try {
-      await updateGeneralSettings(formData)
+      const result = await updateGeneralSettings(formData)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
       setMessage('General settings updated successfully!')
       router.refresh()
     } catch (error) {
-      setMessage('Failed to update general settings')
+      setMessage(`❌ ${error instanceof Error ? error.message : 'Failed to update general settings'}`)
       console.error('Error updating general settings:', error)
     } finally {
       setLoading(false)
@@ -48,7 +49,7 @@ export default function GeneralSettingsForm({
         <div
           role="status"
           className={`rounded p-3 ${
-            message.startsWith('Failed')
+            !message.startsWith('✅')
               ? 'bg-red-500/20 text-red-400'
               : 'bg-green-500/20 text-green-400'
           }`}

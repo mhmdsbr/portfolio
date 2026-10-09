@@ -1,34 +1,14 @@
 import { NextResponse } from 'next/server'
-import { getSection } from '@/server/repos/page-sections'
-import { getContactMethodsForSection } from '@/server/repos/contact-methods'
+import { getPublicContact } from '@/server/services/public-content'
 import type { ApiResponse, ContactResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<ContactResponse>>> {
   try {
-    const [section, methodsData] = await Promise.all([
-      getSection('contact'),
-      getContactMethodsForSection('contact'),
-    ])
-
-    const response: ContactResponse = {
-      title: section?.title ?? null,
-      form_title: section?.config.formTitle ?? null,
-      button: {
-        text: section?.config.buttonText ?? null,
-        url: section?.config.buttonUrl ?? null,
-      },
-      methods: methodsData.map(({ id, kind, title, value }) => ({
-        id,
-        kind,
-        title,
-        value,
-      })),
-    }
-
+    const data = await getPublicContact()
     return NextResponse.json({
-      data: response,
+      data,
       timestamp: new Date().toISOString(),
     })
   } catch (error) {

@@ -31,11 +31,12 @@ export default function AboutForm({ profile }: AboutFormProps) {
     formData.set('description', description)
 
     try {
-      await updateAbout(formData)
+      const result = await updateAbout(formData)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
       setMessage('✅ About section updated successfully!')
       router.refresh()
     } catch (error) {
-      setMessage('❌ Failed to update about section')
+      setMessage(`❌ ${error instanceof Error ? error.message : 'Failed to update about section'}`)
       console.error('Error updating about:', error)
     } finally {
       setLoading(false)
@@ -45,7 +46,7 @@ export default function AboutForm({ profile }: AboutFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
       {message && (
-        <div className={`p-3 rounded ${message.includes('Failed') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+        <div className={`p-3 rounded ${!message.startsWith('✅') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
           {message}
         </div>
       )}

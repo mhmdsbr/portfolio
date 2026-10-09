@@ -1,66 +1,68 @@
-'use server'
-
-import { requireAuth } from '@/lib/auth'
-import { revalidateContent } from '@/server/revalidate'
-import * as service from '@/server/services/contact'
-
-function readMethod(formData: FormData) {
-  return {
-    kind: formData.get('kind'),
-    title: formData.get('title'),
-    value: formData.get('value'),
-    sections: formData.getAll('sections'),
-  }
-}
-
+"use server";
+import { requireAuth } from "@/lib/auth";
+import { withAuthAction } from "@/server/action-result";
+import {
+  idListSchema,
+  parseForm,
+  parseInput,
+  positiveId,
+} from "@/server/schemas/common";
+import {
+  contactMethodSchema,
+  contactSettingsSchema,
+} from "@/server/schemas/contact";
+import { revalidateContent } from "@/server/revalidate";
+import * as service from "@/server/services/contact";
 function revalidateContactMethods() {
   revalidateContent(
-    '/admin/contact',
-    '/admin/about',
-    '/api/contact',
-    '/api/about',
-    '/',
-  )
+    "/admin/contact",
+    "/admin/about",
+    "/api/contact",
+    "/api/about",
+    "/",
+  );
 }
-
 export async function getContact() {
-  await requireAuth()
-  return service.getContact()
+  await requireAuth();
+  return service.getContact();
 }
-
 export async function updateContact(formData: FormData) {
-  await requireAuth()
-  const config = await service.updateContactSettings({
-    formTitle: formData.get('formTitle'),
-    buttonText: formData.get('buttonText'),
-    buttonUrl: formData.get('buttonUrl'),
-  })
-  revalidateContent('/admin/contact', '/api/contact')
-  return config
+  return withAuthAction(async () => {
+    const data = await service.updateContactSettings(
+      parseForm(contactSettingsSchema, formData),
+    );
+    revalidateContent("/admin/contact", "/api/contact");
+    return data;
+  })();
 }
-
 export async function createContactMethod(formData: FormData) {
-  await requireAuth()
-  const method = await service.createContactMethod(readMethod(formData))
-  revalidateContactMethods()
-  return method
+  return withAuthAction(async () => {
+    const method = await service.createContactMethod(
+      parseForm(contactMethodSchema, formData),
+    );
+    revalidateContactMethods();
+    return method;
+  })();
 }
-
 export async function updateContactMethod(id: number, formData: FormData) {
-  await requireAuth()
-  const method = await service.updateContactMethod(id, readMethod(formData))
-  revalidateContactMethods()
-  return method
+  return withAuthAction(async () => {
+    const method = await service.updateContactMethod(
+      parseInput(positiveId, id),
+      parseForm(contactMethodSchema, formData),
+    );
+    revalidateContactMethods();
+    return method;
+  })();
 }
-
 export async function deleteContactMethod(id: number) {
-  await requireAuth()
-  await service.deleteContactMethod(id)
-  revalidateContactMethods()
+  return withAuthAction(async () => {
+    await service.deleteContactMethod(parseInput(positiveId, id));
+    revalidateContactMethods();
+  })();
 }
-
 export async function reorderContactMethods(ids: number[]) {
-  await requireAuth()
-  await service.reorderContactMethods(ids)
-  revalidateContactMethods()
+  return withAuthAction(async () => {
+    await service.reorderContactMethods(parseInput(idListSchema, ids));
+    revalidateContactMethods();
+  })();
 }

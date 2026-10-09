@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { DropResult } from '@hello-pangea/dnd'
+import type { ActionResult } from '@/server/action-result'
 
 export interface CrudActions {
-  create: (formData: FormData) => Promise<unknown>
-  update: (id: number, formData: FormData) => Promise<unknown>
-  remove: (id: number) => Promise<unknown>
-  reorder: (ids: number[]) => Promise<unknown>
+  create: (formData: FormData) => Promise<ActionResult<unknown>>
+  update: (id: number, formData: FormData) => Promise<ActionResult<unknown>>
+  remove: (id: number) => Promise<ActionResult<unknown>>
+  reorder: (ids: number[]) => Promise<ActionResult<unknown>>
 }
 
 interface UseCrudListOptions<T extends { id: number }> {
@@ -46,11 +47,12 @@ export function useCrudList<T extends { id: number }>({
     setLoading(true)
     setMessage('')
     try {
-      await actions.create(formData)
+      const result = await actions.create(formData)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
       setMessage(`✅ ${label} added successfully!`)
       await refresh()
     } catch (error) {
-      setMessage(`❌ Failed to add ${noun}`)
+      setMessage(`❌ ${error instanceof Error ? error.message : `Failed to add ${noun}`}`)
       console.error(`Error creating ${noun}:`, error)
     } finally {
       setLoading(false)
@@ -61,12 +63,13 @@ export function useCrudList<T extends { id: number }>({
     setLoading(true)
     setMessage('')
     try {
-      await actions.update(id, formData)
+      const result = await actions.update(id, formData)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
       setMessage(`✅ ${label} updated successfully!`)
       setEditingId(null)
       await refresh()
     } catch (error) {
-      setMessage(`❌ Failed to update ${noun}`)
+      setMessage(`❌ ${error instanceof Error ? error.message : `Failed to update ${noun}`}`)
       console.error(`Error updating ${noun}:`, error)
     } finally {
       setLoading(false)
@@ -78,10 +81,13 @@ export function useCrudList<T extends { id: number }>({
 
     setDeletingId(id)
     try {
-      await actions.remove(id)
+      const result = await actions.remove(id)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
+      setMessage(`✅ ${label} deleted successfully!`)
       setItems((current) => current.filter((item) => item.id !== id))
       await refresh()
     } catch (error) {
+      setMessage(`❌ ${error instanceof Error ? error.message : `Failed to delete ${noun}`}`)
       console.error(`Error deleting ${noun}:`, error)
     } finally {
       setDeletingId(null)
@@ -98,10 +104,15 @@ export function useCrudList<T extends { id: number }>({
     setItems(reordered)
 
     try {
-      await actions.reorder(reordered.map((item) => item.id))
+      const result = await actions.reorder(reordered.map((item) => item.id))
+      if (!result.success) {
+        setItems(previous)
+        setMessage(`❌ ${result.error}`)
+        return
+      }
     } catch (error) {
       setItems(previous)
-      setMessage(`❌ Failed to reorder ${noun}s`)
+      setMessage(`❌ ${error instanceof Error ? error.message : `Failed to reorder ${noun}s`}`)
       console.error(`Error reordering ${noun}s:`, error)
       return
     }

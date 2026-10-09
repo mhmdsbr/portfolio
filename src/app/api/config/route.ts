@@ -1,20 +1,14 @@
-import { db } from '@/lib/db'
-import * as schema from '@/lib/db/schema'
 import { NextResponse } from 'next/server'
+import { getPublicConfig } from '@/server/services/public-content'
 import type { ApiResponse, ConfigResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<ConfigResponse>>> {
   try {
-    const [configData] = await db.select().from(schema.siteConfig)
-
-    const response: ConfigResponse = {
-      recaptcha_site_key: configData?.recaptchaSiteKey ?? null,
-    }
-
+    const data = await getPublicConfig()
     return NextResponse.json({
-      data: response,
+      data,
       timestamp: new Date().toISOString(),
     })
   } catch (error) {

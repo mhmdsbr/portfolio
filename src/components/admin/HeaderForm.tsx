@@ -42,14 +42,15 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     setLoading(true)
     setMessage('')
     try {
-      await togglePortfolioSection(section.kind, !section.isEnabled)
+      const result = await togglePortfolioSection(section.kind, !section.isEnabled)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
       setSections((previous) => previous.map((item) =>
         item.kind === section.kind ? { ...item, isEnabled: !item.isEnabled } : item,
       ))
       setMessage('Portfolio layout updated.')
       router.refresh()
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Failed to update portfolio layout')
+      setMessage(`❌ ${error instanceof Error ? error.message : 'Failed to update portfolio layout'}`)
     } finally {
       setLoading(false)
     }
@@ -65,18 +66,19 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     setSections(reordered)
 
     try {
-      await reorderHeaderSections(reordered.map(({ kind }) => kind))
+      const result = await reorderHeaderSections(reordered.map(({ kind }) => kind))
+      if (!result.success) { setSections(previousSections); setMessage(`❌ ${result.error}`); return }
       router.refresh()
     } catch (error) {
       setSections(previousSections)
-      setMessage(error instanceof Error ? error.message : 'Failed to reorder sections')
+      setMessage(`❌ ${error instanceof Error ? error.message : 'Failed to reorder sections'}`)
     }
   }
 
   return (
     <div className="space-y-8">
       {message && (
-        <div className={`p-3 rounded ${message.startsWith('Failed') || message.startsWith('Invalid') || message.startsWith('At least')
+        <div className={`p-3 rounded ${message.startsWith('❌')
           ? 'bg-red-500/20 text-red-400'
           : 'bg-green-500/20 text-green-400'}`}>
           {message}
