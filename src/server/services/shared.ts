@@ -9,3 +9,13 @@ export function assertFound<T>(value: T | null | undefined, what: string): T {
   if (value === null || value === undefined) throw new NotFoundError(what)
   return value
 }
+
+/** Postgres unique_violation (SQLSTATE 23505). */
+export function isUniqueViolation(error: unknown) {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === '23505'
+  )
+}

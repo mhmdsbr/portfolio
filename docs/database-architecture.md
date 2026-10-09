@@ -27,7 +27,7 @@ flowchart LR
         ACT["Server actions (controllers)<br/>src/actions/*<br/>requireAuth, FormData to input,<br/>revalidate"]
         SVC["Services<br/>src/server/services/*<br/>validation, rules, transactions"]
         LIB["Repositories<br/>src/server/repos/*<br/>the only layer that queries the DB"]
-        AUTH["auth.ts<br/>sessions, email codes"]
+        AUTH["Auth<br/>src/server/auth/*<br/>passwords, sessions, cookies<br/>(src/lib/auth.ts is a facade)"]
         DRZ["Drizzle ORM<br/>src/lib/db/schema.ts"]
     end
 
@@ -41,11 +41,18 @@ flowchart LR
     ACT --> AUTH
     LIB --> DRZ
     API --> DRZ
-    AUTH --> DRZ
+    AUTH --> LIB
+    SVC --> AUTH
     DRZ --> PG
 
     ACT -. "revalidatePath()" .-> API
 ```
+
+Admin accounts follow the same layering. `src/server/auth/password.ts` (scrypt,
+verification codes) and `session.ts` (cookie, session lookup, login/logout) are
+the auth layer; `services/admin-accounts.ts` and `services/admin-verification.ts`
+hold the account and email-verification rules. Only the `admin-*` repositories
+query the tables, and `src/lib/auth.ts` re-exports the public API for importers.
 
 ## 2. Entity relationships
 

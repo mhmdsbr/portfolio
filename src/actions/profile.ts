@@ -1,9 +1,6 @@
 "use server";
 
-import { count, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { db } from "@/lib/db";
-import * as schema from "@/lib/db/schema";
 import {
   beginCurrentAdminPasswordChange,
   beginAdminEmailVerification,
@@ -14,17 +11,10 @@ import {
   verifyAdminEmail,
   verifyAdminPasswordReset,
 } from "@/lib/auth";
+import * as adminAccounts from "@/server/services/admin-accounts";
+import { isUniqueViolation } from "@/server/services/shared";
 
 const PROFILE_PATH = "/admin/profile-settings";
-
-function isUniqueViolation(error: unknown) {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "23505"
-  );
-}
 
 function parsePreferences(value: FormDataEntryValue | null) {
   if (typeof value !== "string") {
@@ -66,35 +56,7 @@ function parsePreferences(value: FormDataEntryValue | null) {
 
 export async function getProfileSettings() {
   const identity = await requireAuth();
-  const [profile] = await db
-    .select({
-      displayName: schema.adminProfiles.displayName,
-      bio: schema.adminProfiles.bio,
-      preferences: schema.adminProfiles.preferences,
-    })
-    .from(schema.adminProfiles)
-    .where(eq(schema.adminProfiles.userId, identity.id))
-    .limit(1);
-  if (!profile) {
-    throw new Error("Admin profile is missing for the authenticated account.");
-  }
-
-  const admins = await db
-    .select({
-      id: schema.adminUsers.id,
-      email: schema.adminUsers.email,
-      displayName: schema.adminProfiles.displayName,
-      isActive: schema.adminUsers.isActive,
-      createdAt: schema.adminUsers.createdAt,
-    })
-    .from(schema.adminUsers)
-    .innerJoin(
-      schema.adminProfiles,
-      eq(schema.adminProfiles.userId, schema.adminUsers.id),
-    )
-    .orderBy(schema.adminUsers.createdAt, schema.adminUsers.id);
-
-  return { admin: { ...identity, ...profile }, admins };
+  return adminAccounts.getProfileSettings(identity);
 }
 
 export async function updateMyProfile(formData: FormData) {
@@ -122,32 +84,13 @@ export async function updateMyProfile(formData: FormData) {
     };
   }
 
-  try {
-    await db.transaction(async (transaction) => {
-      await transaction
-        .update(schema.adminUsers)
-        .set({ email: validated.email, updatedAt: new Date() })
-        .where(eq(schema.adminUsers.id, admin.id));
-
-      await transaction
-        .update(schema.adminProfiles)
-        .set({
-          displayName: validated.displayName,
-          bio: bioValue.trim() || null,
-          preferences: preferencesValue.preferences,
-          updatedAt: new Date(),
-        })
-        .where(eq(schema.adminProfiles.userId, admin.id));
-    });
-  } catch (error) {
-    if (isUniqueViolation(error)) {
-      return {
-        success: false as const,
-        error: "An account with that email already exists.",
-      };
-    }
-    throw error;
-  }
+  const result = await adminAccounts.updateMyProfile(admin.id, {
+    email: validated.email,
+    displayName: validated.displayName,
+    bio: bioValue,
+    preferences: preferencesValue.preferences,
+  });
+  if (!result.success) return result;
 
   revalidatePath(PROFILE_PATH);
   return { success: true as const };
@@ -235,59 +178,13 @@ export async function setAdminUserActive(formData: FormData) {
   ) {
     return { success: false as const, error: "Invalid account selection." };
   }
-  if (idValue === currentAdmin.id && activeValue === "false") {
-    return {
-      success: false as const,
-      error: "You cannot deactivate your own account.",
-    };
-  }
+  const result = await adminAccounts.setAdminUserActive(
+    currentAdmin.id,
+    idValue,
+    activeValue === "true",
+  );
+  if (!result.success) return result;
 
-  const active = activeValue === "true";
-  let result: "last-admin" | "not-found" | "updated";
-  try {
-    result = await db.transaction(async (transaction) => {
-      await transaction.execute(sql`SELECT pg_advisory_xact_lock(735241, 2)`);
-      if (!active) {
-        const [activeAdmins] = await transaction
-          .select({ value: count() })
-          .from(schema.adminUsers)
-          .where(eq(schema.adminUsers.isActive, true));
-        if (activeAdmins.value <= 1) return "last-admin" as const;
-      }
-
-      const [updated] = await transaction
-        .update(schema.adminUsers)
-        .set({ isActive: active, updatedAt: new Date() })
-        .where(eq(schema.adminUsers.id, idValue))
-        .returning({ id: schema.adminUsers.id });
-      if (!updated) return "not-found" as const;
-
-      if (!active) {
-        await transaction
-          .delete(schema.adminSessions)
-          .where(eq(schema.adminSessions.userId, idValue));
-      }
-      return "updated" as const;
-    });
-  } catch (error) {
-    if (isUniqueViolation(error)) {
-      return {
-        success: false as const,
-        error: "An account with that email already exists.",
-      };
-    }
-    throw error;
-  }
-
-  if (result === "last-admin") {
-    return {
-      success: false as const,
-      error: "The last active admin account cannot be deactivated.",
-    };
-  }
-  if (result === "not-found") {
-    return { success: false as const, error: "Admin account was not found." };
-  }
   revalidatePath(PROFILE_PATH);
   return { success: true as const };
 }
