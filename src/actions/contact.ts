@@ -1,71 +1,66 @@
 'use server'
 
-import { db } from '@/lib/db'
-import * as schema from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
-import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
+import { revalidateContent } from '@/server/revalidate'
+import * as service from '@/server/services/contact'
 
-// =============================================
-// GET
-// =============================================
-
-export async function getContact() {
-  await requireAuth()
-
-  const [contact] = await db.select()
-    .from(schema.contactSection)
-    .limit(1)
-
-  return contact || {
-    id: 0,
-    title: null,
-    overlayTitle: null,
-    formTitle: null,
-    buttonText: null,
-    buttonUrl: null,
-    infoTitle: null,
-    address: null,
-    phone: null,
-    email: null,
+function readMethod(formData: FormData) {
+  return {
+    kind: formData.get('kind'),
+    title: formData.get('title'),
+    value: formData.get('value'),
+    sections: formData.getAll('sections'),
   }
 }
 
-// =============================================
-// UPDATE CONTACT SECTION
-// =============================================
+function revalidateContactMethods() {
+  revalidateContent(
+    '/admin/contact',
+    '/admin/about',
+    '/api/contact',
+    '/api/about',
+    '/',
+  )
+}
+
+export async function getContact() {
+  await requireAuth()
+  return service.getContact()
+}
 
 export async function updateContact(formData: FormData) {
   await requireAuth()
+  const config = await service.updateContactSettings({
+    formTitle: formData.get('formTitle'),
+    buttonText: formData.get('buttonText'),
+    buttonUrl: formData.get('buttonUrl'),
+  })
+  revalidateContent('/admin/contact', '/api/contact')
+  return config
+}
 
-  const title = formData.get('title') as string
-  const overlayTitle = formData.get('overlayTitle') as string
-  const formTitle = formData.get('formTitle') as string
-  const buttonText = formData.get('buttonText') as string
-  const buttonUrl = formData.get('buttonUrl') as string
-  const infoTitle = formData.get('infoTitle') as string
-  const address = formData.get('address') as string
-  const phone = formData.get('phone') as string
-  const email = formData.get('email') as string
+export async function createContactMethod(formData: FormData) {
+  await requireAuth()
+  const method = await service.createContactMethod(readMethod(formData))
+  revalidateContactMethods()
+  return method
+}
 
-  const values = {
-      title: title || null,
-      overlayTitle: overlayTitle || null,
-      formTitle: formTitle || null,
-      buttonText: buttonText || null,
-      buttonUrl: buttonUrl || null,
-      infoTitle: infoTitle || null,
-      address: address || null,
-      phone: phone || null,
-      email: email || null,
-  }
-  const [existingContact] = await db.select().from(schema.contactSection).limit(1)
-  const [contact] = existingContact
-    ? await db.update(schema.contactSection).set(values).where(eq(schema.contactSection.id, existingContact.id)).returning()
-    : await db.insert(schema.contactSection).values(values).returning()
+export async function updateContactMethod(id: number, formData: FormData) {
+  await requireAuth()
+  const method = await service.updateContactMethod(id, readMethod(formData))
+  revalidateContactMethods()
+  return method
+}
 
-  revalidatePath('/admin/contact')
-  revalidatePath('/api/all')
+export async function deleteContactMethod(id: number) {
+  await requireAuth()
+  await service.deleteContactMethod(id)
+  revalidateContactMethods()
+}
 
-  return contact
+export async function reorderContactMethods(ids: number[]) {
+  await requireAuth()
+  await service.reorderContactMethods(ids)
+  revalidateContactMethods()
 }

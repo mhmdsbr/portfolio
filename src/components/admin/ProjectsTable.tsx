@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { deleteProject, reorderProjects, updateProjectCategoriesAndTech } from '@/actions/projects'
 import { useEffect, useState } from 'react'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
+import CategorySelect from '@/components/admin/CategorySelect'
 
 interface Project {
   id: number
@@ -13,16 +14,20 @@ interface Project {
   description: string | null
   image: string | null
   link: string | null
-  github: string | null
+  githubUrl: string | null
   tech: string[] | null
   sortOrder: number | null
 }
 
 interface ProjectsTableProps {
   projects: Project[]
+  categories: string[]
 }
 
-export default function ProjectsTable({ projects }: ProjectsTableProps) {
+const categoryFieldClass =
+  'w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500'
+
+export default function ProjectsTable({ projects, categories }: ProjectsTableProps) {
   const router = useRouter()
   const [items, setItems] = useState(projects)
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -245,16 +250,18 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
                           </div>
                           <div className="hidden sm:block">
                             {isEditingProjectDetails ? (
-                              <input
-                                aria-label={`${project.title} category`}
+                              <CategorySelect
+                                ariaLabel={`${project.title} category`}
+                                categories={categories}
                                 value={categoryDrafts[project.id] ?? ''}
-                                onChange={(event) =>
+                                onChange={(value) =>
                                   setCategoryDrafts((current) => ({
                                     ...current,
-                                    [project.id]: event.target.value,
+                                    [project.id]: value,
                                   }))
                                 }
-                                className="w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                                selectClassName={categoryFieldClass}
+                                inputClassName={categoryFieldClass}
                               />
                             ) : (
                               <span className="rounded-full bg-cyan-500/20 px-2 py-1 text-xs text-cyan-400">
@@ -270,17 +277,19 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
                               >
                                 Category
                               </label>
-                              <input
+                              <CategorySelect
                                 id={`project-category-${project.id}`}
-                                aria-label={`${project.title} category`}
+                                ariaLabel={`${project.title} category`}
+                                categories={categories}
                                 value={categoryDrafts[project.id] ?? ''}
-                                onChange={(event) =>
+                                onChange={(value) =>
                                   setCategoryDrafts((current) => ({
                                     ...current,
-                                    [project.id]: event.target.value,
+                                    [project.id]: value,
                                   }))
                                 }
-                                className="w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                                selectClassName={categoryFieldClass}
+                                inputClassName={categoryFieldClass}
                               />
                             </div>
                           )}

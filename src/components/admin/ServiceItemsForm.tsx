@@ -3,19 +3,20 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createServiceItem, updateServiceItem, deleteServiceItem, reorderServiceItems } from '@/actions/services'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 import { 
   FiMonitor, 
   FiPenTool, 
   FiPieChart, 
   FiBox
 } from 'react-icons/fi'
+import { SERVICE_ICONS, type ServiceIcon } from '@/lib/db/constants'
 
 interface ServiceItem {
   id: number
   title: string
-  content: string | null
-  icon: string | null
+  description: string | null
+  icon: ServiceIcon | null
   sortOrder: number | null
 }
 
@@ -23,14 +24,17 @@ interface ServiceItemsFormProps {
   items: ServiceItem[]
 }
 
-const iconOptions = [
-  { value: 'palette', label: 'Palette', icon: FiMonitor },
-  { value: 'desktop', label: 'Desktop', icon: FiMonitor },
-  { value: 'pen-ruler', label: 'Pencil Ruler', icon: FiPenTool },
-  { value: 'paintbrush', label: 'Paint Brush', icon: FiPenTool },
-  { value: 'chart-area', label: 'Chart Area', icon: FiPieChart },
-  { value: 'bullhorn', label: 'Bull Horn', icon: FiPieChart },
-]
+// Typed so a new ServiceIcon value fails to compile until it is listed here.
+const iconDetails: Record<ServiceIcon, { label: string; icon: typeof FiMonitor }> = {
+  palette: { label: 'Palette', icon: FiMonitor },
+  desktop: { label: 'Desktop', icon: FiMonitor },
+  'pen-ruler': { label: 'Pencil Ruler', icon: FiPenTool },
+  paintbrush: { label: 'Paint Brush', icon: FiPenTool },
+  'chart-area': { label: 'Chart Area', icon: FiPieChart },
+  bullhorn: { label: 'Bull Horn', icon: FiPieChart },
+}
+
+const iconOptions = SERVICE_ICONS.map((value) => ({ value, ...iconDetails[value] }))
 
 export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
   const [serviceItems, setServiceItems] = useState(items)
@@ -92,7 +96,7 @@ export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
     }
   }
 
-  const onDragEnd = async (result: any) => {
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return
 
     const itemsCopy = Array.from(serviceItems)
@@ -131,10 +135,10 @@ export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Content</label>
+          <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
           <input
             type="text"
-            name="content"
+            name="description"
             placeholder="Building responsive websites..."
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
@@ -204,9 +208,9 @@ export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
                               />
                               <input
                                 type="text"
-                                name="content"
-                                defaultValue={item.content || ''}
-                                placeholder="Content"
+                                name="description"
+                                defaultValue={item.description || ''}
+                                placeholder="Description"
                                 className="px-3 py-2 bg-gray-700 border border-cyan-500 rounded-md text-white focus:outline-none"
                               />
                               <select
@@ -246,7 +250,7 @@ export default function ServiceItemsForm({ items }: ServiceItemsFormProps) {
                                 </div>
                                 <div>
                                   <h4 className="font-semibold text-white">{item.title}</h4>
-                                  <p className="text-sm text-gray-400">{item.content || 'No description'}</p>
+                                  <p className="text-sm text-gray-400">{item.description || 'No description'}</p>
                                 </div>
                               </div>
                               <button

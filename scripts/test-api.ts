@@ -1,10 +1,9 @@
 async function testAPI() {
   const endpoints = [
-    '/api/sidebar',
     '/api/hero',
     '/api/about',
     '/api/services',
-    '/api/summary',
+    '/api/experience',
     '/api/testimonials',
     '/api/contact',
     '/api/footer',

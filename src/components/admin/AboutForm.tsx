@@ -5,26 +5,17 @@ import { useRouter } from 'next/navigation'
 import { updateAbout } from '@/actions/about'
 
 interface AboutFormProps {
-  initialData: {
-    id: number
-    title: string | null
-    overlayTitle: string | null
+  profile: {
     name: string | null
     jobTitle: string | null
-    description: string | null
-    buttonText: string | null
-    buttonUrl: string | null
+    biography: string | null
   }
 }
 
-export default function AboutForm({ initialData }: AboutFormProps) {
-  const [title, setTitle] = useState(initialData.title || '')
-  const [overlayTitle, setOverlayTitle] = useState(initialData.overlayTitle || '')
-  const [name, setName] = useState(initialData.name || '')
-  const [jobTitle, setJobTitle] = useState(initialData.jobTitle || '')
-  const [description, setDescription] = useState(initialData.description || '')
-  const [buttonText, setButtonText] = useState(initialData.buttonText || '')
-  const [buttonUrl, setButtonUrl] = useState(initialData.buttonUrl || '')
+export default function AboutForm({ profile }: AboutFormProps) {
+  const [name, setName] = useState(profile.name || '')
+  const [jobTitle, setJobTitle] = useState(profile.jobTitle || '')
+  const [description, setDescription] = useState(profile.biography || '')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const router = useRouter()
@@ -35,13 +26,9 @@ export default function AboutForm({ initialData }: AboutFormProps) {
     setMessage('')
 
     const formData = new FormData()
-    formData.set('title', title)
-    formData.set('overlayTitle', overlayTitle)
     formData.set('name', name)
     formData.set('jobTitle', jobTitle)
     formData.set('description', description)
-    formData.set('buttonText', buttonText)
-    formData.set('buttonUrl', buttonUrl)
 
     try {
       await updateAbout(formData)
@@ -62,34 +49,6 @@ export default function AboutForm({ initialData }: AboutFormProps) {
           {message}
         </div>
       )}
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Primary Title
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="About Me"
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Overlay Title
-          </label>
-          <input
-            type="text"
-            value={overlayTitle}
-            onChange={(e) => setOverlayTitle(e.target.value)}
-            placeholder="About"
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
-        </div>
-      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -130,34 +89,6 @@ export default function AboutForm({ initialData }: AboutFormProps) {
           placeholder="I am a passionate developer with 5+ years of experience..."
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Button Text
-          </label>
-          <input
-            type="text"
-            value={buttonText}
-            onChange={(e) => setButtonText(e.target.value)}
-            placeholder="Download CV"
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Button URL
-          </label>
-          <input
-            type="text"
-            value={buttonUrl}
-            onChange={(e) => setButtonUrl(e.target.value)}
-            placeholder="/cv.pdf"
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
-        </div>
       </div>
 
       <button

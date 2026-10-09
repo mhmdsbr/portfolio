@@ -1,26 +1,30 @@
-import { db } from '@/lib/db'
-import * as schema from '@/lib/db/schema'
 import { NextResponse } from 'next/server'
+import { getSection } from '@/server/repos/page-sections'
+import { getContactMethodsForSection } from '@/server/repos/contact-methods'
 import type { ApiResponse, ContactResponse } from '@/types/api'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<ApiResponse<ContactResponse>>> {
   try {
-    const [contactData] = await db.select().from(schema.contactSection)
+    const [section, methodsData] = await Promise.all([
+      getSection('contact'),
+      getContactMethodsForSection('contact'),
+    ])
 
     const response: ContactResponse = {
-      title: contactData?.title ?? null,
-      overlay_title: contactData?.overlayTitle ?? null,
-      form_title: contactData?.formTitle ?? null,
+      title: section?.title ?? null,
+      form_title: section?.config.formTitle ?? null,
       button: {
-        text: contactData?.buttonText ?? null,
-        url: contactData?.buttonUrl ?? null,
+        text: section?.config.buttonText ?? null,
+        url: section?.config.buttonUrl ?? null,
       },
-      info_title: contactData?.infoTitle ?? null,
-      address: contactData?.address ?? null,
-      phone: contactData?.phone ?? null,
-      email: contactData?.email ?? null,
+      methods: methodsData.map(({ id, kind, title, value }) => ({
+        id,
+        kind,
+        title,
+        value,
+      })),
     }
 
     return NextResponse.json({

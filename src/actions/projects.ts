@@ -1,171 +1,80 @@
 'use server'
 
-import { db } from '@/lib/db'
-import * as schema from '@/lib/db/schema'
-import { eq, asc } from 'drizzle-orm'
-import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
+import {
+  revalidateContent,
+  revalidateProjectCategoryPages,
+} from '@/server/revalidate'
+import * as service from '@/server/services/projects'
 
-// Get all projects
+const PAGE = '/admin/projects'
+
+function readForm(formData: FormData) {
+  return {
+    title: formData.get('title'),
+    category: formData.get('category'),
+    description: formData.get('description'),
+    image: formData.get('image'),
+    link: formData.get('link'),
+    githubUrl: formData.get('githubUrl'),
+    roles: formData.get('roles'),
+    tech: formData.get('tech'),
+  }
+}
+
 export async function getProjects() {
   await requireAuth()
-  
-  const projects = await db.select()
-    .from(schema.projectItems)
-    .orderBy(asc(schema.projectItems.sortOrder))
-  
-  return projects
+  return service.listProjects()
 }
 
-// Get single project
+// Projects page data: the section settings, projects and existing categories
+export async function getProjectsOverview() {
+  await requireAuth()
+  return service.getProjectsOverview()
+}
+
+// Existing category names for the category picker
+export async function getProjectCategories() {
+  await requireAuth()
+  return service.listCategories()
+}
+
 export async function getProject(id: number) {
   await requireAuth()
-  
-  const [project] = await db.select()
-    .from(schema.projectItems)
-    .where(eq(schema.projectItems.id, id))
-  
-  return project
+  return service.getProject(id)
 }
 
-// Create project
 export async function createProject(formData: FormData) {
   await requireAuth()
-  
-  const title = formData.get('title') as string
-  const category = formData.get('category') as string
-  const description = formData.get('description') as string
-  const roles = (formData.get('roles') as string)?.split('\n').map(role => role.trim()).filter(Boolean) || []
-  const image = formData.get('image') as string
-  const link = formData.get('link') as string
-  const github = formData.get('github') as string
-  const tech = (formData.get('tech') as string)?.split(',').map(t => t.trim()).filter(Boolean) || []
-  
-  // Get the projects section ID (there should be only one)
-  const [section] = await db.select()
-    .from(schema.projectsSection)
-    .limit(1)
-  const projectsSection = section ?? (await db.insert(schema.projectsSection).values({}).returning())[0]
-
-  const [project] = await db.insert(schema.projectItems)
-    .values({
-      projectsId: projectsSection.id,
-      title,
-      category,
-      description: description || null,
-      roles: roles.length > 0 ? roles : null,
-      image: image || null,
-      link: link || null,
-      github: github || null,
-      tech: tech.length > 0 ? tech : null,
-    })
-    .returning()
-  
-  revalidatePath('/admin/projects')
-  revalidatePath('/api/all')
-  
+  const project = await service.createProject(readForm(formData))
+  revalidateContent(PAGE)
   return project
 }
 
-// Update project
 export async function updateProject(id: number, formData: FormData) {
   await requireAuth()
-  
-  const title = formData.get('title') as string
-  const category = formData.get('category') as string
-  const description = formData.get('description') as string
-  const roles = (formData.get('roles') as string)?.split('\n').map(role => role.trim()).filter(Boolean) || []
-  const image = formData.get('image') as string
-  const link = formData.get('link') as string
-  const github = formData.get('github') as string
-  const tech = (formData.get('tech') as string)?.split(',').map(t => t.trim()).filter(Boolean) || []
-  
-  const [project] = await db.update(schema.projectItems)
-    .set({
-      title,
-      category,
-      description: description || null,
-      roles: roles.length > 0 ? roles : null,
-      image: image || null,
-      link: link || null,
-      github: github || null,
-      tech: tech.length > 0 ? tech : null,
-    })
-    .where(eq(schema.projectItems.id, id))
-    .returning()
-  
-  revalidatePath('/admin/projects')
-  revalidatePath('/api/all')
-  
+  const project = await service.updateProject(id, readForm(formData))
+  revalidateContent(PAGE)
   return project
 }
 
-// Delete project
 export async function deleteProject(id: number) {
   await requireAuth()
-  
-  await db.delete(schema.projectItems)
-    .where(eq(schema.projectItems.id, id))
-  
-  revalidatePath('/admin/projects')
-  revalidatePath('/api/all')
+  await service.deleteProject(id)
+  revalidateContent(PAGE)
 }
 
-// Update sort order
 export async function reorderProjects(ids: number[]) {
   await requireAuth()
-  
-  await Promise.all(
-    ids.map((id, index) => 
-      db.update(schema.projectItems)
-        .set({ sortOrder: index })
-        .where(eq(schema.projectItems.id, id))
-    )
-  )
-  
-  revalidatePath('/admin/projects')
-  revalidatePath('/api/all')
+  await service.reorderProjects(ids)
+  revalidateContent(PAGE)
 }
 
 export async function updateProjectCategoriesAndTech(
   updates: { id: number; category: string; tech: string[] }[],
 ) {
   await requireAuth()
-
-  if (
-    updates.length === 0 ||
-    updates.some(
-      ({ id, category, tech }) =>
-        !Number.isSafeInteger(id) ||
-        id <= 0 ||
-        !category.trim() ||
-        !Array.isArray(tech) ||
-        tech.some((item) => typeof item !== 'string' || !item.trim()),
-    ) ||
-    new Set(updates.map(({ id }) => id)).size !== updates.length
-  ) {
-    throw new Error('Invalid project category or technology updates')
-  }
-
-  await db.transaction(async (transaction) => {
-    for (const { id, category, tech } of updates) {
-      const [updatedProject] = await transaction
-        .update(schema.projectItems)
-        .set({
-          category: category.trim(),
-          tech: tech.length > 0 ? tech.map((item) => item.trim()) : null,
-        })
-        .where(eq(schema.projectItems.id, id))
-        .returning({ id: schema.projectItems.id })
-
-      if (!updatedProject) {
-        throw new Error(`Project ${id} was not found`)
-      }
-    }
-  })
-
-  revalidatePath('/admin/projects')
-  revalidatePath('/')
-  revalidatePath('/projects/category/[slug]', 'page')
-  revalidatePath('/api/all')
+  await service.classifyProjects(updates)
+  revalidateContent(PAGE, '/')
+  revalidateProjectCategoryPages()
 }

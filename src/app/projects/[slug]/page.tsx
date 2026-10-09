@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProjectBySlug } from "@/lib/projects";
+import { getProjectBySlug } from "@/server/repos/projects";
 import Header from "@/components/header";
 import { ApiDataProvider } from "@/providers/ApiDataProvider";
 import BackgroundGradient from "@/components/backgroundGradient";
@@ -101,9 +101,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   Visit project
                 </a>
               )}
-              {project.github?.startsWith("http") && (
+              {project.githubUrl?.startsWith("http") && (
                 <a
-                  href={project.github}
+                  href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-full border border-gray-600 px-5 py-2.5 font-semibold transition hover:border-gray-400"

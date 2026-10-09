@@ -2,6 +2,12 @@
 // Response Types for New API
 // =============================================
 
+import type {
+  ContactMethodKind,
+  SectionKind,
+  ServiceIcon,
+} from '@/lib/db/constants';
+
 export interface Button {
   text: string | null;
   url: string | null;
@@ -9,15 +15,6 @@ export interface Button {
 
 export interface SocialMediaMap {
   [key: string]: string;
-}
-
-export interface SidebarResponse {
-  profile_image: string | null;
-  profile_image_alt: string | null;
-  profile_title: string | null;
-  social_media: SocialMediaMap;
-  portfolio_title: string | null;
-  portfolio_overlay_title: string | null;
 }
 
 export interface HeroResponse {
@@ -30,14 +27,13 @@ export interface HeroResponse {
 
 export interface AboutResponse {
   title: string | null;
-  overlay_title: string | null;
   name: string | null;
   job_title: string | null;
   description: string | null;
-  button: Button;
   contact_information: Array<{
+    kind: ContactMethodKind;
     title: string;
-    content: string;
+    value: string;
   }>;
   details: Array<{
     number: number;
@@ -47,26 +43,23 @@ export interface AboutResponse {
 
 export interface ServicesResponse {
   title: string | null;
-  overlay_title: string | null;
   items: Array<{
     title: string;
-    content: string | null;
-    icon: string | null;
+    description: string | null;
+    icon: ServiceIcon | null;
   }>;
 }
 
-export interface SummaryResponse {
+export interface ExperienceResponse {
   title: string | null;
-  overlay_title: string | null;
-  button: Button;
-  jobs: Array<{
+  experiences: Array<{
     from: number | null;
-    to: string | null;
+    to: number | null;
     title: string;
     company: string;
     description: string | null;
   }>;
-  experiences: Array<{
+  skills: Array<{
     skill: string;
     level: number | null;
   }>;
@@ -74,64 +67,61 @@ export interface SummaryResponse {
 
 export interface Project {
   id: number;
+  slug: string;
   title: string;
   category: string;
+  category_slug: string;
   description: string | null;
   image: string | null;
   link: string | null;
-  github: string | null;
+  github_url: string | null;
+  roles: string[] | null;
   tech: string[] | null;
 }
 
 export interface ProjectsResponse {
   title: string | null;
-  overlay_title: string | null;
   items: Project[];
 }
 
 export interface TestimonialsResponse {
   title: string | null;
-  overlay_title: string | null;
   items: Array<{
     image: string | null;
     title: string;
     subtitle: string | null;
-    rating: string | null;
-    content: string | null;
+    rating: number | null;
+    body: string | null;
   }>;
 }
 
 export interface ContactResponse {
   title: string | null;
-  overlay_title: string | null;
   form_title: string | null;
   button: Button;
-  info_title: string | null;
-  address: string | null;
-  phone: string | null;
-  email: string | null;
+  methods: Array<{
+    id: number;
+    kind: ContactMethodKind;
+    title: string;
+    value: string;
+  }>;
 }
 
 export interface ConfigResponse {
-  api_base_url: string | null;
-  smtp: {
-    host: string | null;
-    port: string | null;
-    username: string | null;
-    password: string | null;
-  };
   recaptcha_site_key: string | null;
 }
 
-export interface HeaderSection {
+export interface PageSection {
   id: number;
-  sectionId: string;
-  title: string;
-  sortOrder: number | null;
+  kind: SectionKind;
+  navigationTitle: string;
+  title: string | null;
+  sortOrder: number;
+  isEnabled: boolean;
 }
 
 export interface HeaderResponse {
-  sections: HeaderSection[];
+  sections: PageSection[];
   defaultTitle: string | null;
 }
 
@@ -147,11 +137,10 @@ export interface FooterResponse {
 // =============================================
 
 export interface AllDataResponse {
-  sidebar: SidebarResponse;
   hero: HeroResponse;
   about: AboutResponse;
   services: ServicesResponse;
-  summary: SummaryResponse;
+  experience: ExperienceResponse;
   testimonials: TestimonialsResponse;
   projects: ProjectsResponse;
   contact: ContactResponse;
@@ -164,7 +153,7 @@ export interface AllDataResponse {
 // API Response Wrapper
 // =============================================
 
-export interface ApiResponseWrapper<T = any> {
+export interface ApiResponseWrapper<T = unknown> {
   data?: T;
   timestamp?: string;
   error?: string;
@@ -177,11 +166,10 @@ export type ApiResponse<T> = ApiResponseWrapper<T>;
 // =============================================
 
 export interface EndpointMap {
-  'api/sidebar': ApiResponseWrapper<SidebarResponse>;
   'api/hero': ApiResponseWrapper<HeroResponse>;
   'api/about': ApiResponseWrapper<AboutResponse>;
   'api/services': ApiResponseWrapper<ServicesResponse>;
-  'api/summary': ApiResponseWrapper<SummaryResponse>;
+  'api/experience': ApiResponseWrapper<ExperienceResponse>;
   'api/testimonials': ApiResponseWrapper<TestimonialsResponse>;
   'api/contact': ApiResponseWrapper<ContactResponse>;
   'api/footer': ApiResponseWrapper<FooterResponse>;

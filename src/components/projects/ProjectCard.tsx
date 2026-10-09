@@ -1,15 +1,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { projectSlug } from '@/lib/project-slug';
 
 interface Project {
   id: number;
+  slug: string;
   title: string;
   category: string;
+  category_slug: string;
   description: string | null;
   image: string | null;
   link?: string | null;
-  github?: string | null;
+  github_url?: string | null;
   tech?: string[] | null;
 }
 
@@ -18,7 +19,7 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const detailHref = `/projects/${projectSlug(project.title)}`;
+  const detailHref = `/projects/${project.slug}`;
 
   return (
     <div className="group bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 opacity-0">
@@ -46,9 +47,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               >
                 View Project
             </Link>
-            {project.github && project.github !== "#" && (
+            {project.github_url && project.github_url !== "#" && (
               <a
-                href={project.github}
+                href={project.github_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-black/80 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-black transition"
@@ -61,7 +62,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         <div className="p-5">
           <div className="flex items-center justify-between mb-2">
             <Link
-              href={`/projects/category/${projectSlug(project.category)}`}
+              href={`/projects/category/${project.category_slug}`}
               className="text-xs uppercase text-cyan-400 font-semibold tracking-wider hover:text-cyan-300"
             >
               {project.category}
