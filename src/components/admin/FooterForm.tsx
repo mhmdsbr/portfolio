@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateFooter } from '@/actions/footer'
+import { updateFooter } from '@/actions/admin/footer'
 
 interface FooterFormProps {
   initialData: {

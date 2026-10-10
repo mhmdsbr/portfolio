@@ -1,6 +1,6 @@
 'use client'
 
-import { createTestimonialItem, updateTestimonialItem, deleteTestimonialItem, reorderTestimonialItems } from '@/actions/testimonials'
+import { createTestimonialItem, updateTestimonialItem, deleteTestimonialItem, reorderTestimonialItems } from '@/actions/admin/testimonials'
 import Image from 'next/image'
 import { useCrudList } from './crud/useCrudList'
 import SortableCrudList, { CrudField, inputClass, editInputClass } from './crud/SortableCrudList'

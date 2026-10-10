@@ -1,4 +1,4 @@
-import { getProjectsOverview } from '@/actions/projects'
+import { getProjectsOverview } from '@/actions/admin/projects'
 import Link from 'next/link'
 import ProjectsTable from '@/components/admin/ProjectsTable'
 import SectionSettingsForm from '@/components/admin/SectionSettingsForm'

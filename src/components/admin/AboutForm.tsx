@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateAbout } from '@/actions/about'
+import { updateAbout } from '@/actions/admin/about'
 
 interface AboutFormProps {
   profile: {

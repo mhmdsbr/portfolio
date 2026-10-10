@@ -11,7 +11,7 @@ import {
   completeAdminUserEmailVerification,
   setAdminUserActive,
   updateMyProfile,
-} from "@/actions/profile";
+} from "@/actions/admin/profile";
 import type { CurrentAdminProfile } from "@/server/auth/types";
 
 interface AdminAccount {

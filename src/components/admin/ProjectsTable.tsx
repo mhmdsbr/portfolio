@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { deleteProject, reorderProjects, updateProjectCategoriesAndTech } from '@/actions/projects'
+import { deleteProject, reorderProjects, updateProjectCategoriesAndTech } from '@/actions/admin/projects'
 import { useEffect, useState } from 'react'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 import CategorySelect from '@/components/admin/CategorySelect'

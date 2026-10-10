@@ -1,4 +1,4 @@
-import { getContact } from '@/actions/contact'
+import { getContact } from '@/actions/admin/contact'
 import ContactForm from '@/components/admin/ContactForm'
 import ContactMethodsForm from '@/components/admin/ContactMethodsForm'
 import SectionSettingsForm from '@/components/admin/SectionSettingsForm'

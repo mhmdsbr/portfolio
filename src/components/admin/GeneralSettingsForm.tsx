@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateGeneralSettings } from '@/actions/config'
+import { updateGeneralSettings } from '@/actions/admin/config'
 
 interface GeneralSettingsFormProps {
   initialData: {

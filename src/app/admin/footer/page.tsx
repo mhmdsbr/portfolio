@@ -1,4 +1,4 @@
-import { getFooter, updateFooter } from '@/actions/footer'
+import { getFooter, updateFooter } from '@/actions/admin/footer'
 import FooterForm from '@/components/admin/FooterForm'
 
 export default async function FooterPage() {

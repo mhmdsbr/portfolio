@@ -5,7 +5,7 @@ import {
   updateSkill,
   deleteSkill,
   reorderSkills,
-} from "@/actions/experience";
+} from "@/actions/admin/experience";
 import { useCrudList } from "./crud/useCrudList";
 import SortableCrudList, { CrudField, inputClass } from "./crud/SortableCrudList";
 

@@ -1,4 +1,4 @@
-import { getTestimonials } from '@/actions/testimonials'
+import { getTestimonials } from '@/actions/admin/testimonials'
 import TestimonialItemsForm from '@/components/admin/TestimonialItemsForm'
 import SectionSettingsForm from '@/components/admin/SectionSettingsForm'
 

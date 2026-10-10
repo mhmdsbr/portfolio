@@ -5,7 +5,7 @@ import {
   updateExperience,
   deleteExperience,
   reorderExperiences,
-} from "@/actions/experience";
+} from "@/actions/admin/experience";
 import { useCrudList } from "./crud/useCrudList";
 import SortableCrudList, {
   CrudField,

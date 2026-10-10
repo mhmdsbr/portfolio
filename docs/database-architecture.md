@@ -30,7 +30,7 @@ flowchart LR
         direction TB
         UI["Server Components<br/>app/page.tsx, projects/*<br/>sections receive props"]
         API["Public read model<br/>getPublicAll()<br/>uncached, force-dynamic pages"]
-        ACT["Server actions (controllers)<br/>src/actions/*<br/>requireAuth, FormData to input,<br/>revalidate"]
+        ACT["Server actions (controllers)<br/>src/actions/admin/*<br/>requireAuth, FormData to input,<br/>revalidate"]
         SVC["Services<br/>src/server/services/*<br/>public read models, validation, rules, transactions"]
         LIB["Repositories<br/>src/server/repos/*<br/>the only layer that queries the DB"]
         AUTH["Auth<br/>src/server/auth/*<br/>passwords, sessions, cookies"]

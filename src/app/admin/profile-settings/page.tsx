@@ -1,4 +1,4 @@
-import { getProfileSettings } from '@/actions/profile'
+import { getProfileSettings } from '@/actions/admin/profile'
 import ProfileSettingsForm from '@/components/admin/ProfileSettingsForm'
 
 export default async function ProfileSettingsPage() {

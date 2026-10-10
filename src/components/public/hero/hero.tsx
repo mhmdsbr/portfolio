@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { HeroResponse } from "@/types/api";
 import useHeroAnimations from "@/hooks/animations/useHeroAnimations";
-import HeroTitles from "@/components/hero/HeroTitles";
-import HeroBadge from "@/components/hero/HeroBadge";
+import HeroTitles from "@/components/public/hero/HeroTitles";
+import HeroBadge from "@/components/public/hero/HeroBadge";
 import useBadgeScrollAnimation from "@/hooks/animations/useBadgeScrollAnimation";
 
 export default function Hero({ hero }: { hero: HeroResponse }) {

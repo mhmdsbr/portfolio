@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import BackgroundGradient from '@/components/backgroundGradient'
+import BackgroundGradient from '@/components/shared/backgroundGradient'
 
 export default function NotFound() {
   return (

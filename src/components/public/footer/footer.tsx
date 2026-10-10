@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import type { FooterResponse } from '@/types/api'
-import Modal from '@/components/footer/Modal'
+import Modal from '@/components/public/footer/Modal'
 
 const Footer = ({ footerData }: { footerData: FooterResponse }) => {
 

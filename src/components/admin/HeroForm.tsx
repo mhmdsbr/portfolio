@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateHero, updateHeroTitles } from '@/actions/hero'
+import { updateHero, updateHeroTitles } from '@/actions/admin/hero'
 import Image from 'next/image'
 import type { HeroConfig } from '@/shared/section-config'
 

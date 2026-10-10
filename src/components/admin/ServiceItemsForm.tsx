@@ -1,6 +1,6 @@
 'use client'
 
-import { createServiceItem, updateServiceItem, deleteServiceItem, reorderServiceItems } from '@/actions/services'
+import { createServiceItem, updateServiceItem, deleteServiceItem, reorderServiceItems } from '@/actions/admin/services'
 import { useCrudList } from './crud/useCrudList'
 import SortableCrudList, { CrudField, inputClass, editInputClass } from './crud/SortableCrudList'
 import { 

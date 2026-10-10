@@ -1,5 +1,5 @@
 import ProjectForm from '@/components/admin/ProjectForm'
-import { getProjectCategories, getProject, updateProject } from '@/actions/projects'
+import { getProjectCategories, getProject, updateProject } from '@/actions/admin/projects'
 import { notFound } from 'next/navigation'
 
 interface EditProjectPageProps {

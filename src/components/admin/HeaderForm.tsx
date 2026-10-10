@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import {
   reorderHeaderSections,
   togglePortfolioSection,
-} from '@/actions/header'
+} from '@/actions/admin/header'
 import type { SectionKind } from '@/shared/constants'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { createDetail, updateDetail, deleteDetail, reorderDetails } from '@/actions/about'
+import { createDetail, updateDetail, deleteDetail, reorderDetails } from '@/actions/admin/about'
 import { useCrudList } from './crud/useCrudList'
 import SortableCrudList, { CrudField, inputClass } from './crud/SortableCrudList'
 

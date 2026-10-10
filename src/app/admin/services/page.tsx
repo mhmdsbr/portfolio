@@ -1,4 +1,4 @@
-import { getServices } from '@/actions/services'
+import { getServices } from '@/actions/admin/services'
 import ServiceItemsForm from '@/components/admin/ServiceItemsForm'
 import SectionSettingsForm from '@/components/admin/SectionSettingsForm'
 

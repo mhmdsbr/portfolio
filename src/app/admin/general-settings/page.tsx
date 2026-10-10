@@ -1,4 +1,4 @@
-import { getGeneralSettings } from '@/actions/config'
+import { getGeneralSettings } from '@/actions/admin/config'
 import GeneralSettingsForm from '@/components/admin/GeneralSettingsForm'
 
 export default async function GeneralSettingsPage() {

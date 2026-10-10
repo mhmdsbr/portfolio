@@ -60,6 +60,28 @@ const eslintConfig = [
       ],
     },
   },
+  {
+    files: ["src/components/public/**", "src/components/shared/**", "src/hooks/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/lib/db",
+              message: "Import db only from src/server/repos; use a service instead.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["@/actions/*", "@/components/admin/*"],
+              message: "Public and shared UI must not import admin actions or components.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;

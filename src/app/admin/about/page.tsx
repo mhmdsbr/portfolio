@@ -1,4 +1,4 @@
-import { getAbout } from '@/actions/about'
+import { getAbout } from '@/actions/admin/about'
 import AboutForm from '@/components/admin/AboutForm'
 import AboutDetailsForm from '@/components/admin/AboutDetailsForm'
 import ContactMethodsForm from '@/components/admin/ContactMethodsForm'

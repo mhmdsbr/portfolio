@@ -1,4 +1,4 @@
-import { getExperience } from "@/actions/experience";
+import { getExperience } from "@/actions/admin/experience";
 import ExperiencesForm from "@/components/admin/ExperiencesForm";
 import SkillsForm from "@/components/admin/SkillsForm";
 import SectionSettingsForm from "@/components/admin/SectionSettingsForm";

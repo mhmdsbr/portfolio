@@ -5,7 +5,7 @@ import {
   updateContactMethod,
   deleteContactMethod,
   reorderContactMethods,
-} from '@/actions/contact'
+} from '@/actions/admin/contact'
 import { useCrudList } from './crud/useCrudList'
 import SortableCrudList, { CrudField, inputClass } from './crud/SortableCrudList'
 import {

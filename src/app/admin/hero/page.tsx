@@ -1,4 +1,4 @@
-import { getHero } from '@/actions/hero'
+import { getHero } from '@/actions/admin/hero'
 import HeroForm from '@/components/admin/HeroForm'
 import SectionSettingsForm from '@/components/admin/SectionSettingsForm'
 
