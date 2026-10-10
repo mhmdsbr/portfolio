@@ -304,7 +304,7 @@ sequenceDiagram
     rect rgb(226, 232, 240)
     F->>S: FormData
     S->>S: requireAuth() (cookie -> hashed session -> user)
-    S->>V: optionalText / optionalUrl / sanitizeSectionConfig
+    S->>V: Zod schema (optionalText / optionalUrl)
     alt invalid
         V-->>F: throws, nothing written
     else valid
@@ -375,7 +375,7 @@ The TypeScript type per kind is the contract; the database only guarantees that
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','secondaryColor':'#e0f2fe','tertiaryColor':'#f1f5f9','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','clusterBkg':'#f1f5f9','clusterBorder':'#94a3b8','titleColor':'#0f172a','edgeLabelBackground':'#e2e8f0'}}}%%
 flowchart LR
-    IN["Form input"] --> SAN["sanitizeSectionConfig(kind, input)<br/>trim, empty to null,<br/>URL pattern check,<br/>drop unknown keys"]
+    IN["Form input"] --> SAN["Zod schema parse (heroSchema / contactSettingsSchema)<br/>trim, empty to null,<br/>URL pattern check,<br/>drop unknown keys"]
     SAN --> UPD["UPDATE page_sections<br/>SET config WHERE kind"]
     UPD --> CHK{"CHECK<br/>jsonb_typeof(config) = 'object'"}
     CHK --> STORE[("config jsonb")]
@@ -489,7 +489,7 @@ flowchart TB
         U1["select lists, required fields"]
     end
     subgraph L2["2. Server action"]
-        U2["requireAuth()<br/>requiredText / optionalText / optionalUrl<br/>sanitizeSectionConfig<br/>year and rating parsing"]
+        U2["requireAuth()<br/>Zod parse (requiredText / optionalText / optionalUrl)<br/>year and rating parsing"]
     end
     subgraph L3["3. TypeScript types"]
         U3["SectionKind, ServiceIcon, ContactMethodKind,<br/>SocialPlatform, ... from constants.ts"]

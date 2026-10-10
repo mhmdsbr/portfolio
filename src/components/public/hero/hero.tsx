@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { HeroResponse } from "@/types/api";
+import type { HeroResponse } from "@/shared/types/public-content";
 import useHeroAnimations from "@/hooks/animations/useHeroAnimations";
 import HeroTitles from "@/components/public/hero/HeroTitles";
 import HeroBadge from "@/components/public/hero/HeroBadge";

@@ -1,4 +1,3 @@
-import { optionalText } from '@/server/schemas/sanitize'
 import { siteConfigRepo } from '@/server/repos/singletons'
 
 const DEFAULT_COMPANY_NAME = 'Your Company'
@@ -22,10 +21,10 @@ export async function saveFooter(input: {
   copyrightText: string | null
 }) {
   return siteConfigRepo.save({
-    companyName: optionalText(input.companyName) ?? DEFAULT_COMPANY_NAME,
-    privacyPolicy: optionalText(input.privacyPolicy),
-    termsOfService: optionalText(input.termsOfService),
-    copyrightText: optionalText(input.copyrightText),
+    companyName: input.companyName ?? DEFAULT_COMPANY_NAME,
+    privacyPolicy: input.privacyPolicy,
+    termsOfService: input.termsOfService,
+    copyrightText: input.copyrightText,
   })
 }
 
@@ -35,5 +34,5 @@ export async function getGeneralSettings() {
 }
 
 export async function saveGeneralSettings(input: { recaptchaSiteKey: string | null }) {
-  await siteConfigRepo.save({ recaptchaSiteKey: optionalText(input.recaptchaSiteKey) })
+  await siteConfigRepo.save({ recaptchaSiteKey: input.recaptchaSiteKey })
 }

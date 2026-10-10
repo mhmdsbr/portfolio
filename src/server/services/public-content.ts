@@ -1,5 +1,5 @@
-import { readSectionConfig } from '@/shared/section-config'
-import type { SectionKind } from '@/shared/constants'
+import { readSectionConfig } from '@/utils/section-config'
+import type { SectionKind } from '@/shared/types'
 import { getContactMethodsForSection, getContactMethodsWithSections } from '@/server/repos/contact-methods'
 import { experienceRepo, profileFactRepo, serviceRepo, skillRepo, testimonialRepo } from '@/server/repos/collections'
 import { listHeroTitles } from '@/server/repos/hero-titles'
@@ -17,7 +17,7 @@ import type {
   ProjectsResponse,
   ServicesResponse,
   TestimonialsResponse,
-} from '@/types/api'
+} from '@/shared/types/public-content'
 
 export async function getPublicHero(): Promise<HeroResponse> {
   const section = await getSection('hero')

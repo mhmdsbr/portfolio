@@ -1,16 +1,5 @@
 import { z } from "zod";
-import {
-  ASSET_URL_PATTERN,
-  CONTACT_METHOD_KINDS,
-  CONTACT_METHOD_SECTION_KINDS,
-  LINK_URL_PATTERN,
-  SECTION_KINDS,
-  SERVICE_ICONS,
-  SOCIAL_PLATFORMS,
-  WEB_URL_PATTERN,
-  YEAR_MAX,
-  YEAR_MIN,
-} from "@/shared/constants";
+import { ASSET_URL_PATTERN, CONTACT_METHOD_KINDS, CONTACT_METHOD_SECTION_KINDS, LINK_URL_PATTERN, SECTION_KINDS, SERVICE_ICONS, SOCIAL_PLATFORMS, WEB_URL_PATTERN, YEAR_MAX, YEAR_MIN } from "@/shared/constants";
 import { ValidationError } from "@/server/services/shared";
 
 export const optionalText = z.preprocess(

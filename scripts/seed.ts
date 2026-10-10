@@ -2,8 +2,8 @@ import "dotenv/config";
 import { sql } from "drizzle-orm";
 import { db } from "../src/lib/db/index.js";
 import * as schema from "../src/lib/db/schema.js";
-import type { ContactMethodSectionKind } from "../src/shared/constants.js";
-import { SECTION_CONFIG_DEFAULTS } from "../src/shared/section-config.js";
+import type { ContactMethodSectionKind } from "../src/shared/types/index.js";
+import { SECTION_CONFIG_DEFAULTS } from "../src/shared/constants.js";
 import { uniqueSlug } from "../src/utils/project-slug.js";
 
 type SeedSection = Omit<schema.NewPageSection, "id">;

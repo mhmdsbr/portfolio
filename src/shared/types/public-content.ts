@@ -2,11 +2,7 @@
 // Public content payload types
 // =============================================
 
-import type {
-  ContactMethodKind,
-  SectionKind,
-  ServiceIcon,
-} from '@/shared/constants';
+import type { ContactMethodKind, SectionKind, ServiceIcon } from '@/shared/types';
 
 export interface Button {
   text: string | null;

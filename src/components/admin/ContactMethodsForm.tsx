@@ -8,11 +8,8 @@ import {
 } from '@/actions/admin/contact'
 import { useCrudList } from './crud/useCrudList'
 import SortableCrudList, { CrudField, inputClass } from './crud/SortableCrudList'
-import {
-  CONTACT_METHOD_SECTION_KINDS,
-  type ContactMethodKind,
-  type ContactMethodSectionKind,
-} from '@/shared/constants'
+import { CONTACT_METHOD_SECTION_KINDS } from '@/shared/constants'
+import type { ContactMethodKind, ContactMethodSectionKind } from '@/shared/types'
 
 interface ContactMethod {
   id: number

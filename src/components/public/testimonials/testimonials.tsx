@@ -5,7 +5,7 @@ import "swiper/css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import Image from "next/image";
-import type { TestimonialsResponse } from "@/types/api";
+import type { TestimonialsResponse } from "@/shared/types/public-content";
 
 import styles from "./testimonials.module.css";
 import Link from "next/link";

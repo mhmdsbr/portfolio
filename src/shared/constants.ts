@@ -1,6 +1,8 @@
 // Single source of truth for value sets and formats shared by the schema
-// (CHECK constraints), server actions, and UI. Keep this file free of imports
-// so client components can use it.
+// (CHECK constraints), server actions, and UI. Values only; the types derived
+// from them live in ./types. Keep runtime imports out so client components can
+// use it.
+import type { SectionConfigMap } from './types'
 
 export const SECTION_KINDS = [
   'hero',
@@ -11,12 +13,9 @@ export const SECTION_KINDS = [
   'testimonials',
   'contact',
 ] as const
-export type SectionKind = (typeof SECTION_KINDS)[number]
 
 // Sections that can display contact methods.
 export const CONTACT_METHOD_SECTION_KINDS = ['about', 'contact'] as const
-export type ContactMethodSectionKind =
-  (typeof CONTACT_METHOD_SECTION_KINDS)[number]
 
 export const CONTACT_METHOD_KINDS = [
   'email',
@@ -24,7 +23,6 @@ export const CONTACT_METHOD_KINDS = [
   'address',
   'other',
 ] as const
-export type ContactMethodKind = (typeof CONTACT_METHOD_KINDS)[number]
 
 export const SERVICE_ICONS = [
   'palette',
@@ -34,7 +32,6 @@ export const SERVICE_ICONS = [
   'chart-area',
   'bullhorn',
 ] as const
-export type ServiceIcon = (typeof SERVICE_ICONS)[number]
 
 export const SOCIAL_PLATFORMS = [
   'behance',
@@ -50,7 +47,6 @@ export const SOCIAL_PLATFORMS = [
   'whatsapp',
   'youtube',
 ] as const
-export type SocialPlatform = (typeof SOCIAL_PLATFORMS)[number]
 
 export const ADMIN_VERIFICATION_PURPOSES = [
   'initial',
@@ -58,8 +54,6 @@ export const ADMIN_VERIFICATION_PURPOSES = [
   'password_reset',
   'password_change',
 ] as const
-export type AdminVerificationPurpose =
-  (typeof ADMIN_VERIFICATION_PURPOSES)[number]
 
 // Patterns are valid for both PostgreSQL (`~`) and JavaScript (`RegExp`).
 export const SLUG_PATTERN = '^[a-z0-9]+(-[a-z0-9]+)*$'
@@ -72,3 +66,14 @@ export const LINK_URL_PATTERN = '^(https?://|/|#|mailto:|tel:)\\S+$'
 
 export const YEAR_MIN = 1900
 export const YEAR_MAX = 2100
+
+// Defaults for page_sections.config, per section kind.
+export const SECTION_CONFIG_DEFAULTS: SectionConfigMap = {
+  hero: { location: null, subtitleOne: null, subtitleTwo: null, logoUrl: null },
+  about: {},
+  experience: {},
+  services: {},
+  projects: {},
+  testimonials: {},
+  contact: { formTitle: null, buttonText: null, buttonUrl: null },
+}

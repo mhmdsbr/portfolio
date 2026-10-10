@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons';
 import useTitleScrollAnimation from '@/hooks/animations/useTitleScrollAnimation';
-import type { ContactResponse } from '@/types/api';
+import type { ContactResponse } from '@/shared/types/public-content';
 
 export default function Contact({ contact }: { contact: ContactResponse }) {
   const titleRef = useRef<HTMLHeadingElement | null>(null);

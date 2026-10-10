@@ -10,8 +10,8 @@ import Contact from "@/components/public/contact";
 import BackgroundGradient from "@/components/shared/backgroundGradient";
 import Testimonials from "@/components/public/testimonials/testimonials";
 import { getPublicAll } from "@/server/services/public-content";
-import type { SectionKind } from "@/shared/constants";
-import type { AllDataResponse } from "@/types/api";
+import type { SectionKind } from "@/shared/types";
+import type { AllDataResponse } from "@/shared/types/public-content";
 
 export const dynamic = "force-dynamic";
 

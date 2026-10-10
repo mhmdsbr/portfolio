@@ -12,25 +12,9 @@ import {
   type AnyPgColumn,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
-import {
-  ADMIN_VERIFICATION_PURPOSES,
-  ASSET_URL_PATTERN,
-  CONTACT_METHOD_KINDS,
-  LINK_URL_PATTERN,
-  SECTION_KINDS,
-  SERVICE_ICONS,
-  SLUG_PATTERN,
-  SOCIAL_PLATFORMS,
-  WEB_URL_PATTERN,
-  YEAR_MAX,
-  YEAR_MIN,
-  type AdminVerificationPurpose,
-  type ContactMethodKind,
-  type SectionKind,
-  type ServiceIcon,
-  type SocialPlatform,
-} from '@/shared/constants'
-import type { AnySectionConfig } from '@/shared/section-config'
+import { ADMIN_VERIFICATION_PURPOSES, ASSET_URL_PATTERN, CONTACT_METHOD_KINDS, LINK_URL_PATTERN, SECTION_KINDS, SERVICE_ICONS, SLUG_PATTERN, SOCIAL_PLATFORMS, WEB_URL_PATTERN, YEAR_MAX, YEAR_MIN } from '@/shared/constants'
+import type { AdminVerificationPurpose, ContactMethodKind, SectionKind, ServiceIcon, SocialPlatform } from '@/shared/types'
+import type { AnySectionConfig } from '@/shared/types'
 
 export type {
   AdminVerificationPurpose,

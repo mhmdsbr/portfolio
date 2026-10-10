@@ -6,7 +6,7 @@ For data flow, write paths, and enforcement layers, see
 This diagram describes the Drizzle schema in `src/lib/db/schema.ts`. Solid
 relations are enforced foreign keys. Value sets (section kinds, icons, contact
 kinds, social platforms, verification purposes) and URL/slug patterns live in
-`src/shared/constants.ts` and are enforced with `CHECK` constraints, so the
+`src/shared/constants.ts` (types in `src/shared/types.ts`) and are enforced with `CHECK` constraints, so the
 TypeScript types and the database cannot drift apart.
 
 ```mermaid
@@ -208,8 +208,8 @@ up by kind through the typed constants in `src/shared/constants.ts`; there are
 no section names in the queries themselves.
 
 Section-specific settings are stored in `page_sections.config` (jsonb). Their
-shape is defined per kind in `src/shared/section-config.ts`, which also
-validates input on write and fills defaults on read:
+shape is defined per kind in `src/shared/types.ts` (defaults in `src/shared/constants.ts`, `readSectionConfig` in `src/utils/section-config.ts`)
+It fills defaults on read:
 
 | Kind | `config` keys |
 | --- | --- |

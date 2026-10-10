@@ -1,6 +1,6 @@
-import { SECTION_KINDS, type SectionKind } from '@/shared/constants'
-import { sanitizeSectionConfig } from '@/shared/section-config'
-import { requiredText } from '@/server/schemas/sanitize'
+import { SECTION_KINDS } from '@/shared/constants'
+import type { SectionKind } from '@/shared/types'
+import type { SectionConfigMap } from '@/shared/types'
 import { runInTransaction, type DbExecutor } from '@/server/repos/executor'
 import * as sections from '@/server/repos/page-sections'
 import type { SectionMeta, SectionWithConfig } from '@/server/repos/page-sections'
@@ -36,12 +36,11 @@ export async function requireSection<K extends SectionKind>(
   return { section: meta, config: section.config }
 }
 
-/** Replaces a section's config with validated input. */
+/** Replaces a section's config; callers pass input already parsed by its Zod schema. */
 export async function updateSectionConfig<K extends SectionKind>(
   kind: K,
-  input: Record<string, unknown>,
+  config: SectionConfigMap[K],
 ): Promise<SectionWithConfig<K>> {
-  const config = sanitizeSectionConfig(kind, input)
   const section = assertFound(
     await sections.saveSectionConfig(kind, config),
     `Page section "${kind}"`,
@@ -58,18 +57,8 @@ export async function updatePresentation(
   values: { navigationTitle: string; title: string | null },
 ) {
   assertSectionKind(kind)
-  if (
-    !values ||
-    typeof values.navigationTitle !== 'string' ||
-    (values.title !== null && typeof values.title !== 'string')
-  ) {
-    throw new ValidationError('Invalid page section metadata')
-  }
-  const navigationTitle = requiredText(values.navigationTitle, 'Navigation title')
-  const title = values.title?.trim() || null
-
   return assertFound(
-    await sections.savePresentation(kind, { navigationTitle, title }),
+    await sections.savePresentation(kind, values),
     'Portfolio section',
   )
 }

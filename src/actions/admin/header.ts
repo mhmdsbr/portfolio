@@ -1,5 +1,5 @@
 "use server";
-import type { SectionKind } from "@/shared/constants";
+import type { SectionKind } from "@/shared/types";
 import { requireAuth } from "@/server/auth/session";
 import { withAuthAction } from "@/server/action-result";
 import { parseInput, sectionKindSchema } from "@/server/schemas/common";

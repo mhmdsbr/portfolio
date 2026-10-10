@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateContact } from '@/actions/admin/contact'
-import type { ContactConfig } from '@/shared/section-config'
+import type { ContactConfig } from '@/shared/types'
 
 interface ContactFormProps {
   config: ContactConfig

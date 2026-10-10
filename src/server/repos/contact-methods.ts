@@ -1,9 +1,7 @@
 import { asc, desc, eq, inArray } from 'drizzle-orm'
 import * as schema from '@/lib/db/schema'
-import {
-  CONTACT_METHOD_SECTION_KINDS,
-  type ContactMethodSectionKind,
-} from '@/shared/constants'
+import { CONTACT_METHOD_SECTION_KINDS } from '@/shared/constants'
+import type { ContactMethodSectionKind } from '@/shared/types'
 import { defaultExecutor, type DbExecutor } from './executor'
 
 export type ContactMethodWithSections = schema.ContactMethod & {

@@ -1,7 +1,8 @@
 import { asc, eq } from 'drizzle-orm'
 import * as schema from '@/lib/db/schema'
-import type { SectionKind } from '@/shared/constants'
-import { readSectionConfig, type SectionConfigMap } from '@/shared/section-config'
+import type { SectionKind } from '@/shared/types'
+import type { SectionConfigMap } from '@/shared/types'
+import { readSectionConfig } from '@/utils/section-config'
 import { defaultExecutor, type DbExecutor } from './executor'
 
 export type { DbExecutor }

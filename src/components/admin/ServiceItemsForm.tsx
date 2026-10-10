@@ -9,7 +9,8 @@ import {
   FiPieChart, 
   FiBox
 } from 'react-icons/fi'
-import { SERVICE_ICONS, type ServiceIcon } from '@/shared/constants'
+import { SERVICE_ICONS } from '@/shared/constants'
+import type { ServiceIcon } from '@/shared/types'
 
 interface ServiceItem {
   id: number
