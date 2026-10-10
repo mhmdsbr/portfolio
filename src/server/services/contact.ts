@@ -1,4 +1,4 @@
-import type { ContactMethodKind, ContactMethodSectionKind } from '@/shared/constants'
+import type { ContactMethodInput } from '@/server/schemas/contact'
 import {
   deleteContactMethodRow,
   getContactMethodsWithSections,
@@ -11,13 +11,6 @@ import {
 import { runInTransaction } from '@/server/repos/executor'
 import { requireSection, updateSectionConfig } from './page-sections'
 import { assertFound, NotFoundError, ValidationError } from './shared'
-
-export interface ContactMethodInput {
-  kind: ContactMethodKind
-  title: string
-  value: string
-  sections: ContactMethodSectionKind[]
-}
 
 
 export async function getContact() {

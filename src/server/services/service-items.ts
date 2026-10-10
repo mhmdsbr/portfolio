@@ -1,13 +1,7 @@
-import type { ServiceIcon } from '@/shared/constants'
+import type { ServiceItemInput } from '@/server/schemas/services'
 import { serviceRepo } from '@/server/repos/collections'
 import { requireSection } from './page-sections'
 import { assertFound } from './shared'
-
-export interface ServiceItemInput {
-  title: string
-  description: string | null
-  icon: ServiceIcon | null
-}
 
 
 export async function getServices() {

@@ -50,3 +50,7 @@ export const projectClassificationsSchema = z
     (updates) => new Set(updates.map(({ id }) => id)).size === updates.length,
     "Invalid project category or technology updates",
   );
+export type ProjectInput = z.infer<typeof projectSchema>;
+export type ProjectClassification = z.infer<
+  typeof projectClassificationsSchema
+>[number];

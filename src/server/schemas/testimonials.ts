@@ -12,3 +12,4 @@ export const testimonialSchema = z.object({
   rating: optionalInteger("Rating", { min: 1, max: 5 }),
   body: optionalText,
 });
+export type TestimonialInput = z.infer<typeof testimonialSchema>;

@@ -53,3 +53,5 @@ export const skillSchema = z.object({
   skill: requiredText("Skill"),
   level: optionalInteger("Skill level", { min: 0, max: 100 }),
 });
+export type ExperienceInput = z.infer<typeof experienceSchema>;
+export type SkillInput = z.infer<typeof skillSchema>;

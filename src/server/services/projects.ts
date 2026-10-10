@@ -1,25 +1,9 @@
+import type { ProjectInput, ProjectClassification } from '@/server/schemas/projects'
 
 import { runInTransaction } from '@/server/repos/executor'
 import * as projects from '@/server/repos/projects'
 import { requireSection } from './page-sections'
 import { assertFound, ValidationError } from './shared'
-
-export interface ProjectInput {
-  title: string
-  category: string
-  description: string | null
-  image: string | null
-  link: string | null
-  githubUrl: string | null
-  roles: string[]
-  tech: string[]
-}
-
-export interface ProjectClassification {
-  id: number
-  category: string
-  tech: string[]
-}
 
 function normalizeTechnologies(values: string[]) {
   return [...new Map(values.map((item) => item.trim()).filter(Boolean).map((name) => [name.toLocaleLowerCase(), name])).values()]

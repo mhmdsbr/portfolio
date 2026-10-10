@@ -8,3 +8,4 @@ export const serviceItemSchema = z.object({
     serviceIconSchema,
   ),
 });
+export type ServiceItemInput = z.infer<typeof serviceItemSchema>;

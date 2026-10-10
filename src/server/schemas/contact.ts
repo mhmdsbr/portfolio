@@ -17,3 +17,4 @@ export const contactMethodSchema = z.object({
   value: requiredText("Contact method value"),
   sections: z.array(contactMethodSectionSchema),
 });
+export type ContactMethodInput = z.infer<typeof contactMethodSchema>;

@@ -1,15 +1,8 @@
+import type { TestimonialInput } from '@/server/schemas/testimonials'
 
 import { testimonialRepo } from '@/server/repos/collections'
 import { requireSection } from './page-sections'
 import { assertFound } from './shared'
-
-export interface TestimonialInput {
-  imageUrl: string | null
-  title: string
-  subtitle: string | null
-  rating: number | null
-  body: string | null
-}
 
 
 export async function getTestimonials() {

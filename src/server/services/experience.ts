@@ -1,20 +1,8 @@
+import type { ExperienceInput, SkillInput } from '@/server/schemas/experience'
 
 import { experienceRepo, skillRepo } from '@/server/repos/collections'
 import { requireSection } from './page-sections'
 import { assertFound } from './shared'
-
-export interface ExperienceInput {
-  fromYear: number
-  toYear: number | null
-  jobTitle: string
-  company: string
-  description: string | null
-}
-
-export interface SkillInput {
-  skill: string
-  level: number | null
-}
 
 
 export async function getExperience() {
