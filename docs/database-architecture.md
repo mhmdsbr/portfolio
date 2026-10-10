@@ -10,10 +10,13 @@ Diagrams use [Mermaid](https://mermaid.js.org/) and render on GitHub and in VS C
 
 Every read and write goes through Drizzle (`src/lib/db`), accessed only through
 repositories in `src/server/repos`. Admin changes are Next.js server actions
-guarded by `requireAuth()`, while public API routes use the public read-model
-service in `src/server/services/public-content.ts`. ESLint prevents direct DB
+guarded by `requireAuth()`, while the public pages are Server Components that
+call the public read-model service in `src/server/services/public-content.ts`
+directly. ESLint prevents direct DB
 client imports outside the repository and explicitly permitted setup files. The
-public site reads a single JSON payload from `/api/all`.
+public site is rendered on the server from a single `AllDataResponse` payload
+(`getPublicAll()`). The public pages are `force-dynamic`, so they read the
+database on every request and no data cache is used. There is no public JSON API.
 
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','secondaryColor':'#e0f2fe','tertiaryColor':'#f1f5f9','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','clusterBkg':'#f1f5f9','clusterBorder':'#94a3b8','titleColor':'#0f172a','edgeLabelBackground':'#e2e8f0'}}}%%
@@ -25,12 +28,12 @@ flowchart LR
 
     subgraph Next["Next.js app"]
         direction TB
-        UI["Components<br/>useAllData() via SWR"]
-        API["Public API routes<br/>/api/all, /api/hero, /api/about, ...<br/>(read only)"]
+        UI["Server Components<br/>app/page.tsx, projects/*<br/>sections receive props"]
+        API["Public read model<br/>getPublicAll()<br/>uncached, force-dynamic pages"]
         ACT["Server actions (controllers)<br/>src/actions/*<br/>requireAuth, FormData to input,<br/>revalidate"]
         SVC["Services<br/>src/server/services/*<br/>public read models, validation, rules, transactions"]
         LIB["Repositories<br/>src/server/repos/*<br/>the only layer that queries the DB"]
-        AUTH["Auth<br/>src/server/auth/*<br/>passwords, sessions, cookies<br/>(src/lib/auth.ts is a facade)"]
+        AUTH["Auth<br/>src/server/auth/*<br/>passwords, sessions, cookies"]
         DRZ["Drizzle ORM<br/>src/lib/db/schema.ts"]
     end
 
@@ -47,14 +50,13 @@ flowchart LR
     SVC --> AUTH
     DRZ --> PG
 
-    ACT -. "revalidatePath()" .-> API
 ```
 
 Admin accounts follow the same layering. `src/server/auth/password.ts` (scrypt,
 verification codes) and `session.ts` (cookie, session lookup, login/logout) are
 the auth layer; `services/admin-accounts.ts` and `services/admin-verification.ts`
 hold the account and email-verification rules. Only the `admin-*` repositories
-query the tables, and `src/lib/auth.ts` re-exports the public API for importers.
+query the tables.
 
 ## 2. Entity relationships
 
@@ -197,7 +199,7 @@ erDiagram
 ## 3. Which tables feed which section
 
 `page_sections` is the hub: one row per `kind` that holds the section's title,
-nav label, order, visibility, and its own `config`. The API assembles each
+nav label, order, visibility, and its own `config`. The public read model assembles each
 section's payload from those rows plus the content tables.
 
 ```mermaid
@@ -256,13 +258,13 @@ is stored but not currently returned by the API.
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','lineColor':'#64748b','textColor':'#0f172a','actorBkg':'#dbeafe','actorTextColor':'#0f172a','actorBorder':'#2563eb','actorLineColor':'#64748b','signalColor':'#0f172a','signalTextColor':'#0f172a','labelBoxBkgColor':'#bfdbfe','labelBoxBorderColor':'#2563eb','labelTextColor':'#0f172a','loopTextColor':'#0f172a','noteBkgColor':'#fef9c3','noteTextColor':'#0f172a','noteBorderColor':'#ca8a04','sequenceNumberColor':'#ffffff'}}}%%
 sequenceDiagram
     autonumber
-    participant B as Browser (SWR)
-    participant R as GET /api/all
+    participant B as Server Component
+    participant R as getPublicAll()
     participant H as Helpers
     participant DB as PostgreSQL
 
     rect rgb(226, 232, 240)
-    B->>R: fetch api/all
+    B->>R: getCachedPublicAll() (cache miss)
     par parallel queries (Promise.all)
         R->>DB: profile, profile_facts
         R->>DB: hero_titles JOIN page_sections(kind='hero')
@@ -276,8 +278,8 @@ sequenceDiagram
     R->>H: readSectionConfig(kind, row.config)
     Note over H: keeps known keys only,<br/>fills missing keys with null
     R->>R: group tech and roles by project,<br/>split methods per section
-    R-->>B: AllDataResponse (JSON)
-    B->>B: render enabled sections<br/>in stored sortOrder
+    R-->>B: AllDataResponse
+    B->>B: render enabled sections as props<br/>in stored sortOrder
     end
 ```
 
@@ -312,7 +314,7 @@ sequenceDiagram
         DB-->>S: CHECK / FK / UNIQUE enforced
         S->>DB: COMMIT
         S-->>F: updated record
-        S->>S: revalidatePath('/', '/api/all', '/admin/...')
+        S->>S: revalidatePath('/admin/...')
     end
     end
 ```
@@ -358,8 +360,8 @@ The section actions (`getHero`, `getAbout`, `getContact`, `getExperience`,
 `{ section, config?, ...content }`, where `section` is the `page_sections` metadata.
 
 Naming is the same in the database, the admin and the API: `experiences` are the
-jobs, `skills` are the skills, and the API key and route are `experience`
-(`/api/experience`, `data.experience.experiences`, `data.experience.skills`).
+jobs, `skills` are the skills, and the payload key is `experience`
+(`data.experience.experiences`, `data.experience.skills`).
 
 Project categories are chosen from the existing rows (`CategorySelect`); typing a
 new name creates a category on save.
@@ -389,7 +391,7 @@ flowchart LR
 | `services`, `projects`, `testimonials` | none |
 
 Code finds a section by `kind` through the typed constants in
-`src/lib/db/constants.ts` (`getSection(kind)`, `updateSectionConfig(kind, ...)`,
+`src/shared/constants.ts` (`getSection(kind)`, `updateSectionConfig(kind, ...)`,
 `requireSectionId(kind)`), so queries never contain free-form section names.
 
 ## 7. Projects, categories, slugs, technologies
@@ -438,8 +440,8 @@ flowchart LR
     M3["Location"] --> L2
     M4["Hidden method"]:::hidden
 
-    L1 --> API1["/api/about<br/>contact_information"]
-    L2 --> API2["/api/contact<br/>methods"]
+    L1 --> API1["about payload<br/>contact_information"]
+    L2 --> API2["contact payload<br/>methods"]
 
     classDef hidden stroke-dasharray: 4 4
 ```
@@ -503,7 +505,7 @@ flowchart TB
 ```
 
 The value sets and URL/slug regex patterns are defined once in
-`src/lib/db/constants.ts`, and are used both to build the `CHECK` constraints and to
+`src/shared/constants.ts`, and are used both to build the `CHECK` constraints and to
 type and validate application code, so the layers cannot disagree.
 
 ## 11. Schema lifecycle and operations
