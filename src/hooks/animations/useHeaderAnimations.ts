@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { TextPlugin } from "gsap/TextPlugin";
-import { HeaderAnimationRefs } from "@/types/animation";
+import { HeaderAnimationRefs } from "@/hooks/animations/types";
 
 gsap.registerPlugin(TextPlugin, ScrollTrigger);
 

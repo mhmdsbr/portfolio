@@ -3,7 +3,7 @@
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { HeroAnimationRefs } from "@/types/animation";
+import { HeroAnimationRefs } from "@/hooks/animations/types";
 
 export default function useHeroAnimations(
   {

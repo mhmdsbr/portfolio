@@ -1,4 +1,4 @@
-import { BackgroundGradientStar } from "@/types/animation";
+import { BackgroundGradientStar } from "@/hooks/animations/types";
 
 export function drawStarsWithGradient(
   ctx: CanvasRenderingContext2D,

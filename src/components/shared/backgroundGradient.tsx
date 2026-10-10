@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { BackgroundGradientStar } from '@/types/animation';
+import { BackgroundGradientStar } from '@/hooks/animations/types';
 import { drawStarsWithGradient } from '@/utils/drawStars';
 
 export default function BackgroundGradient() {

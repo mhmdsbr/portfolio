@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { UseProjectsAnimation } from '@/types/animation';
+import { UseProjectsAnimation } from '@/hooks/animations/types';
 
 export function useProjectsAnimation<T>({
   projects,

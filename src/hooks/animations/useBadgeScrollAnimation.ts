@@ -3,7 +3,7 @@
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { BadgeAnimationRefs } from "@/types/animation";
+import { BadgeAnimationRefs } from "@/hooks/animations/types";
 
 export default function useBadgeScrollAnimation(
   { containerRef, descriptionRef }: BadgeAnimationRefs,
