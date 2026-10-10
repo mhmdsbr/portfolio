@@ -1,4 +1,4 @@
-import { EmailVerificationDeliveryError, sendAdminEmailVerification } from '@/lib/email'
+import { EmailVerificationDeliveryError, sendAdminEmailVerification } from '@/server/email'
 import {
   checkVerificationCode,
   generateChallengeId,

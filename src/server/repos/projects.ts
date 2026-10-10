@@ -1,6 +1,6 @@
 import { asc, eq, inArray, notExists, sql } from "drizzle-orm";
 import * as schema from "@/lib/db/schema";
-import { uniqueSlug } from "@/lib/project-slug";
+import { uniqueSlug } from "@/utils/project-slug";
 import { defaultExecutor, type DbExecutor } from "./executor";
 
 export type ProjectWithDetails = schema.Project & {

@@ -2,15 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import {
-  beginCurrentAdminPasswordChange,
   beginAdminEmailVerification,
   beginAdminPasswordResetVerification,
+  beginCurrentAdminPasswordChange,
   completeCurrentAdminPasswordChange,
-  requireAuth,
-  validateAdminIdentity,
   verifyAdminEmail,
   verifyAdminPasswordReset,
-} from "@/lib/auth";
+} from "@/server/services/admin-verification";
+import { requireAuth } from "@/server/auth/session";
+import { validateAdminIdentity } from "@/server/auth/validation";
 import * as adminAccounts from "@/server/services/admin-accounts";
 import { isUniqueViolation } from "@/server/services/shared";
 

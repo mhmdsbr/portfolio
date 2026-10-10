@@ -1,5 +1,5 @@
 "use server";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth } from "@/server/auth/session";
 import { withAuthAction } from "@/server/action-result";
 import {
   idListSchema,

@@ -29,8 +29,8 @@ import {
   type SectionKind,
   type ServiceIcon,
   type SocialPlatform,
-} from './constants'
-import type { AnySectionConfig } from './section-config'
+} from '@/shared/constants'
+import type { AnySectionConfig } from '@/shared/section-config'
 
 export type {
   AdminVerificationPurpose,

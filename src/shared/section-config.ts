@@ -1,5 +1,5 @@
-import type { SectionKind } from '@/lib/db/constants'
-import { optionalText, optionalUrl } from '@/lib/validation'
+import type { SectionKind } from '@/shared/constants'
+import { optionalText, optionalUrl } from '@/server/schemas/sanitize'
 
 // Section-specific settings stored in page_sections.config (jsonb).
 export interface ButtonConfig {

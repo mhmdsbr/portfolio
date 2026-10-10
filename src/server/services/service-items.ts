@@ -1,4 +1,4 @@
-import type { ServiceIcon } from '@/lib/db/constants'
+import type { ServiceIcon } from '@/shared/constants'
 import { serviceRepo } from '@/server/repos/collections'
 import { requireSection } from './page-sections'
 import { assertFound } from './shared'

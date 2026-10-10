@@ -7,7 +7,7 @@ import {
   reorderHeaderSections,
   togglePortfolioSection,
 } from '@/actions/header'
-import type { SectionKind } from '@/lib/db/constants'
+import type { SectionKind } from '@/shared/constants'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 
 interface PageSection {

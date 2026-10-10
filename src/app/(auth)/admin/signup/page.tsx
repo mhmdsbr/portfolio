@@ -1,4 +1,4 @@
-import { getAdminCount } from '@/lib/auth'
+import { getAdminCount } from '@/server/services/admin-accounts'
 import { redirect } from 'next/navigation'
 import AdminSignupForm from '@/components/admin/AdminSignupForm'
 

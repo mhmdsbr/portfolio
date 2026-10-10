@@ -13,7 +13,7 @@ import { ApiDataProvider } from "@/providers/ApiDataProvider";
 import Testimonials from "@/components/testimonials/testimonials";
 import { useAllData } from "@/hooks/useAllData";
 import type { ComponentType } from "react";
-import type { SectionKind } from "@/lib/db/constants";
+import type { SectionKind } from "@/shared/constants";
 
 const sectionComponents: Record<SectionKind, ComponentType> = {
   hero: Hero,

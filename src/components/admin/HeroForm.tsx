@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateHero, updateHeroTitles } from '@/actions/hero'
 import Image from 'next/image'
-import type { HeroConfig } from '@/lib/db/section-config'
+import type { HeroConfig } from '@/shared/section-config'
 
 interface HeroFormProps {
   config: HeroConfig

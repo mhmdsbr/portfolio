@@ -1,6 +1,6 @@
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminHeader from '@/components/admin/AdminHeader'
-import { requireAuth } from '@/lib/auth'
+import { requireAuth } from '@/server/auth/session'
 
 export default async function AdminLayout({
   children,

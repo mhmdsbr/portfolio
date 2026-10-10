@@ -10,7 +10,7 @@ import {
   WEB_URL_PATTERN,
   YEAR_MAX,
   YEAR_MIN,
-} from "@/lib/db/constants";
+} from "@/shared/constants";
 import { ValidationError } from "@/server/services/shared";
 
 export const optionalText = z.preprocess(

@@ -12,7 +12,7 @@ import {
   setAdminUserActive,
   updateMyProfile,
 } from "@/actions/profile";
-import type { CurrentAdminProfile } from "@/lib/auth";
+import type { CurrentAdminProfile } from "@/server/auth/types";
 
 interface AdminAccount {
   id: number;

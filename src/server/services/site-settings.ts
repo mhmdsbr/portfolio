@@ -1,4 +1,4 @@
-import { optionalText } from '@/lib/validation'
+import { optionalText } from '@/server/schemas/sanitize'
 import { siteConfigRepo } from '@/server/repos/singletons'
 
 const DEFAULT_COMPANY_NAME = 'Your Company'

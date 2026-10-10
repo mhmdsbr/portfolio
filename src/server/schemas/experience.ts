@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { YEAR_MAX, YEAR_MIN } from "@/lib/db/constants";
+import { YEAR_MAX, YEAR_MIN } from "@/shared/constants";
 import { optionalInteger, optionalText, requiredText } from "./common";
 const startYear = z.preprocess(
   (v) => (typeof v === "string" ? Number(v.trim()) : v),

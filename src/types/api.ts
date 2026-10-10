@@ -6,7 +6,7 @@ import type {
   ContactMethodKind,
   SectionKind,
   ServiceIcon,
-} from '@/lib/db/constants';
+} from '@/shared/constants';
 
 export interface Button {
   text: string | null;

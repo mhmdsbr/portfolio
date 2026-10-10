@@ -1,5 +1,5 @@
 import { isUniqueViolation, NotFoundError, ValidationError } from '@/server/services/shared'
-import { requireAuth } from '@/lib/auth'
+import { requireAuth } from '@/server/auth/session'
 
 export type ActionResult<T = void> =
   | { success: true; data?: T }

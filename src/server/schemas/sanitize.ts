@@ -1,15 +1,14 @@
+// Plain-value sanitizers for code that does not parse FormData; FormData goes through the Zod helpers in ./common.
 import {
   ASSET_URL_PATTERN,
   LINK_URL_PATTERN,
-  SLUG_PATTERN,
   WEB_URL_PATTERN,
-} from '@/lib/db/constants'
+} from '@/shared/constants'
 
 const patterns = {
   web: new RegExp(WEB_URL_PATTERN),
   asset: new RegExp(ASSET_URL_PATTERN),
   link: new RegExp(LINK_URL_PATTERN),
-  slug: new RegExp(SLUG_PATTERN),
 }
 
 export type UrlKind = 'web' | 'asset' | 'link'
@@ -20,7 +19,7 @@ export function optionalText(value: unknown): string | null {
   return value.trim() || null
 }
 
-/** Trims a required form value and throws when it is empty. */
+/** Trims a required form value and throws error when it is empty. */
 export function requiredText(value: unknown, label: string): string {
   const text = optionalText(value)
   if (!text) throw new Error(`${label} is required`)
@@ -39,8 +38,4 @@ export function optionalUrl(
     throw new Error(`${label} must be a valid URL or site path`)
   }
   return url
-}
-
-export function isSlug(value: string): boolean {
-  return patterns.slug.test(value)
 }

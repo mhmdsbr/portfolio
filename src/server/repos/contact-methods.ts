@@ -3,7 +3,7 @@ import * as schema from '@/lib/db/schema'
 import {
   CONTACT_METHOD_SECTION_KINDS,
   type ContactMethodSectionKind,
-} from '@/lib/db/constants'
+} from '@/shared/constants'
 import { defaultExecutor, type DbExecutor } from './executor'
 
 export type ContactMethodWithSections = schema.ContactMethod & {

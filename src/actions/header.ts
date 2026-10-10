@@ -1,6 +1,6 @@
 "use server";
-import type { SectionKind } from "@/lib/db/constants";
-import { requireAuth } from "@/lib/auth";
+import type { SectionKind } from "@/shared/constants";
+import { requireAuth } from "@/server/auth/session";
 import { withAuthAction } from "@/server/action-result";
 import { parseInput, sectionKindSchema } from "@/server/schemas/common";
 import {

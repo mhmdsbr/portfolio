@@ -1,4 +1,4 @@
-import type { ContactMethodKind, ContactMethodSectionKind } from '@/lib/db/constants'
+import type { ContactMethodKind, ContactMethodSectionKind } from '@/shared/constants'
 import {
   deleteContactMethodRow,
   getContactMethodsWithSections,

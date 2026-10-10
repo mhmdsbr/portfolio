@@ -12,7 +12,7 @@ import {
   CONTACT_METHOD_SECTION_KINDS,
   type ContactMethodKind,
   type ContactMethodSectionKind,
-} from '@/lib/db/constants'
+} from '@/shared/constants'
 
 interface ContactMethod {
   id: number
