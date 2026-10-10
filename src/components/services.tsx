@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAllData } from "@/hooks/useAllData";
+import type { ServicesResponse } from "@/types/api";
 import useServicesScrollAnimation from "@/hooks/animations/useServicesScrollAnimation";
 import { FiMonitor, FiPenTool, FiPieChart } from "react-icons/fi";
 
@@ -18,27 +18,25 @@ const getIcon = (iconName: string) => {
   return iconMap[iconName];
 };
 
-export default function Services() {
-  const { data: allData, isLoading } = useAllData();
+export default function Services({ services }: { services: ServicesResponse }) {
   const [animationReady, setAnimationReady] = useState(false);
 
-  const services = allData?.services;
   const sectionId = "services";
   const title = services?.title;
   const content = services?.items || [];
 
   useEffect(() => {
-    if (!isLoading && services) {
+    if (services) {
       setAnimationReady(true);
     }
-  }, [services, isLoading]);
+  }, [services]);
 
   useServicesScrollAnimation({
     isReady: animationReady,
     itemsLength: content.length,
   });
 
-  if (isLoading || !animationReady) {
+  if (!animationReady) {
     return (
       <section id={sectionId} className="px-6 py-16 text-white">
         <div className="flex justify-center items-center h-64">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useAllData } from "@/hooks/useAllData";
+import type { ProjectsResponse } from "@/types/api";
 import { useProjectsAnimation } from "@/hooks/animations/useProjectsAnimation";
 import ProjectCard from "./ProjectCard";
 
@@ -18,16 +18,15 @@ interface Project {
   tech?: string[] | null;
 }
 
-export default function Projects() {
+export default function Projects({ projectsData }: { projectsData: ProjectsResponse }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [projects, setProjects] = useState<Project[]>([]);
 
-  const { data: allData } = useAllData();
   const sectionId = "projects";
 
   const allProjects: Project[] = useMemo(() => {
-    return allData?.projects?.items || [];
-  }, [allData?.projects?.items]);
+    return projectsData.items;
+  }, [projectsData.items]);
 
   const categories = useMemo(() => {
     return ["All", ...new Set(allProjects.map((p) => p.category))];
@@ -72,7 +71,7 @@ export default function Projects() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-6xl font-bold font-mono mt-2">
-            {allData?.projects?.title}
+            {projectsData.title}
           </h2>
         </div>
 

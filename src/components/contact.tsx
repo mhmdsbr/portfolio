@@ -4,14 +4,12 @@ import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons';
 import useTitleScrollAnimation from '@/hooks/animations/useTitleScrollAnimation';
-import { useAllData } from '@/hooks/useAllData';
+import type { ContactResponse } from '@/types/api';
 
-export default function Contact() {
+export default function Contact({ contact }: { contact: ContactResponse }) {
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   useTitleScrollAnimation(titleRef);
 
-  const { data: allData, isLoading } = useAllData();
-  const contact = allData?.contact;
   const sectionId = "contact";
 
   const [formData, setFormData] = useState({
@@ -28,16 +26,6 @@ export default function Contact() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
-
-  if (isLoading) {
-    return (
-      <section id={sectionId} className="px-6 py-16 text-white">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
-        </div>
-      </section>
-    );
-  }
 
   const titleWords = contact?.title?.split(' ') || [];
 

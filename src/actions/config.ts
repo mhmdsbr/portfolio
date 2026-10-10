@@ -14,6 +14,6 @@ export async function updateGeneralSettings(formData: FormData) {
     await service.saveGeneralSettings(
       parseForm(generalSettingsSchema, formData),
     );
-    revalidateContent("/admin/general-settings", "/api/config");
+    revalidateContent("/admin/general-settings");
   })();
 }

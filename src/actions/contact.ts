@@ -17,8 +17,6 @@ function revalidateContactMethods() {
   revalidateContent(
     "/admin/contact",
     "/admin/about",
-    "/api/contact",
-    "/api/about",
     "/",
   );
 }
@@ -31,7 +29,7 @@ export async function updateContact(formData: FormData) {
     const data = await service.updateContactSettings(
       parseForm(contactSettingsSchema, formData),
     );
-    revalidateContent("/admin/contact", "/api/contact");
+    revalidateContent("/admin/contact");
     return data;
   })();
 }

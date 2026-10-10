@@ -2,17 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import useAboutScrollAnimation from "@/hooks/animations/useAboutScrollAnimation";
-import { useAllData } from '@/hooks/useAllData';
+import type { AboutResponse } from '@/types/api';
 
-export default function About() {
+export default function About({ about }: { about: AboutResponse }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
 
-  const { data: allData } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
 
-  const about = allData?.about;
   const sectionId = "about";
 
   const titleWords = about?.title?.split(" ") || [];

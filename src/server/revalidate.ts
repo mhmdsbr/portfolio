@@ -1,10 +1,12 @@
 import { revalidatePath } from 'next/cache'
 
-const PUBLIC_API_ALL = '/api/all'
-
-/** Invalidates the public aggregate endpoint plus any page-specific paths. */
+/**
+ * Revalidates the admin paths that show edited content. Public pages are
+ * force-dynamic and read the database on every request, so they need no
+ * invalidation.
+ */
 export function revalidateContent(...paths: string[]) {
-  for (const path of new Set([...paths, PUBLIC_API_ALL])) revalidatePath(path)
+  for (const path of new Set(paths)) revalidatePath(path)
 }
 
 export function revalidateProjectCategoryPages() {

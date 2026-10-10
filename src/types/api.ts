@@ -1,5 +1,5 @@
 // =============================================
-// Response Types for New API
+// Public content payload types
 // =============================================
 
 import type {
@@ -148,33 +148,3 @@ export interface AllDataResponse {
   header: HeaderResponse
   footer: FooterResponse
 }
-
-// =============================================
-// API Response Wrapper
-// =============================================
-
-export interface ApiResponseWrapper<T = unknown> {
-  data?: T;
-  timestamp?: string;
-  error?: string;
-}
-
-export type ApiResponse<T> = ApiResponseWrapper<T>;
-
-// =============================================
-// Endpoint Map for Type Safety
-// =============================================
-
-export interface EndpointMap {
-  'api/hero': ApiResponseWrapper<HeroResponse>;
-  'api/about': ApiResponseWrapper<AboutResponse>;
-  'api/services': ApiResponseWrapper<ServicesResponse>;
-  'api/experience': ApiResponseWrapper<ExperienceResponse>;
-  'api/testimonials': ApiResponseWrapper<TestimonialsResponse>;
-  'api/contact': ApiResponseWrapper<ContactResponse>;
-  'api/footer': ApiResponseWrapper<FooterResponse>;
-  'api/config': ApiResponseWrapper<ConfigResponse>;
-  'api/all': ApiResponseWrapper<AllDataResponse>;
-}
-
-export type EndpointKeys = keyof EndpointMap;

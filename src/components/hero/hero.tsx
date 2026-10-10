@@ -1,23 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useAllData } from "@/hooks/useAllData";
+import type { HeroResponse } from "@/types/api";
 import useHeroAnimations from "@/hooks/animations/useHeroAnimations";
 import HeroTitles from "@/components/hero/HeroTitles";
 import HeroBadge from "@/components/hero/HeroBadge";
 import useBadgeScrollAnimation from "@/hooks/animations/useBadgeScrollAnimation";
 
-export default function Hero() {
+export default function Hero({ hero }: { hero: HeroResponse }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const line1Ref = useRef<HTMLHeadingElement>(null);
   const line2Ref = useRef<HTMLSpanElement>(null);
   const line3Ref = useRef<HTMLSpanElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
-  const { data: allData } = useAllData();
-  const hero = allData?.hero;
   const sectionId = "hero";
-  console.log(allData)
 
   const [animationReady, setAnimationReady] = useState(false);
 

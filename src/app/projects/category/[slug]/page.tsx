@@ -2,8 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/header";
-import { ApiDataProvider } from "@/providers/ApiDataProvider";
+import { getPublicAll } from "@/server/services/public-content";
 import { getProjectsByCategory } from "@/server/repos/projects";
+
+export const dynamic = "force-dynamic";
 
 interface CategoryPageProps {
   params: Promise<{
@@ -22,11 +24,11 @@ export default async function ProjectCategoryPage({
   }
 
   const categoryName = projects[0].category;
+  const { header } = await getPublicAll();
 
   return (
-    <ApiDataProvider endpoints={["api/all"]}>
       <main className="min-h-screen bg-gray-950 px-6 py-16 text-white">
-        <Header singleTitle={categoryName} />
+        <Header singleTitle={categoryName} headerData={header} />
         <section className="mx-auto max-w-6xl">
           <Link
             href="/#projects"
@@ -101,6 +103,5 @@ export default async function ProjectCategoryPage({
           </div>
         </section>
       </main>
-    </ApiDataProvider>
   );
 }

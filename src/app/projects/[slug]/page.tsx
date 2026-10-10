@@ -3,8 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/server/repos/projects";
 import Header from "@/components/header";
-import { ApiDataProvider } from "@/providers/ApiDataProvider";
+import { getPublicAll } from "@/server/services/public-content";
 import BackgroundGradient from "@/components/backgroundGradient";
+
+export const dynamic = "force-dynamic";
 
 interface ProjectPageProps {
   params: Promise<{
@@ -20,11 +22,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound();
   }
 
+  const { header } = await getPublicAll();
+
   return (
-    <ApiDataProvider endpoints={["api/all"]}>
       <main className="relative min-h-screen overflow-x-hidden px-6 py-16 text-white">
         <BackgroundGradient />
-        <Header singleTitle={project.title} />
+        <Header singleTitle={project.title} headerData={header} />
         <article className="relative z-10 mx-auto max-w-7xl">
           <Link
             href="/#projects"
@@ -116,6 +119,5 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
         </article>
       </main>
-    </ApiDataProvider>
   );
 }

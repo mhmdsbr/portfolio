@@ -2,21 +2,20 @@
 
 import { useRef, useState, useEffect, useMemo } from "react";
 import useHeaderAnimations from "@/hooks/animations/useHeaderAnimations";
-import { useAllData } from "@/hooks/useAllData";
+import type { HeaderResponse } from "@/types/api";
 
 interface HeaderProps {
   singleTitle?: string;
+  headerData: HeaderResponse;
 }
 
-export default function Header({ singleTitle }: HeaderProps) {
+export default function Header({ singleTitle, headerData }: HeaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const expandRef = useRef<HTMLDivElement>(null);
   const reloadTextRef = useRef<HTMLSpanElement>(null);
   const titleRef = useRef<HTMLSpanElement>(null);
 
-  const { data: allData } = useAllData();
-  const headerData = allData?.header;
 
   const sections = useMemo(
     () =>

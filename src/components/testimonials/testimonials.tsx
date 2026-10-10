@@ -5,14 +5,14 @@ import "swiper/css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import Image from "next/image";
-import { useAllData } from "@/hooks/useAllData";
+import type { TestimonialsResponse } from "@/types/api";
 
 import styles from "./testimonials.module.css";
 import Link from "next/link";
 
-const Testimonials: React.FC = () => {
-  const { data: allData } = useAllData();
-  const testimonialsData = allData?.testimonials;
+const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
+  testimonialsData,
+}) => {
   const sectionId = "testimonials";
 
   const colors = ["#337BFF", "#FF5733", "#33FF57", "#FF33A1", "#8A33FF"];

@@ -1,12 +1,10 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { useAllData } from '@/hooks/useAllData'
+import type { FooterResponse } from '@/types/api'
 import Modal from '@/components/footer/Modal'
 
-const Footer = () => {
-  const { data: allData } = useAllData()
-  const footerData = allData?.footer
+const Footer = ({ footerData }: { footerData: FooterResponse }) => {
 
   const [showTerms, setShowTerms] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)

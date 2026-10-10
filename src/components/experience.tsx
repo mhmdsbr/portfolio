@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useAllData } from "@/hooks/useAllData";
+import type { ExperienceResponse } from "@/types/api";
 import useExperienceScrollAnimation from "@/hooks/animations/useExperienceScrollAnimation";
 
-export default function Experience() {
+export default function Experience({ experience }: { experience: ExperienceResponse }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { data: allData } = useAllData();
   const [animationReady, setAnimationReady] = useState(false);
 
-  const experience = allData?.experience;
   const sectionId = "experience";
   const title = experience?.title;
   const experienceItems = experience?.experiences || [];
