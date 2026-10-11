@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { HeroResponse } from "@/shared/types/public-content";
+import type { HeroResponse } from "@/shared/types";
 import useHeroAnimations from "@/hooks/animations/useHeroAnimations";
 import HeroTitles from "@/components/public/hero/HeroTitles";
 import HeroBadge from "@/components/public/hero/HeroBadge";
@@ -54,7 +54,7 @@ export default function Hero({ hero }: { hero: HeroResponse }) {
     <section
       id={sectionId}
       ref={containerRef}
-      className="relative overflow-x-hidden h-screen min-h-[700px] flex flex-col items-center gap-4 justify-evenly text-center"
+      className="relative overflow-x-hidden h-screen min-h-175 flex flex-col items-center gap-4 justify-evenly text-center"
     >
       <HeroTitles
         titles={hero.titles}
