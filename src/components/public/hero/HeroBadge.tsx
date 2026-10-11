@@ -21,7 +21,7 @@ export default function HeroBadge({
 }: HeroBadgeProps) {
   return (
     <div className="absolute bottom-8 left-0 z-10 flex h-14 w-full max-w-full items-center justify-start overflow-hidden text-[10px] font-medium uppercase text-white sm:bottom-20 sm:h-16 sm:w-fit sm:text-xs md:text-sm lg:left-4">
-      <div className="z-20 flex h-full shrink-0 items-center rounded-l-xs border-r-1 border-white bg-primary-cyan p-2 sm:p-3">
+      <div className="z-20 flex h-full shrink-0 items-center rounded-l-xs border-r border-white bg-primary-cyan p-2 sm:p-3">
         {logo ? (
           <Image
             src={logo}
@@ -32,7 +32,7 @@ export default function HeroBadge({
           />
         ) : null}
       </div>
-      <div className="z-20 flex h-full min-w-0 max-w-[22vw] items-center border-r-1 border-white bg-primary-orange px-2 sm:max-w-none sm:px-3">
+      <div className="z-20 flex h-full min-w-0 max-w-[22vw] items-center border-r border-white bg-primary-orange px-2 sm:max-w-none sm:px-3">
         <p className="truncate">{location}</p>
       </div>
       <div className="z-20 flex h-full min-w-0 max-w-[24vw] items-center border-white bg-primary-purple px-2 sm:max-w-none sm:px-3">

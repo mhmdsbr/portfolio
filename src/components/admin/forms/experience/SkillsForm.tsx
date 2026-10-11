@@ -81,7 +81,7 @@ export default function SkillsForm({ skills }: SkillsFormProps) {
           <div className="flex items-center gap-3 w-48">
             <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all"
+                className="h-full bg-linear-to-r from-cyan-500 to-purple-500 rounded-full transition-all"
                 style={{ width: `${item.level || 0}%` }}
               />
             </div>

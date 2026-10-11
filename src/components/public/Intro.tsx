@@ -83,7 +83,7 @@ export default function Intro() {
 
       {isVideoOpen && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm sm:p-8"
+          className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm sm:p-8"
           onClick={() => setIsVideoOpen(false)}
         >
           <section

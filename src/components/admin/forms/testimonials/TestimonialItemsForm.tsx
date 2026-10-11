@@ -121,7 +121,7 @@ export default function TestimonialItemsForm({ items }: TestimonialItemsFormProp
       renderItem={(item) => (
         <div className="flex items-start gap-4">
           {item.imageUrl && (
-            <div className="relative w-12 h-12 flex-shrink-0 rounded-full overflow-hidden bg-gray-700">
+            <div className="relative w-12 h-12 shrink-0 rounded-full overflow-hidden bg-gray-700">
               <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
             </div>
           )}

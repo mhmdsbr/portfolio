@@ -34,7 +34,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+            <div className="w-full h-full bg-linear-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
               <span className="text-6xl font-bold text-white/20">
                 {project.title[0]}
               </span>

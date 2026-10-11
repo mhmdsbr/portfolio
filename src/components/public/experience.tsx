@@ -43,7 +43,7 @@ export default function Experience({ experience }: { experience: ExperienceRespo
             {experienceItems.map((exp, i) => (
               <div
                 key={i}
-                className="experience-item p-6 border border-gray-700 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 shadow-lg"
+                className="experience-item p-6 border border-gray-700 rounded-2xl bg-linear-to-br from-gray-900 to-gray-800 shadow-lg"
               >
                 <h3 className="text-xl font-semibold">
                   {exp.title} @ {exp.company}
