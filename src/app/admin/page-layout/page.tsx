@@ -1,8 +1,8 @@
-import { getHeader } from '@/actions/admin/header'
-import HeaderForm from '@/components/admin/forms/header/HeaderForm'
+import { getPageLayout } from '@/actions/admin/page-layout'
+import PageLayoutForm from '@/components/admin/forms/page-layout/PageLayoutForm'
 
-export default async function HeaderPage() {
-  const { sections } = await getHeader()
+export default async function PageLayoutPage() {
+  const { sections } = await getPageLayout()
 
   return (
     <div>
@@ -11,7 +11,7 @@ export default async function HeaderPage() {
         Choose which portfolio sections appear and set their order. This controls
         presentation only; it does not delete portfolio content.
       </p>
-      <HeaderForm 
+      <PageLayoutForm
         initialSections={sections.map(({ kind, navigationTitle, title, sortOrder, isEnabled }) => ({
           kind,
           navigationTitle,

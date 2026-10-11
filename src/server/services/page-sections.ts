@@ -81,7 +81,7 @@ export async function setSectionEnabled(kind: SectionKind, isEnabled: boolean) {
   })
 }
 
-export async function reorderSections(kinds: SectionKind[]) {
+export async function reorderPageLayoutSections(kinds: SectionKind[]) {
   if (
     !Array.isArray(kinds) ||
     kinds.length === 0 ||

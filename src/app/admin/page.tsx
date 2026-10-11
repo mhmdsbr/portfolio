@@ -43,7 +43,7 @@ export default async function AdminDashboard() {
               Edit profile & about
             </Link>
             <Link
-              href="/admin/header"
+              href="/admin/page-layout"
               className="block text-sm text-cyan-400 hover:text-cyan-300 transition"
             >
               Configure page layout

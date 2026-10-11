@@ -38,7 +38,7 @@ const navGroups = [
   {
     label: 'Page presentation',
     items: [
-      { href: '/admin/header', label: 'Page layout', icon: FiMenu },
+      { href: '/admin/page-layout', label: 'Page layout', icon: FiMenu },
       { href: '/admin/footer', label: 'Footer', icon: FiFileText },
     ],
   },

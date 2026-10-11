@@ -2,7 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { togglePortfolioSection, updatePageSection } from '@/actions/admin/header'
+import {
+  setSectionVisibility,
+  updateSectionPresentation,
+} from '@/actions/admin/page-layout'
 import type { SectionMeta } from '@/server/repos/types'
 
 interface SectionSettingsFormProps {
@@ -25,10 +28,10 @@ export default function SectionSettingsForm({ section }: SectionSettingsFormProp
     setMessage('')
 
     try {
-      const saved = await updatePageSection(section.kind, { navigationTitle, title })
+      const saved = await updateSectionPresentation(section.kind, { navigationTitle, title })
       if (!saved.success) { setMessage(`❌ ${saved.error}`); return }
       if (isEnabled !== section.isEnabled) {
-        const toggled = await togglePortfolioSection(section.kind, isEnabled)
+        const toggled = await setSectionVisibility(section.kind, isEnabled)
         if (!toggled.success) { setMessage(`❌ ${toggled.error}`); return }
       }
       setMessage('✅ Section settings saved!')

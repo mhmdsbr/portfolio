@@ -350,7 +350,7 @@ form and its content records. **Page layout** only changes order and visibility.
 | `/admin/projects` | `projects` | none | `projects`, `project_categories` |
 | `/admin/testimonials` | `testimonials` | none | `testimonials` |
 | `/admin/contact` | `contact` | form title, button | **contact methods** |
-| `/admin/header` | all kinds | none | order and visibility only |
+| `/admin/page-layout` | all kinds | none | order and visibility only |
 
 Contact methods appear on both the About and Contact pages because they are shared
 records; the checkboxes on each method decide which sections show it.

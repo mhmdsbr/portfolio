@@ -4,13 +4,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
-  reorderHeaderSections,
-  togglePortfolioSection,
-} from '@/actions/admin/header'
+  reorderPageLayoutSections,
+  setSectionVisibility,
+} from '@/actions/admin/page-layout'
 import type { SectionKind } from '@/shared/types'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
 
-interface PageSection {
+interface PageLayoutSection {
   kind: SectionKind
   navigationTitle: string
   title: string | null
@@ -18,11 +18,11 @@ interface PageSection {
   isEnabled: boolean
 }
 
-interface HeaderFormProps {
-  initialSections: PageSection[]
+interface PageLayoutFormProps {
+  initialSections: PageLayoutSection[]
 }
 
-const sectionIcons: Record<SectionKind, string> = {
+const pageLayoutSectionIcons: Record<SectionKind, string> = {
   hero: '🏠',
   about: '👤',
   experience: '💼',
@@ -32,17 +32,17 @@ const sectionIcons: Record<SectionKind, string> = {
   contact: '✉️',
 }
 
-export default function HeaderForm({ initialSections }: HeaderFormProps) {
+export default function PageLayoutForm({ initialSections }: PageLayoutFormProps) {
   const [sections, setSections] = useState(initialSections)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const router = useRouter()
 
-  const handleToggle = async (section: PageSection) => {
+  const handleToggle = async (section: PageLayoutSection) => {
     setLoading(true)
     setMessage('')
     try {
-      const result = await togglePortfolioSection(section.kind, !section.isEnabled)
+      const result = await setSectionVisibility(section.kind, !section.isEnabled)
       if (!result.success) { setMessage(`❌ ${result.error}`); return }
       setSections((previous) => previous.map((item) =>
         item.kind === section.kind ? { ...item, isEnabled: !item.isEnabled } : item,
@@ -66,7 +66,7 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
     setSections(reordered)
 
     try {
-      const result = await reorderHeaderSections(reordered.map(({ kind }) => kind))
+      const result = await reorderPageLayoutSections(reordered.map(({ kind }) => kind))
       if (!result.success) { setSections(previousSections); setMessage(`❌ ${result.error}`); return }
       router.refresh()
     } catch (error) {
@@ -118,7 +118,7 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
                           ⠿
                         </span>
                         <span className="self-start pt-2 text-xl" aria-hidden="true">
-                          {sectionIcons[section.kind] || '📄'}
+                          {pageLayoutSectionIcons[section.kind] || '📄'}
                         </span>
                         <div className="min-w-0 flex-1 flex items-center justify-between gap-3">
                           <div className="min-w-0">

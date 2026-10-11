@@ -1,17 +1,17 @@
 import { z } from "zod";
 import { checkboxBoolean, sectionKindSchema, requiredText } from "./common";
-export const presentationSchema = z.object({
+export const sectionPresentationSchema = z.object({
   navigationTitle: requiredText("Navigation title"),
   title: z.preprocess(
     (v) => (typeof v === "string" ? v.trim() || null : null),
     z.string().nullable(),
   ),
 });
-export const sectionToggleSchema = z.object({
+export const sectionVisibilitySchema = z.object({
   kind: sectionKindSchema,
   isEnabled: checkboxBoolean,
 });
-export const sectionOrderSchema = z
+export const pageLayoutOrderSchema = z
   .array(sectionKindSchema)
   .min(1)
   .refine(

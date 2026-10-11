@@ -4,17 +4,17 @@ import { requireAuth } from "@/server/auth/session";
 import { withAuthAction } from "@/server/action-result";
 import { parseInput, sectionKindSchema } from "@/server/schemas/common";
 import {
-  presentationSchema,
-  sectionOrderSchema,
-  sectionToggleSchema,
-} from "@/server/schemas/header";
+  pageLayoutOrderSchema,
+  sectionPresentationSchema,
+  sectionVisibilitySchema,
+} from "@/server/schemas/page-layout";
 import { revalidateContent } from "@/server/revalidate";
 import * as service from "@/server/services/page-sections";
-export async function getHeader() {
+export async function getPageLayout() {
   await requireAuth();
   return service.listSections();
 }
-export async function updatePageSection(
+export async function updateSectionPresentation(
   kind: SectionKind,
   values: { navigationTitle: string; title: string },
 ) {
@@ -22,25 +22,27 @@ export async function updatePageSection(
     const validKind = parseInput(sectionKindSchema, kind);
     const section = await service.updatePresentation(
       validKind,
-      parseInput(presentationSchema, values),
+      parseInput(sectionPresentationSchema, values),
     );
-    revalidateContent("/admin/header", `/admin/${validKind}`, "/");
+    revalidateContent("/admin/page-layout", `/admin/${validKind}`, "/");
     return section;
   })();
 }
-export async function togglePortfolioSection(
+export async function setSectionVisibility(
   kind: SectionKind,
   isEnabled: boolean,
 ) {
   return withAuthAction(async () => {
-    const input = parseInput(sectionToggleSchema, { kind, isEnabled });
+    const input = parseInput(sectionVisibilitySchema, { kind, isEnabled });
     await service.setSectionEnabled(input.kind, input.isEnabled);
-    revalidateContent("/admin/header", `/admin/${kind}`, "/");
+    revalidateContent("/admin/page-layout", `/admin/${kind}`, "/");
   })();
 }
-export async function reorderHeaderSections(kinds: SectionKind[]) {
+export async function reorderPageLayoutSections(kinds: SectionKind[]) {
   return withAuthAction(async () => {
-    await service.reorderSections(parseInput(sectionOrderSchema, kinds));
-    revalidateContent("/admin/header", "/");
+    await service.reorderPageLayoutSections(
+      parseInput(pageLayoutOrderSchema, kinds),
+    );
+    revalidateContent("/admin/page-layout", "/");
   })();
 }
