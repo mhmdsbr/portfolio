@@ -31,12 +31,9 @@ export default function useAboutScrollAnimation({
       const paragraphs = textRef.current.querySelectorAll("p");
 
       const textsToCapture: string[] = [];
-      let hasContent = false;
 
       paragraphs.forEach((p) => {
-        const text = p.innerHTML.trim();
-        textsToCapture.push(text);
-        if (text.length > 0) hasContent = true;
+        textsToCapture.push(p.innerHTML.trim());
       });
 
 
