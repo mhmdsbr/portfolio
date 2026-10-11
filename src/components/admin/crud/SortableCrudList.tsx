@@ -102,7 +102,7 @@ export default function SortableCrudList<T extends { id: number }>({
                     <div
                       ref={draggable.innerRef}
                       {...draggable.draggableProps}
-                      className={`bg-gray-800 rounded-lg ${rowClassName} ${
+                      className={`bg-gray-800/50 rounded-lg ${rowClassName} ${
                         snapshot.isDragging ? 'shadow-lg ring-2 ring-cyan-500' : ''
                       }`}
                     >

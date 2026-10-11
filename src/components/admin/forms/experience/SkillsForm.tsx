@@ -6,8 +6,8 @@ import {
   deleteSkill,
   reorderSkills,
 } from "@/actions/admin/experience";
-import { useCrudList } from "./crud/useCrudList";
-import SortableCrudList, { CrudField, inputClass } from "./crud/SortableCrudList";
+import { useCrudList } from "@/components/admin/crud/useCrudList";
+import SortableCrudList, { CrudField, inputClass } from "@/components/admin/crud/SortableCrudList";
 
 interface Skill {
   id: number;

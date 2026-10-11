@@ -1,6 +1,6 @@
 import { getAdminCount } from '@/server/services/admin-accounts'
 import { redirect } from 'next/navigation'
-import AdminSignupForm from '@/components/admin/AdminSignupForm'
+import AdminSignupForm from '@/components/admin/forms/auth/AdminSignupForm'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,7 +1,7 @@
 import { getExperience } from "@/actions/admin/experience";
-import ExperiencesForm from "@/components/admin/ExperiencesForm";
-import SkillsForm from "@/components/admin/SkillsForm";
-import SectionSettingsForm from "@/components/admin/SectionSettingsForm";
+import ExperiencesForm from "@/components/admin/forms/experience/ExperiencesForm";
+import SkillsForm from "@/components/admin/forms/experience/SkillsForm";
+import SectionSettingsForm from "@/components/admin/forms/sections/SectionSettingsForm";
 
 export default async function ExperiencePage() {
   const { section, experiences, skills } = await getExperience();
@@ -10,13 +10,13 @@ export default async function ExperiencePage() {
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">Career & Skills</h1>
 
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-800/50 rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Section settings</h2>
         <SectionSettingsForm section={section} />
       </div>
 
       {/* Experiences */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-800/50 rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Work Experience</h2>
         <p className="text-sm text-gray-400 mb-4">
           Drag to reorder. Click Edit to modify.
@@ -25,7 +25,7 @@ export default async function ExperiencePage() {
       </div>
 
       {/* Skills */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-800/50 rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Skills</h2>
         <p className="text-sm text-gray-400 mb-4">
           Drag to reorder. Click Edit to modify.

@@ -62,7 +62,7 @@ function AdminAccounts({
   };
 
   return (
-    <section className="space-y-4 rounded-lg bg-gray-800 p-6">
+    <section className="space-y-4 rounded-lg bg-gray-800/50 p-6">
       <div>
         <h2 className="text-lg font-semibold">Admin Accounts</h2>
         <p className="mt-1 text-sm text-gray-400">
@@ -328,7 +328,7 @@ export default function ProfileSettingsForm({
 
   return (
     <div className="max-w-4xl space-y-6">
-      <section className="space-y-4 rounded-lg bg-gray-800 p-6">
+      <section className="space-y-4 rounded-lg bg-gray-800/50 p-6">
         <div>
           <h2 className="text-lg font-semibold">Your Profile</h2>
           <p className="mt-1 text-sm text-gray-400">
@@ -420,7 +420,7 @@ export default function ProfileSettingsForm({
         </form>
       </section>
 
-      <section className="space-y-4 rounded-lg bg-gray-800 p-6">
+      <section className="space-y-4 rounded-lg bg-gray-800/50 p-6">
         <div>
           <h2 className="text-lg font-semibold">Change Password</h2>
           <p className="mt-1 text-sm text-gray-400">
@@ -534,7 +534,7 @@ export default function ProfileSettingsForm({
 
       <AdminAccounts admins={admins} admin={admin} />
 
-      <section className="space-y-4 rounded-lg bg-gray-800 p-6">
+      <section className="space-y-4 rounded-lg bg-gray-800/50 p-6">
         <div>
           <h2 className="text-lg font-semibold">Add Admin Account</h2>
           <p className="mt-1 text-sm text-gray-400">
@@ -668,7 +668,7 @@ export default function ProfileSettingsForm({
         </form>
       </section>
 
-      <section className="space-y-4 rounded-lg bg-gray-800 p-6">
+      <section className="space-y-4 rounded-lg bg-gray-800/50 p-6">
         <div>
           <h2 className="text-lg font-semibold">
             Reset Another Admin’s Password

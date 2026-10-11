@@ -110,7 +110,7 @@ export default function HeaderForm({ initialSections }: HeaderFormProps) {
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className={`flex items-center gap-4 p-3 bg-gray-800 rounded-lg ${
+                        className={`flex items-center gap-4 p-3 bg-gray-800/50 rounded-lg ${
                           snapshot.isDragging ? 'shadow-lg ring-2 ring-cyan-500' : ''
                         }`}
                       >

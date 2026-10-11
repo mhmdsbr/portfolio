@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import CategorySelect from '@/components/admin/CategorySelect'
+import CategorySelect from '@/components/admin/forms/projects/CategorySelect'
 import type { ActionResult } from '@/server/action-result'
 
 interface ProjectFormProps {
@@ -127,7 +127,7 @@ export default function ProjectForm({ initialData, onSubmit, submitLabel, catego
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
         {imageUrl && (
-          <div className="mt-2 inline-block rounded bg-gray-800 p-2">
+          <div className="mt-2 inline-block rounded bg-gray-800/50 p-2">
             <Image
               src={imageUrl}
               alt="Project image preview"

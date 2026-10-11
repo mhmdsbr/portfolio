@@ -1,5 +1,5 @@
-import { getFooter, updateFooter } from '@/actions/admin/footer'
-import FooterForm from '@/components/admin/FooterForm'
+import { getFooter } from '@/actions/admin/footer'
+import FooterForm from '@/components/admin/forms/footer/FooterForm'
 
 export default async function FooterPage() {
   const footer = await getFooter()

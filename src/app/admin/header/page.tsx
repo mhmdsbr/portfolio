@@ -1,5 +1,5 @@
 import { getHeader } from '@/actions/admin/header'
-import HeaderForm from '@/components/admin/HeaderForm'
+import HeaderForm from '@/components/admin/forms/header/HeaderForm'
 
 export default async function HeaderPage() {
   const { sections } = await getHeader()

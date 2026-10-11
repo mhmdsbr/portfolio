@@ -2,7 +2,7 @@
 
 export default function AdminHeader() {
   return (
-    <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+    <header className="bg-gray-800/50 border-b border-gray-700 px-6 py-4">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold text-white">
           Welcome back, Admin

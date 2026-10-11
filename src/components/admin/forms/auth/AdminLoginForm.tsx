@@ -37,7 +37,7 @@ export default function AdminLoginForm() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 px-4">
-      <div className="w-full max-w-md rounded-lg bg-gray-800 p-8 shadow-xl">
+      <div className="w-full max-w-md rounded-lg bg-gray-800/50 p-8 shadow-xl">
         <h1 className="mb-6 text-center text-2xl font-bold text-white">
           Admin Login
         </h1>

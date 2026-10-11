@@ -79,7 +79,7 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="w-64 shrink-0 bg-gray-800 border-r border-gray-700 flex flex-col">
+    <aside className="w-64 shrink-0 bg-gray-800/50 border-r border-gray-700 flex flex-col">
       <div className="p-4 border-b border-gray-700">
         <h1 className="text-xl font-bold text-cyan-400">Portfolio CMS</h1>
       </div>

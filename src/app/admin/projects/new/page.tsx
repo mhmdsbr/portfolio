@@ -1,4 +1,4 @@
-import ProjectForm from '@/components/admin/ProjectForm'
+import ProjectForm from '@/components/admin/forms/projects/ProjectForm'
 import { createProject, getProjectCategories } from '@/actions/admin/projects'
 import { requireAuth } from '@/server/auth/session'
 

@@ -6,12 +6,12 @@ import {
   deleteExperience,
   reorderExperiences,
 } from "@/actions/admin/experience";
-import { useCrudList } from "./crud/useCrudList";
+import { useCrudList } from "@/components/admin/crud/useCrudList";
 import SortableCrudList, {
   CrudField,
   inputClass,
   editInputClass,
-} from "./crud/SortableCrudList";
+} from "@/components/admin/crud/SortableCrudList";
 
 interface Experience {
   id: number;

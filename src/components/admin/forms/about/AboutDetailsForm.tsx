@@ -1,8 +1,8 @@
 'use client'
 
 import { createDetail, updateDetail, deleteDetail, reorderDetails } from '@/actions/admin/about'
-import { useCrudList } from './crud/useCrudList'
-import SortableCrudList, { CrudField, inputClass } from './crud/SortableCrudList'
+import { useCrudList } from '@/components/admin/crud/useCrudList'
+import SortableCrudList, { CrudField, inputClass } from '@/components/admin/crud/SortableCrudList'
 
 interface Detail {
   id: number

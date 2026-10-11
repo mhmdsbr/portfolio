@@ -58,7 +58,7 @@ export default function GeneralSettingsForm({
         </div>
       )}
 
-      <section className="space-y-2 rounded-lg bg-gray-800 p-6">
+      <section className="space-y-2 rounded-lg bg-gray-800/50 p-6">
         <h2 className="text-lg font-semibold">Email delivery</h2>
         <p className="text-sm text-gray-300">
           SMTP is configured with server-only environment variables:
@@ -66,7 +66,7 @@ export default function GeneralSettingsForm({
         </p>
       </section>
 
-      <section className="space-y-4 rounded-lg bg-gray-800 p-6">
+      <section className="space-y-4 rounded-lg bg-gray-800/50 p-6">
         <h2 className="text-lg font-semibold">reCAPTCHA</h2>
         <div>
           <label

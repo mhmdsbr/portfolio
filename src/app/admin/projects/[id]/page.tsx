@@ -1,4 +1,4 @@
-import ProjectForm from '@/components/admin/ProjectForm'
+import ProjectForm from '@/components/admin/forms/projects/ProjectForm'
 import { getProjectCategories, getProject, updateProject } from '@/actions/admin/projects'
 import { notFound } from 'next/navigation'
 

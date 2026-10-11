@@ -1,7 +1,7 @@
 import { getProjectsOverview } from '@/actions/admin/projects'
 import Link from 'next/link'
-import ProjectsTable from '@/components/admin/ProjectsTable'
-import SectionSettingsForm from '@/components/admin/SectionSettingsForm'
+import ProjectsTable from '@/components/admin/forms/projects/ProjectsTable'
+import SectionSettingsForm from '@/components/admin/forms/sections/SectionSettingsForm'
 
 export default async function ProjectsPage() {
   const { section, projects, categories } = await getProjectsOverview()
@@ -18,7 +18,7 @@ export default async function ProjectsPage() {
         </Link>
       </div>
 
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-800/50 rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Section settings</h2>
         <SectionSettingsForm section={section} />
       </div>

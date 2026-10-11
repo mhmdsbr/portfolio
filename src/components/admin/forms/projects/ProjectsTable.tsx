@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { deleteProject, reorderProjects, updateProjectCategoriesAndTech } from '@/actions/admin/projects'
 import { useEffect, useState } from 'react'
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
-import CategorySelect from '@/components/admin/CategorySelect'
+import CategorySelect from '@/components/admin/forms/projects/CategorySelect'
 
 interface Project {
   id: number
@@ -25,7 +25,7 @@ interface ProjectsTableProps {
 }
 
 const categoryFieldClass =
-  'w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500'
+  'w-full rounded-md border border-gray-600 bg-gray-800/50 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500'
 
 export default function ProjectsTable({ projects, categories }: ProjectsTableProps) {
   const router = useRouter()
@@ -149,7 +149,7 @@ export default function ProjectsTable({ projects, categories }: ProjectsTablePro
   }
 
   return (
-    <div className="rounded-lg bg-gray-800">
+    <div className="rounded-lg bg-gray-800/50">
       {message && (
         <div className={`p-3 ${message.includes('❌') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
           {message}
@@ -312,20 +312,20 @@ export default function ProjectsTable({ projects, categories }: ProjectsTablePro
                                   }))
                                 }
                                 placeholder="React, TypeScript, Tailwind"
-                                className="w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                                className="w-full rounded-md border border-gray-600 bg-gray-800/50 px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                               />
                             ) : (
                               <>
                                 {project.tech?.slice(0, 3).map((tech, i) => (
                                   <span
                                     key={i}
-                                    className="rounded bg-gray-800 px-2 py-0.5 text-xs"
+                                    className="rounded bg-gray-800/50 px-2 py-0.5 text-xs"
                                   >
                                     {tech}
                                   </span>
                                 ))}
                                 {project.tech && project.tech.length > 3 && (
-                                  <span className="rounded bg-gray-800 px-2 py-0.5 text-xs">
+                                  <span className="rounded bg-gray-800/50 px-2 py-0.5 text-xs">
                                     +{project.tech.length - 3}
                                   </span>
                                 )}

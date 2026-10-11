@@ -1,5 +1,5 @@
 import { getGeneralSettings } from '@/actions/admin/config'
-import GeneralSettingsForm from '@/components/admin/GeneralSettingsForm'
+import GeneralSettingsForm from '@/components/admin/forms/general-settings/GeneralSettingsForm'
 
 export default async function GeneralSettingsPage() {
   const settings = await getGeneralSettings()

@@ -128,7 +128,7 @@ export default function HeroForm({ config, titles: initialTitles }: HeroFormProp
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
         {logoUrl && (
-          <div className="mt-2 p-2 bg-gray-800 rounded inline-block">
+          <div className="mt-2 p-2 bg-gray-800/50 rounded inline-block">
             <Image src={logoUrl} alt="Logo preview" width="12" height="12" className="h-12 w-auto" />
           </div>
         )}
