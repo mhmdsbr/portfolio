@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect, useMemo } from "react";
 import useHeaderAnimations from "@/hooks/animations/useHeaderAnimations";
-import type { HeaderResponse } from "@/shared/types/public-content";
+import type { HeaderResponse } from "@/shared/types";
 
 interface HeaderProps {
   singleTitle?: string;

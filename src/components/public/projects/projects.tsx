@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import type { ProjectsResponse } from "@/shared/types/public-content";
+import type { ProjectsResponse } from "@/shared/types";
 import { useProjectsAnimation } from "@/hooks/animations/useProjectsAnimation";
 import ProjectCard from "./ProjectCard";
 

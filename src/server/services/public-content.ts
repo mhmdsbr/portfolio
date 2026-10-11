@@ -17,7 +17,7 @@ import type {
   ProjectsResponse,
   ServicesResponse,
   TestimonialsResponse,
-} from '@/shared/types/public-content'
+} from '@/shared/types'
 
 export async function getPublicHero(): Promise<HeroResponse> {
   const section = await getSection('hero')

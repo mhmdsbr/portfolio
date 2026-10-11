@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ExperienceResponse } from "@/shared/types/public-content";
+import type { ExperienceResponse } from "@/shared/types";
 import useExperienceScrollAnimation from "@/hooks/animations/useExperienceScrollAnimation";
 
 export default function Experience({ experience }: { experience: ExperienceResponse }) {

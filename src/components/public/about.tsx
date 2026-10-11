@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import useAboutScrollAnimation from "@/hooks/animations/useAboutScrollAnimation";
-import type { AboutResponse } from '@/shared/types/public-content';
+import type { AboutResponse } from '@/shared/types';
 
 export default function About({ about }: { about: AboutResponse }) {
   const containerRef = useRef<HTMLDivElement>(null);

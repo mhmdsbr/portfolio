@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ServicesResponse } from "@/shared/types/public-content";
+import type { ServicesResponse } from "@/shared/types";
 import useServicesScrollAnimation from "@/hooks/animations/useServicesScrollAnimation";
 import { FiMonitor, FiPenTool, FiPieChart } from "react-icons/fi";
 
