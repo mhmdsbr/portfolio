@@ -4,7 +4,11 @@ import React, { useEffect, useRef } from 'react';
 import { BackgroundGradientStar } from '@/hooks/animations/types';
 import { drawStarsWithGradient } from '@/utils/drawStars';
 
-export default function BackgroundGradient() {
+export default function BackgroundGradient({
+  className = 'fixed inset-0 -z-10 w-full h-full',
+}: {
+  className?: string
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stars = useRef<BackgroundGradientStar[]>([]);
   const animationFrameId = useRef<number | null>(null);
@@ -62,7 +66,7 @@ export default function BackgroundGradient() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10 w-full h-full"
+      className={className}
       aria-hidden="true"
     />
   );
