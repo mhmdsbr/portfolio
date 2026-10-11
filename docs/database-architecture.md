@@ -540,3 +540,21 @@ flowchart LR
 | a `technologies` row | its `project_technologies` links | |
 | a `project_categories` row | | any project still uses it (`RESTRICT`) |
 | an `admin_users` row | profile, sessions, verifications it created | |
+
+## 13. Where types live
+
+A type lives in the narrowest layer that needs it.
+
+| I need... | Look in |
+| --- | --- |
+| a value set (enum) type, e.g. `SectionKind` | `src/shared/types/enums.ts` (values in `src/shared/constants.ts`) |
+| section `config` shapes | `src/shared/types/section-config.ts` |
+| what the public pages receive | `src/shared/types/public-content.ts` |
+| what an admin form submits | `src/server/schemas/<entity>.ts` (`z.infer` of the Zod schema) |
+| a DB row (`Select`/`Insert`) | `src/lib/db/schema.ts` (repos only) |
+| repo and service internals (`DbExecutor`, `ProjectWithDetails`, ...) | `src/server/repos/types.ts` |
+| auth and action results | `src/server/auth/types.ts`, `src/server/action-result.ts` |
+| client-only types | next to the hook or component (`src/hooks/animations/types.ts`) |
+
+`@/shared/types` re-exports the three shared files. Promote a type to `shared`
+only when a second layer needs it.

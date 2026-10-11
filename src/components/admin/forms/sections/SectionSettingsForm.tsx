@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { togglePortfolioSection, updatePageSection } from '@/actions/admin/header'
-import type { SectionMeta } from '@/server/repos/page-sections'
+import type { SectionMeta } from '@/server/repos/types'
 
 interface SectionSettingsFormProps {
   section: Pick<SectionMeta, 'kind' | 'navigationTitle' | 'title' | 'isEnabled'>

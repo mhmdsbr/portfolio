@@ -1,14 +1,7 @@
 import { asc, eq, inArray, sql } from 'drizzle-orm'
-import type { PgColumn, PgTable } from 'drizzle-orm/pg-core'
+import type { PgTable } from 'drizzle-orm/pg-core'
 import { defaultExecutor, runInTransaction, type DbExecutor } from './executor'
-
-type OrderedTable = PgTable & { id: PgColumn; sortOrder: PgColumn }
-type ManagedColumn = 'id' | 'sortOrder' | 'createdAt' | 'updatedAt'
-
-export type OrderedInput<T extends OrderedTable> = Omit<
-  T['$inferInsert'],
-  ManagedColumn
->
+import type { OrderedInput, OrderedTable } from './types'
 
 /**
  * Data access for a table that is an admin-ordered list (`id` + `sort_order`).

@@ -1,29 +1,9 @@
 import { asc, eq } from 'drizzle-orm'
 import * as schema from '@/lib/db/schema'
 import type { SectionKind } from '@/shared/types'
-import type { SectionConfigMap } from '@/shared/types'
 import { readSectionConfig } from '@/utils/section-config'
 import { defaultExecutor, type DbExecutor } from './executor'
-
-export type { DbExecutor }
-
-export type SectionWithConfig<K extends SectionKind> = Omit<
-  schema.PageSection,
-  'kind' | 'config'
-> & {
-  kind: K
-  config: SectionConfigMap[K]
-}
-
-export type SectionMeta = Pick<
-  schema.PageSection,
-  'id' | 'kind' | 'navigationTitle' | 'title' | 'isEnabled'
->
-
-export type SectionPresentation = Pick<
-  schema.PageSection,
-  'navigationTitle' | 'title'
->
+import type { SectionPresentation, SectionWithConfig } from './types'
 
 /** Reads a section and its normalized config; returns null when not seeded. */
 export async function getSection<K extends SectionKind>(

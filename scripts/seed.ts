@@ -2,7 +2,7 @@ import "dotenv/config";
 import { sql } from "drizzle-orm";
 import { db } from "../src/lib/db/index.js";
 import * as schema from "../src/lib/db/schema.js";
-import type { ContactMethodSectionKind } from "../src/shared/types/index.js";
+import type { ContactMethodSectionKind, SectionKind } from "../src/shared/types/index.js";
 import { SECTION_CONFIG_DEFAULTS } from "../src/shared/constants.js";
 import { uniqueSlug } from "../src/utils/project-slug.js";
 
@@ -541,7 +541,7 @@ async function seed() {
       .returning({ id: schema.pageSections.id, kind: schema.pageSections.kind });
     const sectionIds = new Map(sections.map(({ id, kind }) => [kind, id]));
     const requireSectionId = (kind: string) => {
-      const id = sectionIds.get(kind as schema.SectionKind);
+      const id = sectionIds.get(kind as SectionKind);
       if (id === undefined) throw new Error(`Missing seeded section "${kind}"`);
       return id;
     };

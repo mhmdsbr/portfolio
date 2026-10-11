@@ -3,10 +3,8 @@ import type { SectionKind } from '@/shared/types'
 import type { SectionConfigMap } from '@/shared/types'
 import { runInTransaction, type DbExecutor } from '@/server/repos/executor'
 import * as sections from '@/server/repos/page-sections'
-import type { SectionMeta, SectionWithConfig } from '@/server/repos/page-sections'
+import type { SectionMeta, SectionWithConfig } from '@/server/repos/types'
 import { assertFound, ValidationError } from './shared'
-
-export type { SectionMeta }
 
 export const isSectionKind = (value: unknown): value is SectionKind =>
   typeof value === 'string' && (SECTION_KINDS as readonly string[]).includes(value)

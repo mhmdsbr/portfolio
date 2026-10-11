@@ -2,18 +2,7 @@ import { asc, eq, inArray, notExists, sql } from "drizzle-orm";
 import * as schema from "@/lib/db/schema";
 import { uniqueSlug } from "@/utils/project-slug";
 import { defaultExecutor, type DbExecutor } from "./executor";
-
-export type ProjectWithDetails = schema.Project & {
-  category: string;
-  categorySlug: string;
-  tech: string[];
-  roles: string[];
-};
-
-export type ProjectFields = Omit<
-  schema.NewProject,
-  "id" | "slug" | "categoryId" | "sortOrder" | "createdAt" | "updatedAt"
->;
+import type { ProjectFields, ProjectWithDetails } from "./types";
 
 export async function getProjects(executor: DbExecutor = defaultExecutor) {
   const [projectRows, technologyLinks, roleLinks] = await Promise.all([

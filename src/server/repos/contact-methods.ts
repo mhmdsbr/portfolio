@@ -3,10 +3,7 @@ import * as schema from '@/lib/db/schema'
 import { CONTACT_METHOD_SECTION_KINDS } from '@/shared/constants'
 import type { ContactMethodSectionKind } from '@/shared/types'
 import { defaultExecutor, type DbExecutor } from './executor'
-
-export type ContactMethodWithSections = schema.ContactMethod & {
-  sections: ContactMethodSectionKind[]
-}
+import type { ContactMethodFields, ContactMethodWithSections } from './types'
 
 const isMethodSection = (kind: string): kind is ContactMethodSectionKind =>
   (CONTACT_METHOD_SECTION_KINDS as readonly string[]).includes(kind)
@@ -78,11 +75,6 @@ export async function setContactMethodSections(
     sections.map(({ id }) => ({ contactMethodId, sectionId: id })),
   )
 }
-
-export type ContactMethodFields = Pick<
-  schema.NewContactMethod,
-  'kind' | 'title' | 'value'
->
 
 export async function insertContactMethodAtEnd(
   executor: DbExecutor,

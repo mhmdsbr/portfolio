@@ -16,13 +16,6 @@ import { ADMIN_VERIFICATION_PURPOSES, ASSET_URL_PATTERN, CONTACT_METHOD_KINDS, L
 import type { AdminVerificationPurpose, ContactMethodKind, SectionKind, ServiceIcon, SocialPlatform } from '@/shared/types'
 import type { AnySectionConfig } from '@/shared/types'
 
-export type {
-  AdminVerificationPurpose,
-  ContactMethodKind,
-  SectionKind,
-  ServiceIcon,
-  SocialPlatform,
-}
 
 // =============================================
 // SHARED COLUMN HELPERS

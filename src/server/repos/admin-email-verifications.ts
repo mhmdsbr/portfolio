@@ -1,8 +1,9 @@
 import { and, eq, gt, isNull, lt, sql } from 'drizzle-orm'
 import * as schema from '@/lib/db/schema'
 import { defaultExecutor, type DbExecutor } from './executor'
+import type { AdminVerificationPurpose } from '@/shared/types'
 
-type Purpose = schema.AdminVerificationPurpose
+type Purpose = AdminVerificationPurpose
 
 export const adminEmailVerificationsRepo = {
   async deleteExpired(now: Date, executor: DbExecutor = defaultExecutor) {
