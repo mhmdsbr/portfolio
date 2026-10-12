@@ -1,13 +1,14 @@
-import { getProjects } from '@/actions/projects'
+import { getProjectsOverview } from '@/server/actions/admin/projects'
 import Link from 'next/link'
-import ProjectsTable from '@/components/admin/ProjectsTable'
+import ProjectsTable from '@/client/components/admin/forms/projects/ProjectsTable'
+import SectionSettingsForm from '@/client/components/admin/forms/sections/SectionSettingsForm'
 
 export default async function ProjectsPage() {
-  const projects = await getProjects()
+  const { section, projects, categories } = await getProjectsOverview()
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Projects</h1>
         <Link
           href="/admin/projects/new"
@@ -17,7 +18,15 @@ export default async function ProjectsPage() {
         </Link>
       </div>
 
-      <ProjectsTable projects={projects} />
+      <div className="bg-gray-800/50 rounded-lg p-6">
+        <h2 className="text-lg font-semibold mb-4">Section settings</h2>
+        <SectionSettingsForm section={section} />
+      </div>
+
+      <ProjectsTable
+        projects={projects}
+        categories={categories.map(({ name }) => name)}
+      />
     </div>
   )
 }

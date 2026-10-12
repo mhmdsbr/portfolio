@@ -1,21 +1,5 @@
-import { getHeader } from '@/actions/header'
-import HeaderForm from '@/components/admin/HeaderForm'
+import { redirect } from 'next/navigation'
 
-export default async function HeaderPage() {
-  const { settings, sections } = await getHeader()
-
-  return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Header Settings</h1>
-      <HeaderForm 
-        initialSettings={{
-          defaultTitle: settings.defaultTitle ?? 'Welcome',
-        }}
-        initialSections={sections.map((section) => ({
-          ...section,
-          sortOrder: section.sortOrder ?? 0,
-        }))}
-      />
-    </div>
-  )
+export default function LegacyHeaderPage() {
+  redirect('/admin/page-layout')
 }

@@ -1,0 +1,13 @@
+import { getGeneralSettings } from '@/server/actions/admin/config'
+import GeneralSettingsForm from '@/client/components/admin/forms/general-settings/GeneralSettingsForm'
+
+export default async function GeneralSettingsPage() {
+  const settings = await getGeneralSettings()
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">General Settings</h1>
+      <GeneralSettingsForm initialData={settings} />
+    </div>
+  )
+}

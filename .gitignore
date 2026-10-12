@@ -4,7 +4,6 @@
 
 # React
 build
-drizzle
 *.tsbuildinfo
 .next/
 

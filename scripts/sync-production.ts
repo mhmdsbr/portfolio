@@ -19,29 +19,23 @@ if (!process.argv.includes("--confirm")) {
 }
 
 const tables = [
-  "sidebar",
-  "social_media",
-  "general_settings",
-  "hero_section",
+  "page_sections",
+  "profile",
+  "social_links",
   "hero_titles",
-  "about_section",
-  "about_contact_info",
-  "about_details",
-  "services_section",
-  "service_items",
-  "summary_section",
-  "summary_jobs",
-  "summary_experiences",
-  "testimonials_section",
-  "testimonial_items",
-  "projects_section",
-  "project_items",
-  "contact_section",
-  "footer",
-  "config",
-  "header_sections",
-  "header_settings",
-  "footer_section",
+  "contact_methods",
+  "contact_method_sections",
+  "profile_facts",
+  "services",
+  "experiences",
+  "skills",
+  "testimonials",
+  "project_categories",
+  "projects",
+  "project_roles",
+  "technologies",
+  "project_technologies",
+  "site_config",
 ] as const;
 
 const quoteIdentifier = (identifier: string) =>
@@ -101,8 +95,17 @@ async function syncProduction() {
       }
 
       for (const table of tables) {
+        // Join tables use composite keys and have no id column or sequence.
+        const [{ sequence }] = await transaction<{ sequence: string | null }[]>`
+          SELECT CASE WHEN EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = ${table} AND column_name = 'id'
+          ) THEN pg_get_serial_sequence(${table}, 'id') END AS sequence
+        `;
+        if (!sequence) continue;
         await transaction.unsafe(
-          `SELECT setval(pg_get_serial_sequence('${table}', 'id'), COALESCE(MAX(id), 1), MAX(id) IS NOT NULL) FROM ${quoteIdentifier(table)}`,
+          `SELECT setval($1::regclass, COALESCE(MAX(id), 1), MAX(id) IS NOT NULL) FROM ${quoteIdentifier(table)}`,
+          [sequence],
         );
       }
     });

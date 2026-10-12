@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Header from "@/components/header";
-import { ApiDataProvider } from "@/providers/ApiDataProvider";
-import { getProjects } from "@/lib/projects";
-import { projectSlug } from "@/lib/project-slug";
+import Header from "@/client/components/public/header";
+import { getPublicAll } from "@/server/services/public-content";
+import { getProjectsByCategory } from "@/server/repos/projects";
+
+export const dynamic = "force-dynamic";
 
 interface CategoryPageProps {
   params: Promise<{
@@ -16,21 +17,18 @@ export default async function ProjectCategoryPage({
   params,
 }: CategoryPageProps) {
   const { slug } = await params;
-  const allProjects = await getProjects();
-  const projects = allProjects.filter(
-    (project) => projectSlug(project.category) === slug,
-  );
+  const projects = await getProjectsByCategory(slug);
 
   if (projects.length === 0) {
     notFound();
   }
 
   const categoryName = projects[0].category;
+  const { header } = await getPublicAll();
 
   return (
-    <ApiDataProvider endpoints={["api/all"]}>
       <main className="min-h-screen bg-gray-950 px-6 py-16 text-white">
-        <Header singleTitle={categoryName} />
+        <Header singleTitle={categoryName} headerData={header} />
         <section className="mx-auto max-w-6xl">
           <Link
             href="/#projects"
@@ -94,7 +92,7 @@ export default async function ProjectCategoryPage({
                   )}
 
                   <Link
-                    href={`/projects/${projectSlug(project.title)}`}
+                    href={`/projects/${project.slug}`}
                     className="mt-6 inline-flex text-sm font-semibold text-cyan-400 transition hover:text-cyan-300"
                   >
                     View project →
@@ -105,6 +103,5 @@ export default async function ProjectCategoryPage({
           </div>
         </section>
       </main>
-    </ApiDataProvider>
   );
 }

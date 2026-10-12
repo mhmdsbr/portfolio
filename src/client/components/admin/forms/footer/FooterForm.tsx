@@ -1,0 +1,108 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { updateFooter } from '@/server/actions/admin/footer'
+import type { FooterFormProps } from './types'
+
+export default function FooterForm({ initialData }: FooterFormProps) {
+  const [companyName, setCompanyName] = useState(initialData.companyName)
+  const [privacyPolicy, setPrivacyPolicy] = useState(initialData.privacyPolicy || '')
+  const [termsOfService, setTermsOfService] = useState(initialData.termsOfService || '')
+  const [copyrightText, setCopyrightText] = useState(initialData.copyrightText || '')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setMessage('')
+
+    const formData = new FormData()
+    formData.set('companyName', companyName)
+    formData.set('privacyPolicy', privacyPolicy)
+    formData.set('termsOfService', termsOfService)
+    formData.set('copyrightText', copyrightText)
+
+    try {
+      const result = await updateFooter(formData)
+      if (!result.success) { setMessage(`❌ ${result.error}`); return }
+      setMessage('✅ Footer settings updated successfully!')
+      router.refresh()
+    } catch (error) {
+      setMessage(`❌ ${error instanceof Error ? error.message : 'Failed to update footer settings'}`)
+      console.error('Error updating footer:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+      {message && (
+        <div className={`p-3 rounded ${!message.startsWith('✅') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+          {message}
+        </div>
+      )}
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-1">
+          Company Name
+        </label>
+        <input
+          type="text"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-1">
+          Privacy Policy (HTML allowed)
+        </label>
+        <textarea
+          value={privacyPolicy}
+          onChange={(e) => setPrivacyPolicy(e.target.value)}
+          rows={6}
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          placeholder="Enter privacy policy content..."
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-1">
+          Terms of Service (HTML allowed)
+        </label>
+        <textarea
+          value={termsOfService}
+          onChange={(e) => setTermsOfService(e.target.value)}
+          rows={6}
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          placeholder="Enter terms of service..."
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-1">
+          Copyright Text
+        </label>
+        <input
+          type="text"
+          value={copyrightText}
+          onChange={(e) => setCopyrightText(e.target.value)}
+          placeholder="All rights reserved."
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-6 rounded-md transition disabled:opacity-50"
+      >
+        {loading ? 'Saving...' : 'Save Footer Settings'}
+      </button>
+    </form>
+  )
+}
