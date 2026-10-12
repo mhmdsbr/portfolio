@@ -1,49 +1,43 @@
-"use client";
+import { Fragment, type ReactNode } from "react";
+import Header from "@/client/components/public/header";
+import Footer from "@/client/components/public/footer/footer";
+import Hero from "@/client/components/public/hero/hero";
+import About from "@/client/components/public/about";
+import Experience from "@/client/components/public/experience";
+import Services from "@/client/components/public/services";
+import Projects from "@/client/components/public/projects/projects";
+import Contact from "@/client/components/public/contact";
+import BackgroundGradient from "@/client/components/common/backgroundGradient";
+import Testimonials from "@/client/components/public/testimonials/testimonials";
+import { getPublicAll } from "@/server/services/public-content";
+import type { SectionKind } from "@/shared/types";
+import type { AllDataResponse } from "@/shared/types/public-content";
 
-import Header from "@/components/header";
-import Footer from "@/components/footer/footer";
-import Hero from "@/components/hero/hero";
-import About from "@/components/about";
-import Experience from "@/components/experience";
-import Services from "@/components/services";
-import Projects from "@/components/projects/projects";
-import Contact from "@/components/contact";
-import BackgroundGradient from "@/components/backgroundGradient";
-import { ApiDataProvider } from "@/providers/ApiDataProvider";
-import Testimonials from "@/components/testimonials/testimonials";
-import { useAllData } from "@/hooks/useAllData";
-import type { ComponentType } from "react";
-import type { SectionKind } from "@/lib/db/constants";
+export const dynamic = "force-dynamic";
 
-const sectionComponents: Record<SectionKind, ComponentType> = {
-  hero: Hero,
-  about: About,
-  experience: Experience,
-  services: Services,
-  projects: Projects,
-  testimonials: Testimonials,
-  contact: Contact,
+const sectionRenderers: Record<SectionKind, (data: AllDataResponse) => ReactNode> = {
+  hero: (data) => <Hero hero={data.hero} />,
+  about: (data) => <About about={data.about} />,
+  experience: (data) => <Experience experience={data.experience} />,
+  services: (data) => <Services services={data.services} />,
+  projects: (data) => <Projects projectsData={data.projects} />,
+  testimonials: (data) => <Testimonials testimonialsData={data.testimonials} />,
+  contact: (data) => <Contact contact={data.contact} />,
 };
 
-function ConfiguredSections() {
-  const { data } = useAllData();
-  const sections = data?.header.sections.filter((section) => section.isEnabled) ?? [];
+export default async function Home() {
+  const data = await getPublicAll();
+  const sections = data.header.sections.filter((section) => section.isEnabled);
 
-  return sections.map((section) => {
-    const Section = sectionComponents[section.kind];
-    return Section ? <Section key={section.kind} /> : null;
-  });
-}
-
-export default function Home() {
   return (
-    <ApiDataProvider endpoints={["api/all"]}>
-      <main id="main" className="relative text-white overflow-x-hidden">
-        <BackgroundGradient />
-        <Header />
-        <ConfiguredSections />
-        <Footer />
-      </main>
-    </ApiDataProvider>
+    <main id="main" className="relative text-white overflow-x-hidden">
+      <BackgroundGradient />
+      <Header headerData={data.header} />
+      {sections.map((section) => {
+        const render = sectionRenderers[section.kind];
+        return render ? <Fragment key={section.kind}>{render(data)}</Fragment> : null;
+      })}
+      <Footer footerData={data.footer} />
+    </main>
   );
 }

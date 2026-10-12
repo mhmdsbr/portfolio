@@ -30,16 +30,6 @@ UPDATE "page_sections" p SET "config" = jsonb_strip_nulls(jsonb_build_object(
 )) FROM "hero_section" h WHERE p."kind" = h."section_key";
 
 UPDATE "page_sections" p SET "config" = jsonb_strip_nulls(jsonb_build_object(
-  'buttonText', NULLIF(btrim(s."button_text"), ''),
-  'buttonUrl', NULLIF(btrim(s."button_url"), '')
-)) FROM "about_section" s WHERE p."kind" = s."section_key";
-
-UPDATE "page_sections" p SET "config" = jsonb_strip_nulls(jsonb_build_object(
-  'buttonText', NULLIF(btrim(s."button_text"), ''),
-  'buttonUrl', NULLIF(btrim(s."button_url"), '')
-)) FROM "experience_section" s WHERE p."kind" = s."section_key";
-
-UPDATE "page_sections" p SET "config" = jsonb_strip_nulls(jsonb_build_object(
   'formTitle', NULLIF(btrim(s."form_title"), ''),
   'buttonText', NULLIF(btrim(s."button_text"), ''),
   'buttonUrl', NULLIF(btrim(s."button_url"), '')

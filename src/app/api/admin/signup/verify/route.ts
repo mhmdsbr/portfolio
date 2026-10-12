@@ -1,4 +1,4 @@
-import { verifyAdminEmail } from "@/lib/auth";
+import { verifyAdminEmail } from "@/server/services/admin-verification";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {

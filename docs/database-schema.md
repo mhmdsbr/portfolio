@@ -3,10 +3,10 @@
 For data flow, write paths, and enforcement layers, see
 [database-architecture.md](./database-architecture.md).
 
-This diagram describes the Drizzle schema in `src/lib/db/schema.ts`. Solid
+This diagram describes the Drizzle schema in `src/server/db/schema.ts`. Solid
 relations are enforced foreign keys. Value sets (section kinds, icons, contact
 kinds, social platforms, verification purposes) and URL/slug patterns live in
-`src/lib/db/constants.ts` and are enforced with `CHECK` constraints, so the
+`src/shared/constants.ts` (types in `src/shared/types.ts`) and are enforced with `CHECK` constraints, so the
 TypeScript types and the database cannot drift apart.
 
 ```mermaid
@@ -195,7 +195,7 @@ erDiagram
   `technologies`, `admin_sessions` and `admin_email_verifications` only have
   `created_at`.
 - Ordered lists use `sort_order`; queries break ties with `id`
-  (`src/lib/db/order.ts`).
+  (`src/server/repos/order.ts`).
 - Empty form values are stored as `NULL`, never as empty strings.
 - URL columns are checked against `WEB_URL_PATTERN` (absolute http(s)),
   `ASSET_URL_PATTERN` (http(s) or site path) or `LINK_URL_PATTERN` (also anchors,
@@ -204,18 +204,17 @@ erDiagram
 ## Page sections
 
 `page_sections` has exactly one row per section `kind`. The code looks sections
-up by kind through the typed constants in `src/lib/db/constants.ts`; there are
+up by kind through the typed constants in `src/shared/constants.ts`; there are
 no section names in the queries themselves.
 
 Section-specific settings are stored in `page_sections.config` (jsonb). Their
-shape is defined per kind in `src/lib/db/section-config.ts`, which also
-validates input on write and fills defaults on read:
+shape is defined per kind in `src/shared/types/section-config.ts` (defaults in `src/shared/constants.ts`, `readSectionConfig` in `src/server/helpers/section-config.ts`)
+It fills defaults on read:
 
 | Kind | `config` keys |
 | --- | --- |
 | `hero` | `location`, `subtitleOne`, `subtitleTwo`, `logoUrl` |
-| `about` | `buttonText`, `buttonUrl` |
-| `experience` | `buttonText`, `buttonUrl` |
+| `about`, `experience` | none |
 | `contact` | `formTitle`, `buttonText`, `buttonUrl` |
 | `services`, `projects`, `testimonials` | none |
 
@@ -226,8 +225,8 @@ validates input on write and fills defaults on read:
 | Section | Data returned with it |
 | --- | --- |
 | `hero` | `config`, `hero_titles` |
-| `about` | `config`, `profile`, `profile_facts`, contact methods linked to it |
-| `experience` | `config`, `experiences`, `skills` |
+| `about` | `profile`, `profile_facts`, contact methods linked to it |
+| `experience` | `experiences`, `skills` |
 | `services` | `services` |
 | `projects` | `projects`, `project_categories`, `project_roles`, `technologies` |
 | `testimonials` | `testimonials` |

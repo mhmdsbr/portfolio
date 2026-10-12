@@ -1,0 +1,131 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { TextPlugin } from "gsap/TextPlugin";
+
+export default function useAboutScrollAnimation({
+  titleRef,
+  textRef,
+  containerRef,
+  isReady,
+}: {
+  titleRef: React.RefObject<HTMLElement | null>;
+  textRef: React.RefObject<HTMLElement | null>;
+  containerRef: React.RefObject<HTMLElement | null>;
+  isReady: boolean;
+}) {
+  const originalTextsRef = useRef<string[]>([]);
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!isReady) return;
+
+    gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+    if (!titleRef.current || !textRef.current || !containerRef.current) return;
+
+    // Capture original texts only once when they're actually available
+    if (!hasInitialized.current) {
+      const paragraphs = textRef.current.querySelectorAll("p");
+
+      const textsToCapture: string[] = [];
+
+      paragraphs.forEach((p) => {
+        textsToCapture.push(p.innerHTML.trim());
+      });
+
+
+      originalTextsRef.current = textsToCapture;
+      hasInitialized.current = true;
+
+    }
+
+    const triggerId = "about-section-trigger";
+    const existingTrigger = ScrollTrigger.getById(triggerId);
+    if (existingTrigger) existingTrigger.kill();
+
+    const words = titleRef.current.querySelectorAll(".word");
+    const [wordOne, wordTwo] = words;
+
+    gsap.set(wordOne, { scale: .5, z: 400, x: -100, opacity: 0 });
+    gsap.set(wordTwo, { scale: .5, z: 400, x: 100, opacity: 0 });
+
+    const paragraphs = textRef.current.querySelectorAll("p");
+
+    const measureDescription = () => {
+      const currentParagraphs = Array.from(paragraphs, (paragraph) => paragraph.innerHTML);
+
+      paragraphs.forEach((paragraph, index) => {
+        paragraph.innerHTML = originalTextsRef.current[index] ?? "";
+      });
+      textRef.current!.style.minHeight = `${textRef.current!.scrollHeight}px`;
+      paragraphs.forEach((paragraph, index) => {
+        paragraph.innerHTML = currentParagraphs[index] ?? "";
+      });
+    };
+
+    measureDescription();
+    paragraphs.forEach((p) => {
+      p.innerHTML = "";
+    });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        id: triggerId,
+        trigger: containerRef.current,
+        start: "top center",
+        end: "+=100",
+        pinSpacing: true,
+        pin: true,
+        scrub: 0.5,
+      },
+    });
+
+    words.forEach((word) => {
+      tl.to(
+        word,
+        {
+          scale: 1,
+          z: 0,
+          x: 0,
+          opacity: 1,
+          rotationX: 0,
+          ease: "power2.out",
+          duration: 0.5,
+        },
+        "+=.3"
+      );
+    });
+
+    originalTextsRef.current.forEach((text, i) => {
+      if (paragraphs[i] && text) {
+        tl.to(
+          paragraphs[i],
+          {
+            text: {
+              value: text,
+              delimiter: "",
+            },
+            duration: 2,
+            ease: "none",
+          },
+          "+=0.2"
+        );
+      }
+    });
+
+    const resizeHandler = () => {
+      measureDescription();
+      ScrollTrigger.refresh();
+    };
+    window.addEventListener("resize", resizeHandler);
+
+    return () => {
+      const t = ScrollTrigger.getById(triggerId);
+      if (t) t.kill();
+      window.removeEventListener("resize", resizeHandler);
+    };
+  }, [titleRef, textRef, containerRef, isReady]);
+}

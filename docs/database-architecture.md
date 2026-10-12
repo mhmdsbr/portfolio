@@ -8,9 +8,15 @@ Diagrams use [Mermaid](https://mermaid.js.org/) and render on GitHub and in VS C
 
 ## 1. System overview
 
-Every read and write goes through Drizzle (`src/lib/db`). Admin changes are
-Next.js server actions guarded by `requireAuth()`. The public site reads a single
-JSON payload from `/api/all`.
+Every read and write goes through Drizzle (`src/server/db`), accessed only through
+repositories in `src/server/repos`. Admin changes are Next.js server actions
+guarded by `requireAuth()`, while the public pages are Server Components that
+call the public read-model service in `src/server/services/public-content.ts`
+directly. ESLint prevents direct DB
+client imports outside the repository and explicitly permitted setup files. The
+public site is rendered on the server from a single `AllDataResponse` payload
+(`getPublicAll()`). The public pages are `force-dynamic`, so they read the
+database on every request and no data cache is used. There is no public JSON API.
 
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','secondaryColor':'#e0f2fe','tertiaryColor':'#f1f5f9','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','clusterBkg':'#f1f5f9','clusterBorder':'#94a3b8','titleColor':'#0f172a','edgeLabelBackground':'#e2e8f0'}}}%%
@@ -22,12 +28,13 @@ flowchart LR
 
     subgraph Next["Next.js app"]
         direction TB
-        UI["Components<br/>useAllData() via SWR"]
-        API["Public API routes<br/>/api/all, /api/hero, /api/about, ...<br/>(read only)"]
-        ACT["Server actions<br/>src/actions/*<br/>requireAuth() first"]
-        LIB["Domain helpers<br/>sections.ts, contact-methods.ts,<br/>projects.ts, section-config.ts,<br/>validation.ts"]
-        AUTH["auth.ts<br/>sessions, email codes"]
-        DRZ["Drizzle ORM<br/>src/lib/db/schema.ts"]
+        UI["Server Components<br/>app/page.tsx, projects/*<br/>sections receive props"]
+        API["Public read model<br/>getPublicAll()<br/>uncached, force-dynamic pages"]
+        ACT["Server actions (controllers)<br/>src/server/actions/admin/*<br/>requireAuth, FormData to input,<br/>revalidate"]
+        SVC["Services<br/>src/server/services/*<br/>public read models, validation, rules, transactions"]
+        LIB["Repositories<br/>src/server/repos/*<br/>the only layer that queries the DB"]
+        AUTH["Auth<br/>src/server/auth/*<br/>passwords, sessions, cookies"]
+        DRZ["Drizzle ORM<br/>src/server/db/schema.ts"]
     end
 
     PG[("PostgreSQL 16<br/>portfo_db")]
@@ -35,16 +42,21 @@ flowchart LR
     V --> UI --> API
     A -->|forms / FormData| ACT
     A -->|login, signup| AUTH
-    ACT --> LIB
-    API --> LIB
+    ACT --> SVC --> LIB
+    API --> SVC --> LIB
     ACT --> AUTH
     LIB --> DRZ
-    API --> DRZ
-    AUTH --> DRZ
+    AUTH --> LIB
+    SVC --> AUTH
     DRZ --> PG
 
-    ACT -. "revalidatePath()" .-> API
 ```
+
+Admin accounts follow the same layering. `src/server/auth/password.ts` (scrypt,
+verification codes) and `session.ts` (cookie, session lookup, login/logout) are
+the auth layer; `services/admin-accounts.ts` and `services/admin-verification.ts`
+hold the account and email-verification rules. Only the `admin-*` repositories
+query the tables.
 
 ## 2. Entity relationships
 
@@ -187,7 +199,7 @@ erDiagram
 ## 3. Which tables feed which section
 
 `page_sections` is the hub: one row per `kind` that holds the section's title,
-nav label, order, visibility, and its own `config`. The API assembles each
+nav label, order, visibility, and its own `config`. The public read model assembles each
 section's payload from those rows plus the content tables.
 
 ```mermaid
@@ -200,13 +212,11 @@ flowchart TB
         HT[("hero_titles")]
     end
     subgraph about["about"]
-        AC["config: buttonText, buttonUrl"]
         PR[("profile")]
         PF[("profile_facts")]
         CMA[("contact_methods<br/>via contact_method_sections")]
     end
     subgraph exp["experience"]
-        EC["config: buttonText, buttonUrl"]
         EX[("experiences")]
         SK[("skills")]
     end
@@ -248,13 +258,13 @@ is stored but not currently returned by the API.
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','lineColor':'#64748b','textColor':'#0f172a','actorBkg':'#dbeafe','actorTextColor':'#0f172a','actorBorder':'#2563eb','actorLineColor':'#64748b','signalColor':'#0f172a','signalTextColor':'#0f172a','labelBoxBkgColor':'#bfdbfe','labelBoxBorderColor':'#2563eb','labelTextColor':'#0f172a','loopTextColor':'#0f172a','noteBkgColor':'#fef9c3','noteTextColor':'#0f172a','noteBorderColor':'#ca8a04','sequenceNumberColor':'#ffffff'}}}%%
 sequenceDiagram
     autonumber
-    participant B as Browser (SWR)
-    participant R as GET /api/all
+    participant B as Server Component
+    participant R as getPublicAll()
     participant H as Helpers
     participant DB as PostgreSQL
 
     rect rgb(226, 232, 240)
-    B->>R: fetch api/all
+    B->>R: getCachedPublicAll() (cache miss)
     par parallel queries (Promise.all)
         R->>DB: profile, profile_facts
         R->>DB: hero_titles JOIN page_sections(kind='hero')
@@ -268,8 +278,8 @@ sequenceDiagram
     R->>H: readSectionConfig(kind, row.config)
     Note over H: keeps known keys only,<br/>fills missing keys with null
     R->>R: group tech and roles by project,<br/>split methods per section
-    R-->>B: AllDataResponse (JSON)
-    B->>B: render enabled sections<br/>in stored sortOrder
+    R-->>B: AllDataResponse
+    B->>B: render enabled sections as props<br/>in stored sortOrder
     end
 ```
 
@@ -294,7 +304,7 @@ sequenceDiagram
     rect rgb(226, 232, 240)
     F->>S: FormData
     S->>S: requireAuth() (cookie -> hashed session -> user)
-    S->>V: optionalText / optionalUrl / sanitizeSectionConfig
+    S->>V: Zod schema (optionalText / optionalUrl)
     alt invalid
         V-->>F: throws, nothing written
     else valid
@@ -304,7 +314,7 @@ sequenceDiagram
         DB-->>S: CHECK / FK / UNIQUE enforced
         S->>DB: COMMIT
         S-->>F: updated record
-        S->>S: revalidatePath('/', '/api/all', '/admin/...')
+        S->>S: revalidatePath('/admin/...')
     end
     end
 ```
@@ -314,8 +324,8 @@ sequenceDiagram
 | Action module | Tables written | Notes |
 | --- | --- | --- |
 | `hero.ts` | `page_sections.config` (hero), `hero_titles` | titles are replaced as a list |
-| `about.ts` | `page_sections.config` (about), `profile`, `profile_facts` | profile is a singleton row |
-| `experience.ts` | `page_sections.config` (experience), `experiences`, `skills` | year range validated |
+| `about.ts` | `profile`, `profile_facts` | profile is a singleton row |
+| `experience.ts` | `experiences`, `skills` | year range validated |
 | `contact.ts` | `page_sections.config` (contact), `contact_methods`, `contact_method_sections` | method + section links in one transaction |
 | `services.ts` | `services` | icon checked against `SERVICE_ICONS` |
 | `testimonials.ts` | `testimonials` | rating 1-5, image URL validated |
@@ -340,7 +350,7 @@ form and its content records. **Page layout** only changes order and visibility.
 | `/admin/projects` | `projects` | none | `projects`, `project_categories` |
 | `/admin/testimonials` | `testimonials` | none | `testimonials` |
 | `/admin/contact` | `contact` | form title, button | **contact methods** |
-| `/admin/header` | all kinds | none | order and visibility only |
+| `/admin/page-layout` | all kinds | none | order and visibility only |
 
 Contact methods appear on both the About and Contact pages because they are shared
 records; the checkboxes on each method decide which sections show it.
@@ -350,8 +360,8 @@ The section actions (`getHero`, `getAbout`, `getContact`, `getExperience`,
 `{ section, config?, ...content }`, where `section` is the `page_sections` metadata.
 
 Naming is the same in the database, the admin and the API: `experiences` are the
-jobs, `skills` are the skills, and the API key and route are `experience`
-(`/api/experience`, `data.experience.experiences`, `data.experience.skills`).
+jobs, `skills` are the skills, and the payload key is `experience`
+(`data.experience.experiences`, `data.experience.skills`).
 
 Project categories are chosen from the existing rows (`CategorySelect`); typing a
 new name creates a category on save.
@@ -365,7 +375,7 @@ The TypeScript type per kind is the contract; the database only guarantees that
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','secondaryColor':'#e0f2fe','tertiaryColor':'#f1f5f9','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','clusterBkg':'#f1f5f9','clusterBorder':'#94a3b8','titleColor':'#0f172a','edgeLabelBackground':'#e2e8f0'}}}%%
 flowchart LR
-    IN["Form input"] --> SAN["sanitizeSectionConfig(kind, input)<br/>trim, empty to null,<br/>URL pattern check,<br/>drop unknown keys"]
+    IN["Form input"] --> SAN["Zod schema parse (heroSchema / contactSettingsSchema)<br/>trim, empty to null,<br/>URL pattern check,<br/>drop unknown keys"]
     SAN --> UPD["UPDATE page_sections<br/>SET config WHERE kind"]
     UPD --> CHK{"CHECK<br/>jsonb_typeof(config) = 'object'"}
     CHK --> STORE[("config jsonb")]
@@ -376,13 +386,12 @@ flowchart LR
 | Kind | Config keys |
 | --- | --- |
 | `hero` | `location`, `subtitleOne`, `subtitleTwo`, `logoUrl` |
-| `about` | `buttonText`, `buttonUrl` |
-| `experience` | `buttonText`, `buttonUrl` |
+| `about`, `experience` | none |
 | `contact` | `formTitle`, `buttonText`, `buttonUrl` |
 | `services`, `projects`, `testimonials` | none |
 
 Code finds a section by `kind` through the typed constants in
-`src/lib/db/constants.ts` (`getSection(kind)`, `updateSectionConfig(kind, ...)`,
+`src/shared/constants.ts` (`getSection(kind)`, `updateSectionConfig(kind, ...)`,
 `requireSectionId(kind)`), so queries never contain free-form section names.
 
 ## 7. Projects, categories, slugs, technologies
@@ -431,8 +440,8 @@ flowchart LR
     M3["Location"] --> L2
     M4["Hidden method"]:::hidden
 
-    L1 --> API1["/api/about<br/>contact_information"]
-    L2 --> API2["/api/contact<br/>methods"]
+    L1 --> API1["about payload<br/>contact_information"]
+    L2 --> API2["contact payload<br/>methods"]
 
     classDef hidden stroke-dasharray: 4 4
 ```
@@ -480,7 +489,7 @@ flowchart TB
         U1["select lists, required fields"]
     end
     subgraph L2["2. Server action"]
-        U2["requireAuth()<br/>requiredText / optionalText / optionalUrl<br/>sanitizeSectionConfig<br/>year and rating parsing"]
+        U2["requireAuth()<br/>Zod parse (requiredText / optionalText / optionalUrl)<br/>year and rating parsing"]
     end
     subgraph L3["3. TypeScript types"]
         U3["SectionKind, ServiceIcon, ContactMethodKind,<br/>SocialPlatform, ... from constants.ts"]
@@ -496,7 +505,7 @@ flowchart TB
 ```
 
 The value sets and URL/slug regex patterns are defined once in
-`src/lib/db/constants.ts`, and are used both to build the `CHECK` constraints and to
+`src/shared/constants.ts`, and are used both to build the `CHECK` constraints and to
 type and validate application code, so the layers cannot disagree.
 
 ## 11. Schema lifecycle and operations
@@ -504,7 +513,7 @@ type and validate application code, so the layers cannot disagree.
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','secondaryColor':'#e0f2fe','tertiaryColor':'#f1f5f9','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','clusterBkg':'#f1f5f9','clusterBorder':'#94a3b8','titleColor':'#0f172a','edgeLabelBackground':'#e2e8f0'}}}%%
 flowchart LR
-    SCH["src/lib/db/schema.ts"] -->|drizzle-kit generate| MIG["drizzle/0000_baseline.sql<br/>+ snapshot"]
+    SCH["src/server/db/schema.ts"] -->|drizzle-kit generate| MIG["drizzle/0000_baseline.sql<br/>+ snapshot"]
     MIG -->|db:migrate / db:push| NEW[("new database")]
     OLD[("database from the previous schema")] -->|"npm run db:upgrade<br/>scripts/sql/upgrade-section-config.sql<br/>one transaction"| NEW2[("current schema,<br/>data preserved")]
 
@@ -531,3 +540,34 @@ flowchart LR
 | a `technologies` row | its `project_technologies` links | |
 | a `project_categories` row | | any project still uses it (`RESTRICT`) |
 | an `admin_users` row | profile, sessions, verifications it created | |
+
+## 13. Where types live
+
+A type lives in the narrowest layer that needs it.
+
+| I need... | Look in |
+| --- | --- |
+| a value set (enum) type, e.g. `SectionKind` | `src/shared/types/enums.ts` (values in `src/shared/constants.ts`) |
+| section `config` shapes | `src/shared/types/section-config.ts` |
+| what the public pages receive | `src/shared/types/public-content.ts` |
+| what an admin form submits | `src/server/schemas/<entity>.ts` (`z.infer` of the Zod schema) |
+| a DB row (`Select`/`Insert`) | `src/server/db/schema.ts` (repos only) |
+| repo and service internals (`DbExecutor`, `ProjectWithDetails`, ...) | `src/server/repos/types.ts` |
+| auth and action results | `src/server/auth/types.ts`, `src/server/action-result.ts` |
+| client-only types | next to the hook or component (`src/client/hooks/animations/types.ts`) |
+
+`@/shared/types` re-exports the three shared files. Promote a type to `shared`
+only when a second layer needs it.
+
+## 14. Source boundaries
+
+| Directory | Owns |
+| --- | --- |
+| `src/app` | App Router routes, layouts, route boundaries and route-level composition |
+| `src/server` | Server actions, services, repositories, schemas, auth, database access and server-only types |
+| `src/client` | UI components, hooks, browser utilities and client-only types |
+| `src/shared` | Types, constants and pure helpers safe to import from either environment |
+
+The directory names describe ownership, not React rendering mode. Next.js still
+uses `"use client"` to define the client module boundary; components without it
+can remain Server Components when the import graph permits.

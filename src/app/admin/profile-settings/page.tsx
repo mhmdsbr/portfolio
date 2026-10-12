@@ -1,5 +1,5 @@
-import { getProfileSettings } from '@/actions/profile'
-import ProfileSettingsForm from '@/components/admin/ProfileSettingsForm'
+import { getProfileSettings } from '@/server/actions/admin/profile'
+import ProfileSettingsForm from '@/client/components/admin/forms/profile-settings/ProfileSettingsForm'
 
 export default async function ProfileSettingsPage() {
   const { admin, admins } = await getProfileSettings()
