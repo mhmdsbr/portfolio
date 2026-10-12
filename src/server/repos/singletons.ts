@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import type { PgColumn, PgTable } from 'drizzle-orm/pg-core'
-import * as schema from '@/lib/db/schema'
+import * as schema from '@/server/db/schema'
 import { defaultExecutor, type DbExecutor } from './executor'
 
 type SingletonTable = PgTable & { id: PgColumn }

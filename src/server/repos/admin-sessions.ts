@@ -1,5 +1,5 @@
 import { and, eq, gt, sql } from 'drizzle-orm'
-import * as schema from '@/lib/db/schema'
+import * as schema from '@/server/db/schema'
 import { defaultExecutor, type DbExecutor } from './executor'
 
 /** Session ids are always passed hashed; raw ids never reach the DB. */

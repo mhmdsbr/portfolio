@@ -1,8 +1,8 @@
-import { getAbout } from '@/actions/admin/about'
-import AboutForm from '@/components/admin/forms/about/AboutForm'
-import AboutDetailsForm from '@/components/admin/forms/about/AboutDetailsForm'
-import ContactMethodsForm from '@/components/admin/forms/contact/ContactMethodsForm'
-import SectionSettingsForm from '@/components/admin/forms/sections/SectionSettingsForm'
+import { getAbout } from '@/server/actions/admin/about'
+import AboutForm from '@/client/components/admin/forms/about/AboutForm'
+import AboutDetailsForm from '@/client/components/admin/forms/about/AboutDetailsForm'
+import ContactMethodsForm from '@/client/components/admin/forms/contact/ContactMethodsForm'
+import SectionSettingsForm from '@/client/components/admin/forms/sections/SectionSettingsForm'
 
 export default async function AboutPage() {
   const { section, profile, details, contactMethods } = await getAbout()

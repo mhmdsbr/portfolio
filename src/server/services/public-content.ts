@@ -1,4 +1,4 @@
-import { readSectionConfig } from '@/utils/section-config'
+import { readSectionConfig } from '@/server/helpers/section-config'
 import type { SectionKind } from '@/shared/types'
 import { getContactMethodsForSection, getContactMethodsWithSections } from '@/server/repos/contact-methods'
 import { experienceRepo, profileFactRepo, serviceRepo, skillRepo, testimonialRepo } from '@/server/repos/collections'

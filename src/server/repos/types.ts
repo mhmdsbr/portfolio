@@ -1,8 +1,8 @@
 // Types private to the server data layer (repos and the services above them).
-// DB row types come from '@/lib/db/schema'; admin input types from
+// DB row types come from '@/server/db/schema'; admin input types from
 // '@/server/schemas/*'; types needed by the UI live in '@/shared/types'.
 import type { PgColumn, PgTable } from 'drizzle-orm/pg-core'
-import type * as schema from '@/lib/db/schema'
+import type * as schema from '@/server/db/schema'
 import type {
   ContactMethodSectionKind,
   SectionConfigMap,

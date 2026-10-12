@@ -1,7 +1,7 @@
-import { getContact } from '@/actions/admin/contact'
-import ContactForm from '@/components/admin/forms/contact/ContactForm'
-import ContactMethodsForm from '@/components/admin/forms/contact/ContactMethodsForm'
-import SectionSettingsForm from '@/components/admin/forms/sections/SectionSettingsForm'
+import { getContact } from '@/server/actions/admin/contact'
+import ContactForm from '@/client/components/admin/forms/contact/ContactForm'
+import ContactMethodsForm from '@/client/components/admin/forms/contact/ContactMethodsForm'
+import SectionSettingsForm from '@/client/components/admin/forms/sections/SectionSettingsForm'
 
 export default async function ContactPage() {
   const { section, config, contactMethods } = await getContact()

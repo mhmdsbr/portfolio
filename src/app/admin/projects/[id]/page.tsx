@@ -1,5 +1,5 @@
-import ProjectForm from '@/components/admin/forms/projects/ProjectForm'
-import { getProjectCategories, getProject, updateProject } from '@/actions/admin/projects'
+import ProjectForm from '@/client/components/admin/forms/projects/ProjectForm'
+import { getProjectCategories, getProject, updateProject } from '@/server/actions/admin/projects'
 import { notFound } from 'next/navigation'
 
 interface EditProjectPageProps {
@@ -9,7 +9,6 @@ interface EditProjectPageProps {
 }
 
 export default async function EditProjectPage({ params }: EditProjectPageProps) {
-  // ✅ Await params in Next.js 15
   const { id: idParam } = await params
   const id = parseInt(idParam, 10)
   

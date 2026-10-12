@@ -1,7 +1,7 @@
-import { getExperience } from "@/actions/admin/experience";
-import ExperiencesForm from "@/components/admin/forms/experience/ExperiencesForm";
-import SkillsForm from "@/components/admin/forms/experience/SkillsForm";
-import SectionSettingsForm from "@/components/admin/forms/sections/SectionSettingsForm";
+import { getExperience } from "@/server/actions/admin/experience";
+import ExperiencesForm from "@/client/components/admin/forms/experience/ExperiencesForm";
+import SkillsForm from "@/client/components/admin/forms/experience/SkillsForm";
+import SectionSettingsForm from "@/client/components/admin/forms/sections/SectionSettingsForm";
 
 export default async function ExperiencePage() {
   const { section, experiences, skills } = await getExperience();

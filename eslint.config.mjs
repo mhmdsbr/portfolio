@@ -15,7 +15,7 @@ const eslintConfig = [
     files: ["**/*.{js,jsx,ts,tsx,mjs,cjs}"],
     ignores: [
       "src/server/repos/**",
-      "src/lib/db/**",
+      "src/server/db/**",
       "scripts/**",
       "drizzle.config.*",
       "seed.ts",
@@ -26,33 +26,33 @@ const eslintConfig = [
         {
           paths: [
             {
-              name: "@/lib/db",
+              name: "@/server/db",
               message: "Import db only from src/server/repos; use a service instead.",
             },
             {
-              name: "@/lib/db/index",
+              name: "@/server/db/index",
               message: "Import db only from src/server/repos; use a service instead.",
             },
             {
-              name: "@/lib/db/index.ts",
+              name: "@/server/db/index.ts",
               message: "Import db only from src/server/repos; use a service instead.",
             },
             {
-              name: "@/lib/db/index.tsx",
+              name: "@/server/db/index.tsx",
               message: "Import db only from src/server/repos; use a service instead.",
             },
             {
-              name: "@/lib/db/index.js",
+              name: "@/server/db/index.js",
               message: "Import db only from src/server/repos; use a service instead.",
             },
             {
-              name: "@/lib/db/index.mjs",
+              name: "@/server/db/index.mjs",
               message: "Import db only from src/server/repos; use a service instead.",
             },
           ],
           patterns: [
             {
-              regex: "^(?:\\.\\.?/)+lib/db(?:/index(?:\\.(?:ts|tsx|js|mjs))?)?$",
+              regex: "^(?:\\.\\.?/)+server/db(?:/index(?:\\.(?:ts|tsx|js|mjs))?)?$",
               message: "Import db only from src/server/repos; use a service instead.",
             },
           ],
@@ -61,21 +61,114 @@ const eslintConfig = [
     },
   },
   {
-    files: ["src/components/public/**", "src/components/shared/**", "src/hooks/**"],
+    files: [
+      "src/client/components/public/**",
+      "src/client/components/common/**",
+      "src/client/hooks/**",
+      "src/client/utils/**",
+    ],
     rules: {
       "no-restricted-imports": [
         "error",
         {
-          paths: [
-            {
-              name: "@/lib/db",
-              message: "Import db only from src/server/repos; use a service instead.",
-            },
-          ],
           patterns: [
             {
-              group: ["@/actions/*", "@/components/admin/*"],
-              message: "Public and shared UI must not import admin actions or components.",
+              group: [
+                "@/server/actions/*",
+                "@/client/components/admin/*",
+                "@/server/db",
+                "@/server/db/**",
+                "@/server/repos",
+                "@/server/repos/**",
+                "@/server/services",
+                "@/server/services/**",
+                "@/server/schemas",
+                "@/server/schemas/**",
+                "@/server/auth",
+                "@/server/auth/**",
+                "@/server/action-result",
+                "@/server/email",
+                "@/server/revalidate",
+              ],
+              message: "Public and common UI must not import admin actions or components.",
+            },
+            {
+              regex: "^(?:\\.\\.?/)+server/(?:actions|db|repos|services|schemas|auth)(?:/|$)",
+              message: "Public and shared UI must not import server or admin modules.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/client/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/server/db",
+                "@/server/db/**",
+                "@/server/repos",
+                "@/server/repos/**",
+                "@/server/services",
+                "@/server/services/**",
+                "@/server/schemas",
+                "@/server/schemas/**",
+                "@/server/auth",
+                "@/server/auth/**",
+                "@/server/action-result",
+                "@/server/email",
+                "@/server/revalidate",
+              ],
+              message: "Client code may only depend on server actions, not server internals.",
+            },
+            {
+              regex: "^(?:\\.\\.?/)+server/(?:db|repos|services|schemas|auth)(?:/|$)",
+              message: "Client code may only depend on server actions, not server internals.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/shared/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/server/**", "@/client/**"],
+              message: "Shared code must remain safe to import from either environment.",
+            },
+            {
+              regex: "^(?:\\.\\.?/)+(?:server|client)(?:/|$)",
+              message: "Shared code must remain safe to import from either environment.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/server/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/client/**"],
+              message: "Server code must not depend on client modules.",
+            },
+            {
+              regex: "^(?:\\.\\.?/)+client(?:/|$)",
+              message: "Server code must not depend on client modules.",
             },
           ],
         },

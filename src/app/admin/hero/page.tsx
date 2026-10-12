@@ -1,6 +1,6 @@
-import { getHero } from '@/actions/admin/hero'
-import HeroForm from '@/components/admin/forms/hero/HeroForm'
-import SectionSettingsForm from '@/components/admin/forms/sections/SectionSettingsForm'
+import { getHero } from '@/server/actions/admin/hero'
+import HeroForm from '@/client/components/admin/forms/hero/HeroForm'
+import SectionSettingsForm from '@/client/components/admin/forms/sections/SectionSettingsForm'
 
 export default async function HeroPage() {
   const { section, config, titles } = await getHero()

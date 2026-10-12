@@ -1,5 +1,5 @@
 import { and, eq, gt, isNull, lt, sql } from 'drizzle-orm'
-import * as schema from '@/lib/db/schema'
+import * as schema from '@/server/db/schema'
 import { defaultExecutor, type DbExecutor } from './executor'
 import type { AdminVerificationPurpose } from '@/shared/types'
 

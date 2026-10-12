@@ -1,4 +1,4 @@
-import { db } from '@/lib/db'
+import { db } from '@/server/db'
 
 export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 

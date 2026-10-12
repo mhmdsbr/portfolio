@@ -1,6 +1,6 @@
-import { getTestimonials } from '@/actions/admin/testimonials'
-import TestimonialItemsForm from '@/components/admin/forms/testimonials/TestimonialItemsForm'
-import SectionSettingsForm from '@/components/admin/forms/sections/SectionSettingsForm'
+import { getTestimonials } from '@/server/actions/admin/testimonials'
+import TestimonialItemsForm from '@/client/components/admin/forms/testimonials/TestimonialItemsForm'
+import SectionSettingsForm from '@/client/components/admin/forms/sections/SectionSettingsForm'
 
 export default async function TestimonialsPage() {
   const { section, items } = await getTestimonials()

@@ -8,7 +8,7 @@ Diagrams use [Mermaid](https://mermaid.js.org/) and render on GitHub and in VS C
 
 ## 1. System overview
 
-Every read and write goes through Drizzle (`src/lib/db`), accessed only through
+Every read and write goes through Drizzle (`src/server/db`), accessed only through
 repositories in `src/server/repos`. Admin changes are Next.js server actions
 guarded by `requireAuth()`, while the public pages are Server Components that
 call the public read-model service in `src/server/services/public-content.ts`
@@ -30,11 +30,11 @@ flowchart LR
         direction TB
         UI["Server Components<br/>app/page.tsx, projects/*<br/>sections receive props"]
         API["Public read model<br/>getPublicAll()<br/>uncached, force-dynamic pages"]
-        ACT["Server actions (controllers)<br/>src/actions/admin/*<br/>requireAuth, FormData to input,<br/>revalidate"]
+        ACT["Server actions (controllers)<br/>src/server/actions/admin/*<br/>requireAuth, FormData to input,<br/>revalidate"]
         SVC["Services<br/>src/server/services/*<br/>public read models, validation, rules, transactions"]
         LIB["Repositories<br/>src/server/repos/*<br/>the only layer that queries the DB"]
         AUTH["Auth<br/>src/server/auth/*<br/>passwords, sessions, cookies"]
-        DRZ["Drizzle ORM<br/>src/lib/db/schema.ts"]
+        DRZ["Drizzle ORM<br/>src/server/db/schema.ts"]
     end
 
     PG[("PostgreSQL 16<br/>portfo_db")]
@@ -513,7 +513,7 @@ type and validate application code, so the layers cannot disagree.
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','secondaryColor':'#e0f2fe','tertiaryColor':'#f1f5f9','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','clusterBkg':'#f1f5f9','clusterBorder':'#94a3b8','titleColor':'#0f172a','edgeLabelBackground':'#e2e8f0'}}}%%
 flowchart LR
-    SCH["src/lib/db/schema.ts"] -->|drizzle-kit generate| MIG["drizzle/0000_baseline.sql<br/>+ snapshot"]
+    SCH["src/server/db/schema.ts"] -->|drizzle-kit generate| MIG["drizzle/0000_baseline.sql<br/>+ snapshot"]
     MIG -->|db:migrate / db:push| NEW[("new database")]
     OLD[("database from the previous schema")] -->|"npm run db:upgrade<br/>scripts/sql/upgrade-section-config.sql<br/>one transaction"| NEW2[("current schema,<br/>data preserved")]
 
@@ -551,10 +551,23 @@ A type lives in the narrowest layer that needs it.
 | section `config` shapes | `src/shared/types/section-config.ts` |
 | what the public pages receive | `src/shared/types/public-content.ts` |
 | what an admin form submits | `src/server/schemas/<entity>.ts` (`z.infer` of the Zod schema) |
-| a DB row (`Select`/`Insert`) | `src/lib/db/schema.ts` (repos only) |
+| a DB row (`Select`/`Insert`) | `src/server/db/schema.ts` (repos only) |
 | repo and service internals (`DbExecutor`, `ProjectWithDetails`, ...) | `src/server/repos/types.ts` |
 | auth and action results | `src/server/auth/types.ts`, `src/server/action-result.ts` |
-| client-only types | next to the hook or component (`src/hooks/animations/types.ts`) |
+| client-only types | next to the hook or component (`src/client/hooks/animations/types.ts`) |
 
 `@/shared/types` re-exports the three shared files. Promote a type to `shared`
 only when a second layer needs it.
+
+## 14. Source boundaries
+
+| Directory | Owns |
+| --- | --- |
+| `src/app` | App Router routes, layouts, route boundaries and route-level composition |
+| `src/server` | Server actions, services, repositories, schemas, auth, database access and server-only types |
+| `src/client` | UI components, hooks, browser utilities and client-only types |
+| `src/shared` | Types, constants and pure helpers safe to import from either environment |
+
+The directory names describe ownership, not React rendering mode. Next.js still
+uses `"use client"` to define the client module boundary; components without it
+can remain Server Components when the import graph permits.

@@ -1,5 +1,5 @@
-import { getProjects } from '@/actions/admin/projects'
-import { getAbout } from '@/actions/admin/about'
+import { getProjects } from '@/server/actions/admin/projects'
+import { getAbout } from '@/server/actions/admin/about'
 import Link from 'next/link'
 
 export default async function AdminDashboard() {

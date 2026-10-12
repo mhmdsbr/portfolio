@@ -1,9 +1,8 @@
 import { isUniqueViolation, NotFoundError, ValidationError } from '@/server/services/shared'
 import { requireAuth } from '@/server/auth/session'
+import type { ActionResult } from '@/shared/types'
 
-export type ActionResult<T = void> =
-  | { success: true; data?: T }
-  | { success: false; error: string }
+export type { ActionResult } from '@/shared/types'
 
 function isRedirectError(error: unknown): boolean {
   return (
@@ -56,4 +55,3 @@ export function withAuthAction<TArgs extends unknown[], TResult>(
     return fn(...args)
   })
 }
-

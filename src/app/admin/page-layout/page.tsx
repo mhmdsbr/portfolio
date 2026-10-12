@@ -1,5 +1,5 @@
-import { getPageLayout } from '@/actions/admin/page-layout'
-import PageLayoutForm from '@/components/admin/forms/page-layout/PageLayoutForm'
+import { getPageLayout } from '@/server/actions/admin/page-layout'
+import PageLayoutForm from '@/client/components/admin/forms/page-layout/PageLayoutForm'
 
 export default async function PageLayoutPage() {
   const { sections } = await getPageLayout()

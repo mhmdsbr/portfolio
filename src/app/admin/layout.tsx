@@ -1,6 +1,6 @@
-import AdminSidebar from '@/components/admin/AdminSidebar'
-import AdminHeader from '@/components/admin/AdminHeader'
-import BackgroundGradient from '@/components/shared/backgroundGradient'
+import AdminSidebar from '@/client/components/admin/AdminSidebar'
+import AdminHeader from '@/client/components/admin/AdminHeader'
+import BackgroundGradient from '@/client/components/common/backgroundGradient'
 import { requireAuth } from '@/server/auth/session'
 
 export default async function AdminLayout({

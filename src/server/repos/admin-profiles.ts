@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import * as schema from '@/lib/db/schema'
+import * as schema from '@/server/db/schema'
 import { defaultExecutor, type DbExecutor } from './executor'
 
 export const adminProfilesRepo = {

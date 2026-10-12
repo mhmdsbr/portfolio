@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/server/repos/projects";
-import Header from "@/components/public/header";
+import Header from "@/client/components/public/header";
 import { getPublicAll } from "@/server/services/public-content";
-import BackgroundGradient from "@/components/shared/backgroundGradient";
+import BackgroundGradient from "@/client/components/common/backgroundGradient";
 
 export const dynamic = "force-dynamic";
 

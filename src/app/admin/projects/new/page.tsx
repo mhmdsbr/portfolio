@@ -1,5 +1,5 @@
-import ProjectForm from '@/components/admin/forms/projects/ProjectForm'
-import { createProject, getProjectCategories } from '@/actions/admin/projects'
+import ProjectForm from '@/client/components/admin/forms/projects/ProjectForm'
+import { createProject, getProjectCategories } from '@/server/actions/admin/projects'
 import { requireAuth } from '@/server/auth/session'
 
 export default async function NewProjectPage() {

@@ -1,4 +1,4 @@
-import * as schema from '@/lib/db/schema'
+import * as schema from '@/server/db/schema'
 import { createOrderedRepo } from './ordered-collection'
 
 export const serviceRepo = createOrderedRepo(schema.services)

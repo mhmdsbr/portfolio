@@ -1,7 +1,7 @@
-import { getProjectsOverview } from '@/actions/admin/projects'
+import { getProjectsOverview } from '@/server/actions/admin/projects'
 import Link from 'next/link'
-import ProjectsTable from '@/components/admin/forms/projects/ProjectsTable'
-import SectionSettingsForm from '@/components/admin/forms/sections/SectionSettingsForm'
+import ProjectsTable from '@/client/components/admin/forms/projects/ProjectsTable'
+import SectionSettingsForm from '@/client/components/admin/forms/sections/SectionSettingsForm'
 
 export default async function ProjectsPage() {
   const { section, projects, categories } = await getProjectsOverview()

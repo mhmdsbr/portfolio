@@ -1,6 +1,6 @@
-import { getServices } from '@/actions/admin/services'
-import ServiceItemsForm from '@/components/admin/forms/services/ServiceItemsForm'
-import SectionSettingsForm from '@/components/admin/forms/sections/SectionSettingsForm'
+import { getServices } from '@/server/actions/admin/services'
+import ServiceItemsForm from '@/client/components/admin/forms/services/ServiceItemsForm'
+import SectionSettingsForm from '@/client/components/admin/forms/sections/SectionSettingsForm'
 
 export default async function ServicesPage() {
   const { section, items } = await getServices()
