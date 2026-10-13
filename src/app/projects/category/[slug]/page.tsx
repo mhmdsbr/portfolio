@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Header from "@/client/components/public/header";
+import Header from "@/client/components/public/organisms/header";
+import { Badge, Typography } from "@/client/components/public/atoms";
 import { getPublicAll } from "@/server/services/public-content";
 import { getProjectsByCategory } from "@/server/repos/projects";
 
@@ -38,14 +39,14 @@ export default async function ProjectCategoryPage({
           </Link>
 
           <header className="mb-12">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-cyan-400">
+            <Typography className="mb-3 text-sm font-semibold uppercase tracking-wider text-cyan-400">
               Project category
-            </p>
+            </Typography>
             <h1 className="text-4xl font-bold md:text-6xl">{categoryName}</h1>
-            <p className="mt-4 max-w-2xl text-lg text-gray-400">
+            <Typography className="mt-4 max-w-2xl text-lg text-gray-400">
               {projects.length} {projects.length === 1 ? "project" : "projects"}{" "}
               in this category.
-            </p>
+            </Typography>
           </header>
 
           <div className="grid gap-6 md:grid-cols-2">
@@ -74,19 +75,20 @@ export default async function ProjectCategoryPage({
 
                 <div className="p-6">
                   <h2 className="text-2xl font-bold">{project.title}</h2>
-                  <p className="mt-3 leading-7 text-gray-300">
+                  <Typography className="mt-3 leading-7 text-gray-300">
                     {project.description || "Project details coming soon."}
-                  </p>
+                  </Typography>
 
                   {project.tech && project.tech.length > 0 && (
                     <div className="mt-5 flex flex-wrap gap-2">
                       {project.tech.map((technology) => (
-                        <span
+                        <Badge
                           key={technology}
-                          className="rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-300"
+                          size="medium"
+                          tone="cyan"
                         >
                           {technology}
-                        </span>
+                        </Badge>
                       ))}
                     </div>
                   )}

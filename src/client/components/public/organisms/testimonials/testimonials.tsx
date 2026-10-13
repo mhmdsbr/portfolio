@@ -9,6 +9,7 @@ import type { TestimonialsResponse } from "@/shared/types";
 
 import styles from "./testimonials.module.css";
 import Link from "next/link";
+import { Heading, Typography } from "@/client/components/public/atoms";
 
 const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
   testimonialsData,
@@ -31,9 +32,9 @@ const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
   return (
     <section id={sectionId} className={styles["testimonial-slider"]}>
       {title && (
-        <h2 className="text-4xl md:text-6xl font-bold text-center font-mono mb-12">
+        <Heading className="mb-12 md:text-6xl">
           {title}
-        </h2>
+        </Heading>
       )}
 
       <Swiper
@@ -98,7 +99,9 @@ const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
                       <h4 className={styles["author-name"]}>{item.title}</h4>
                     )}
                     {item.subtitle && (
-                      <p className={styles["author-role"]}>{item.subtitle}</p>
+                      <Typography className={styles["author-role"]}>
+                        {item.subtitle}
+                      </Typography>
                     )}
                     {item.rating && (
                       <div className={styles["author-rating"]}>

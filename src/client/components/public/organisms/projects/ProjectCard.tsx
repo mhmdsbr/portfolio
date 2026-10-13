@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Badge, Typography } from "@/client/components/public/atoms";
 
 interface Project {
   id: number;
@@ -70,12 +71,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             {project.tech && project.tech.length > 0 && (
               <div className="flex gap-1">
                 {project.tech.slice(0, 3).map((tech, i) => (
-                  <span
-                    key={i}
-                    className="text-xs bg-gray-700 px-2 py-0.5 rounded-full"
-                  >
+                  <Badge key={i} size="small">
                     {tech}
-                  </span>
+                  </Badge>
                 ))}
                 {project.tech.length > 3 && (
                   <span className="text-xs text-gray-400">
@@ -90,9 +88,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               {project.title}
             </h3>
           </Link>
-          <p className="text-sm text-gray-400 line-clamp-2">
+          <Typography className="text-sm text-gray-400 line-clamp-2">
             {project.description}
-          </p>
+          </Typography>
         </div>
       </div>
     </div>

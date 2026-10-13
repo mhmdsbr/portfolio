@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useLenis } from 'lenis/react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Typography } from "@/client/components/public/atoms";
 
 const INTRO_VIDEO_URL = 'https://video.sabermohamad.de/intro.mp4'
 
@@ -48,9 +49,9 @@ export default function Intro() {
           <span aria-hidden="true">←</span>
           Back to home
         </Link>
-        <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-400">
+        <Typography className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-400">
           Video introduction
-        </p>
+        </Typography>
         <h1 className="text-xl font-bold sm:text-2xl md:text-4xl">
           Tomorrow University of Applied Sciences
         </h1>

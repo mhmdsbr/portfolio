@@ -10,7 +10,7 @@ interface ModalProps {
   htmlContent: string
 }
 
-const ANIMATION_DURATION = 250 
+const ANIMATION_DURATION = 250
 
 const Modal = ({ isOpen, onClose, title, htmlContent }: ModalProps) => {
   const [shouldRender, setShouldRender] = useState(isOpen)

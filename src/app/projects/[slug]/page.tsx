@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/server/repos/projects";
-import Header from "@/client/components/public/header";
+import Header from "@/client/components/public/organisms/header";
+import { Badge, Typography } from "@/client/components/public/atoms";
 import { getPublicAll } from "@/server/services/public-content";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
 
@@ -56,15 +57,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-gray-950/60 p-7 backdrop-blur-sm md:p-10">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-cyan-400">
+            <Typography className="mb-3 text-sm font-semibold uppercase tracking-wider text-cyan-400">
               {project.category}
-            </p>
+            </Typography>
             <h1 className="mb-6 text-4xl font-bold md:text-6xl">
               {project.title}
             </h1>
-            <p className="text-lg leading-8 text-gray-300">
+            <Typography className="text-lg leading-8 text-gray-300">
               {project.description || "Project details coming soon."}
-            </p>
+            </Typography>
 
             {project.roles && project.roles.length > 0 && (
               <div className="mt-10 border-t border-white/10 pt-8">
@@ -83,12 +84,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             {project.tech && project.tech.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">
                 {project.tech.map((technology) => (
-                  <span
+                  <Badge
                     key={technology}
-                    className="rounded-full bg-gray-800 px-3 py-1 text-sm text-gray-300"
+                    size="large"
+                    tone="dark"
                   >
                     {technology}
-                  </span>
+                  </Badge>
                 ))}
               </div>
             )}

@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import type { ServicesResponse } from "@/shared/types";
 import useServicesScrollAnimation from "@/client/hooks/animations/useServicesScrollAnimation";
 import { FiMonitor, FiPenTool, FiPieChart } from "react-icons/fi";
+import {
+  Heading,
+  LoadingSpinner,
+  Typography,
+} from "@/client/components/public/atoms";
 
 const iconMap: Record<string, React.ReactNode> = {
   palette: <FiMonitor className="w-12 h-12 mx-auto text-cyan-400" />,
@@ -40,7 +45,7 @@ export default function Services({ services }: { services: ServicesResponse }) {
     return (
       <section id={sectionId} className="px-6 py-16 text-white">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+          <LoadingSpinner />
         </div>
       </section>
     );
@@ -53,7 +58,9 @@ export default function Services({ services }: { services: ServicesResponse }) {
           <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
             {title}
           </h2>
-          <p className="text-gray-400 mt-8">No services available yet.</p>
+          <Typography className="mt-8 text-gray-400">
+            No services available yet.
+          </Typography>
         </div>
       </section>
     );
@@ -65,9 +72,9 @@ export default function Services({ services }: { services: ServicesResponse }) {
       className="block w-full overflow-hidden mx-auto my-10 text-center"
     >
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto">
-        <h2 className="flex justify-center text-4xl md:text-6xl font-bold text-center font-mono relative z-10">
+        <Heading className="relative z-10 flex justify-center md:text-6xl">
           {title}
-        </h2>
+        </Heading>
         <div className="services-container container mx-auto grid w-full grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:w-10/12 md:gap-8 lg:w-10/12 xl:grid-cols-3">
           {content.map((item, i) => (
             <div
@@ -81,7 +88,9 @@ export default function Services({ services }: { services: ServicesResponse }) {
                 {item.title}
               </h3>
               <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto md:items-start md:justify-start">
-                <p className="text-gray-400">{item.description}</p>
+                <Typography className="text-gray-400">
+                  {item.description}
+                </Typography>
               </div>
             </div>
           ))}

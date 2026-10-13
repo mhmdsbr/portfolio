@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import type { ProjectsResponse } from "@/shared/types";
 import { useProjectsAnimation } from "@/client/hooks/animations/useProjectsAnimation";
+import { Heading, Typography } from "@/client/components/public/atoms";
 import ProjectCard from "./ProjectCard";
 
 interface Project {
@@ -60,7 +61,9 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
           </span>
           <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
           </h2>
-          <p className="text-gray-400 mt-8">No projects available yet.</p>
+          <Typography className="mt-8 text-gray-400">
+            No projects available yet.
+          </Typography>
         </div>
       </section>
     );
@@ -70,9 +73,9 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
     <section id={sectionId} className="px-6 py-16 text-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-6xl font-bold font-mono mt-2">
+          <Heading className="mt-2 md:text-6xl">
             {projectsData.title}
-          </h2>
+          </Heading>
         </div>
 
         {/* Tabs */}

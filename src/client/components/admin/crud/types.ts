@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { CrudList } from '@/client/hooks/useCrudList/types'
+import type { CrudList } from '@/client/hooks/crudList/types'
 
 export interface CrudFieldProps {
   label: string

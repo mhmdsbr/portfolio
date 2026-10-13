@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { RefObject } from "react";
+import { Typography } from "@/client/components/public/atoms";
 
 interface HeroBadgeProps {
   logo: string | null;
@@ -33,10 +34,10 @@ export default function HeroBadge({
         ) : null}
       </div>
       <div className="z-20 flex h-full min-w-0 max-w-[22vw] items-center border-r border-white bg-primary-orange px-2 sm:max-w-none sm:px-3">
-        <p className="truncate">{location}</p>
+        <Typography className="truncate">{location}</Typography>
       </div>
       <div className="z-20 flex h-full min-w-0 max-w-[24vw] items-center border-white bg-primary-purple px-2 sm:max-w-none sm:px-3">
-        <p className="truncate">{subtitleOne}</p>
+        <Typography className="truncate">{subtitleOne}</Typography>
       </div>
       <div
         ref={descriptionRef}

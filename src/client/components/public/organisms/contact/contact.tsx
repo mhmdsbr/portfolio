@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons';
 import useTitleScrollAnimation from '@/client/hooks/animations/useTitleScrollAnimation';
 import type { ContactResponse } from '@/shared/types';
+import { Heading, Typography } from "@/client/components/public/atoms";
 
 export default function Contact({ contact }: { contact: ContactResponse }) {
   const titleRef = useRef<HTMLHeadingElement | null>(null);
@@ -32,20 +33,20 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
   return (
     <section id={sectionId} className="block w-full overflow-hidden mx-auto text-center">
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto max-w-5xl px-4">
-        <h2 ref={titleRef} className="text-4xl md:text-6xl font-bold text-center font-mono mb-12">
+        <Heading ref={titleRef} className="mb-12 md:text-6xl">
           {titleWords.map((word, i) => (
             <span key={i} className="word inline-block mx-2">
               {word}
             </span>
           ))}
-        </h2>
+        </Heading>
 
         <div className="grid md:grid-cols-2 gap-10 text-left">
           <div className="space-y-6 text-gray-700">
             {contact?.methods.map((method) => (
               <div key={method.id} className="flex items-start gap-3">
                 <div>
-                  <p className="font-semibold">{method.title}</p>
+                  <Typography className="font-semibold">{method.title}</Typography>
                   {method.kind === 'email' ? (
                     <a href={`mailto:${method.value.replace(/^mailto:/i, '')}`} className="text-sm text-white hover:underline">
                       {method.value.replace(/^mailto:/i, '')}
@@ -55,13 +56,17 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                       {method.value}
                     </a>
                   ) : (
-                    <p className="text-sm text-white">{method.value}</p>
+                    <Typography className="text-sm text-white">
+                      {method.value}
+                    </Typography>
                   )}
                 </div>
               </div>
             ))}
             <div className="pt-4">
-              <p className="font-semibold mb-2">Follow me</p>
+              <Typography className="font-semibold mb-2">
+                Follow me
+              </Typography>
               <div className="flex gap-4 text-primary">
                 <a href="https://www.linkedin.com/in/mohammad-saber-20b9551a3/" className="text-white" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                   <FontAwesomeIcon icon={faLinkedin} />

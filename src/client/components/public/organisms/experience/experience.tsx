@@ -3,6 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import type { ExperienceResponse } from "@/shared/types";
 import useExperienceScrollAnimation from "@/client/hooks/animations/useExperienceScrollAnimation";
+import {
+  Heading,
+  LoadingSpinner,
+  Typography,
+} from "@/client/components/public/atoms";
 
 export default function Experience({ experience }: { experience: ExperienceResponse }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,13 +37,13 @@ export default function Experience({ experience }: { experience: ExperienceRespo
     >
       {!experience ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+          <LoadingSpinner />
         </div>
       ) : (
         <>
-          <h2 className="text-4xl md:text-6xl font-bold text-center font-mono mb-12">
+          <Heading className="mb-12 md:text-6xl">
             {title}
-          </h2>
+          </Heading>
           <div className="space-y-10 max-w-3xl mx-auto">
             {experienceItems.map((exp, i) => (
               <div
@@ -48,10 +53,10 @@ export default function Experience({ experience }: { experience: ExperienceRespo
                 <h3 className="text-xl font-semibold">
                   {exp.title} @ {exp.company}
                 </h3>
-                <p className="text-sm text-gray-400 mb-2">
+                <Typography className="text-sm text-gray-400 mb-2">
                   {exp.from} - {exp.to ?? "Present"}
-                </p>
-                <p className="text-base">{exp.description}</p>
+                </Typography>
+                <Typography className="text-base">{exp.description}</Typography>
               </div>
             ))}
           </div>
