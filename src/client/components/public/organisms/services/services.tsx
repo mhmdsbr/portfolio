@@ -9,6 +9,7 @@ import {
   LoadingSpinner,
   Typography,
 } from "@/client/components/public/atoms";
+import SectionLayout from "@/client/components/public/molecules/SectionLayout";
 
 const iconMap: Record<string, React.ReactNode> = {
   palette: <FiMonitor className="w-12 h-12 mx-auto text-cyan-400" />,
@@ -44,9 +45,12 @@ export default function Services({ services }: { services: ServicesResponse }) {
   if (!animationReady) {
     return (
       <section id={sectionId} className="px-6 py-16 text-white">
-        <div className="flex justify-center items-center h-64">
+        <SectionLayout
+          width="wide"
+          className="flex h-64 items-center justify-center"
+        >
           <LoadingSpinner />
-        </div>
+        </SectionLayout>
       </section>
     );
   }
@@ -54,7 +58,7 @@ export default function Services({ services }: { services: ServicesResponse }) {
   if (!services || content.length === 0) {
     return (
       <section id={sectionId} className="px-6 py-16 text-white">
-        <div className="max-w-6xl mx-auto text-center">
+        <SectionLayout width="wide" className="text-center">
           <Heading
             as="h2"
             size="sectionLarge"
@@ -67,7 +71,7 @@ export default function Services({ services }: { services: ServicesResponse }) {
           <Typography size="base" color="muted" spacing="topLarge">
             No services available yet.
           </Typography>
-        </div>
+        </SectionLayout>
       </section>
     );
   }
@@ -75,9 +79,12 @@ export default function Services({ services }: { services: ServicesResponse }) {
   return (
     <section
       id={sectionId}
-      className="block w-full overflow-hidden mx-auto my-10 text-center"
+      className="mx-auto my-10 block w-full overflow-hidden text-center"
     >
-      <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto">
+      <SectionLayout
+        width="wide"
+        className="my-12 flex h-full flex-col justify-center gap-6"
+      >
         <Heading
           as="h2"
           size="sectionCompact"
@@ -87,7 +94,7 @@ export default function Services({ services }: { services: ServicesResponse }) {
         >
           {title}
         </Heading>
-        <div className="services-container container mx-auto grid w-full grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:w-10/12 md:gap-8 lg:w-10/12 xl:grid-cols-3">
+        <div className="services-container mx-auto grid w-full grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:w-10/12 md:gap-8 lg:w-10/12 xl:grid-cols-3">
           {content.map((item, i) => (
             <div
               key={i}
@@ -113,7 +120,7 @@ export default function Services({ services }: { services: ServicesResponse }) {
             </div>
           ))}
         </div>
-      </div>
+      </SectionLayout>
     </section>
   );
 }

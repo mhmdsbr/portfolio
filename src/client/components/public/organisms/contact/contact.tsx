@@ -20,6 +20,7 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import useTitleScrollAnimation from '@/client/hooks/animations/useTitleScrollAnimation';
 import type { ContactResponse } from '@/shared/types';
 import { Button, Heading, Typography } from "@/client/components/public/atoms";
+import SectionLayout from "@/client/components/public/molecules/SectionLayout";
 
 type ContactSocialPlatform = ContactResponse["socialLinks"][number]["platform"];
 
@@ -63,7 +64,10 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
 
   return (
     <section id={sectionId} className="block w-full overflow-hidden mx-auto text-center">
-      <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto max-w-5xl px-4">
+      <SectionLayout
+        width="standard"
+        className="my-12 flex h-full flex-col justify-center gap-6 px-4"
+      >
         <Heading
           as="h2"
           size="sectionCompact"
@@ -186,7 +190,7 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
             </Button>
           </form>
         </div>
-      </div>
+      </SectionLayout>
     </section>
   );
 }

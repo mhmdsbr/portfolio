@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import type { ProjectsResponse } from "@/shared/types";
 import { useProjectsAnimation } from "@/client/hooks/animations/useProjectsAnimation";
 import { Button, Heading, Typography } from "@/client/components/public/atoms";
+import SectionLayout from "@/client/components/public/molecules/SectionLayout";
 import ProjectCard from "./ProjectCard";
 
 interface Project {
@@ -56,9 +57,8 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
   if (projects.length === 0) {
     return (
       <section id={sectionId} className="px-6 py-16 text-white">
-        <div className="max-w-6xl mx-auto text-center">
-          <span className="text-sm uppercase tracking-wider text-gray-400">
-          </span>
+        <SectionLayout width="wide" className="text-center">
+          <span className="text-sm uppercase tracking-wider text-gray-400" />
           <Heading
             as="h2"
             size="sectionLarge"
@@ -71,15 +71,15 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
           <Typography size="base" color="muted" spacing="topLarge">
             No projects available yet.
           </Typography>
-        </div>
+        </SectionLayout>
       </section>
     );
   }
 
   return (
     <section id={sectionId} className="px-6 py-16 text-white">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
+      <SectionLayout width="wide">
+        <div className="mb-12 text-center">
           <Heading
             as="h2"
             size="sectionCompact"
@@ -91,8 +91,7 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
           </Heading>
         </div>
 
-        {/* Tabs */}
-        <div className="flex justify-center gap-3 mb-10 flex-wrap">
+        <div className="mb-10 flex flex-wrap justify-center gap-3">
           {categories.map((cat) => (
             <Button
               key={cat}
@@ -101,12 +100,11 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
               onClick={() => handleTabClick(cat)}
               disabled={animating}
             >
-                {cat}
+              {cat}
             </Button>
           ))}
         </div>
 
-        {/* Projects Grid */}
         <div
           ref={containerRef}
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
@@ -115,7 +113,7 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
-      </div>
+      </SectionLayout>
     </section>
   );
 }

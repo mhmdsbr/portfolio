@@ -10,6 +10,7 @@ import type { TestimonialsResponse } from "@/shared/types";
 import styles from "./testimonials.module.css";
 import Link from "next/link";
 import { Heading, Typography } from "@/client/components/public/atoms";
+import SectionLayout from "@/client/components/public/molecules/SectionLayout";
 
 const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
   testimonialsData,
@@ -31,6 +32,7 @@ const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
 
   return (
     <section id={sectionId} className={styles["testimonial-slider"]}>
+      <SectionLayout width="full">
       {title && (
         <Heading
           as="h2"
@@ -144,6 +146,7 @@ const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
           </SwiperSlide>
         ))}
       </Swiper>
+      </SectionLayout>
     </section>
   );
 };

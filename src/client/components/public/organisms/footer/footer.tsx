@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import type { FooterResponse } from '@/shared/types'
 import Modal from '@/client/components/public/molecules/modal/Modal'
+import SectionLayout from '@/client/components/public/molecules/SectionLayout'
 import { Button, Typography } from "@/client/components/public/atoms";
 
 const Footer = ({ footerData }: { footerData: FooterResponse }) => {
@@ -16,7 +17,7 @@ const Footer = ({ footerData }: { footerData: FooterResponse }) => {
   return (
     <>
       <footer className="bg-gray-900 text-white py-8">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <SectionLayout width="wide" className="flex flex-col items-center justify-between gap-4 px-4 md:flex-row">
           <Typography size="sm" color="inherit" align="footer">
             © {new Date().getFullYear()} {footerData?.companyName || 'Your Company'}. {footerData?.copyrightText || 'All rights reserved.'}
           </Typography>
@@ -38,7 +39,7 @@ const Footer = ({ footerData }: { footerData: FooterResponse }) => {
               </Button>
             )}
           </div>
-        </div>
+        </SectionLayout>
       </footer>
 
       {footerData?.privacyPolicy && (

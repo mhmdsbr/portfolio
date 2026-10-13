@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import useAboutScrollAnimation from "@/client/hooks/animations/useAboutScrollAnimation";
-import type { AboutResponse } from '@/shared/types';
+import type { AboutResponse } from "@/shared/types";
 import { Heading, Typography } from "@/client/components/public/atoms";
+import SectionLayout from "@/client/components/public/molecules/SectionLayout";
 
 export default function About({ about }: { about: AboutResponse }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -40,9 +41,10 @@ export default function About({ about }: { about: AboutResponse }) {
       id={sectionId}
       className="mx-auto block w-full overflow-x-clip text-center"
     >
-      <div
+      <SectionLayout
+        width="wide"
         ref={containerRef}
-        className="mx-auto my-12 flex h-full flex-col justify-center gap-6"
+        className="my-12 flex h-full flex-col justify-center gap-6 px-4 sm:px-6"
       >
         <Heading
           as="h2"
@@ -58,7 +60,7 @@ export default function About({ about }: { about: AboutResponse }) {
             </span>
           ))}
         </Heading>
-        <div className="container mx-auto flex w-full flex-col gap-8 px-4 sm:px-6">
+        <div className="flex w-full flex-col gap-8">
           <div
             ref={textRef}
             className="mx-auto flex w-full max-w-4xl flex-col justify-start gap-4 text-base leading-7 text-justify sm:text-xl sm:leading-8"
@@ -68,7 +70,7 @@ export default function About({ about }: { about: AboutResponse }) {
             </Typography>
           </div>
         </div>
-      </div>
+      </SectionLayout>
     </section>
   );
 }

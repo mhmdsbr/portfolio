@@ -5,6 +5,7 @@ import { useLenis } from 'lenis/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button, Heading, Typography } from "@/client/components/public/atoms";
+import SectionLayout from "@/client/components/public/molecules/SectionLayout";
 
 const INTRO_VIDEO_URL = 'https://video.sabermohamad.de/intro.mp4'
 
@@ -41,7 +42,8 @@ export default function Intro() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-24 text-white sm:px-8">
-      <section className="relative z-10 mx-auto w-full max-w-4xl rounded-3xl border border-white/10 bg-gray-950/60 p-7 text-center shadow-2xl shadow-cyan-950/20 backdrop-blur-sm sm:p-12 md:p-16">
+      <SectionLayout width="narrow" className="relative z-10">
+      <section className="w-full rounded-3xl border border-white/10 bg-gray-950/60 p-7 text-center shadow-2xl shadow-cyan-950/20 backdrop-blur-sm sm:p-12 md:p-16">
         <Link
           href="/"
           className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-gray-300 transition hover:text-cyan-300"
@@ -92,19 +94,24 @@ export default function Intro() {
           </span>
         </Button>
       </section>
+      </SectionLayout>
 
       {isVideoOpen && (
         <div
           className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm sm:p-8"
           onClick={() => setIsVideoOpen(false)}
         >
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="intro-video-title"
-            className="w-full max-w-5xl overflow-hidden rounded-2xl border border-white/15 bg-gray-950 shadow-2xl"
-            onClick={(event) => event.stopPropagation()}
+          <SectionLayout
+            width="standard"
+            className="overflow-hidden rounded-2xl border border-white/15 bg-gray-950 shadow-2xl"
           >
+            <section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="intro-video-title"
+              className="w-full"
+              onClick={(event) => event.stopPropagation()}
+            >
             <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
               <Heading
                 as="h2"
@@ -133,7 +140,8 @@ export default function Intro() {
             >
               Your browser does not support embedded videos.
             </video>
-          </section>
+            </section>
+          </SectionLayout>
         </div>
       )}
     </main>
