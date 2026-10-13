@@ -2,7 +2,20 @@
 
 import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import {
+  faBehance,
+  faDribbble,
+  faFacebook,
+  faGithub,
+  faInstagram,
+  faLinkedin,
+  faMedium,
+  faTelegram,
+  faWhatsapp,
+  faXTwitter,
+  faYoutube,
+} from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import useTitleScrollAnimation from '@/client/hooks/animations/useTitleScrollAnimation';
 import type { ContactResponse } from '@/shared/types';
@@ -10,9 +23,19 @@ import { Button, Heading, Typography } from "@/client/components/public/atoms";
 
 type ContactSocialPlatform = ContactResponse["socialLinks"][number]["platform"];
 
-const socialIcons: Partial<Record<ContactSocialPlatform, IconDefinition>> = {
+const socialIcons: Record<ContactSocialPlatform, IconDefinition> = {
+  behance: faBehance,
+  dribbble: faDribbble,
+  facebook: faFacebook,
+  github: faGithub,
+  instagram: faInstagram,
   linkedin: faLinkedin,
-  github: faGithub
+  mail: faEnvelope,
+  medium: faMedium,
+  telegram: faTelegram,
+  twitter: faXTwitter,
+  whatsapp: faWhatsapp,
+  youtube: faYoutube,
 };
 
 export default function Contact({ contact }: { contact: ContactResponse }) {
@@ -100,11 +123,7 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                     rel={url.startsWith("http") ? "noopener noreferrer" : undefined}
                     aria-label={platform}
                   >
-                    {socialIcons[platform] ? (
-                      <FontAwesomeIcon icon={socialIcons[platform]} />
-                    ) : (
-                      platform
-                    )}
+                    <FontAwesomeIcon icon={socialIcons[platform]} aria-hidden="true" />
                   </a>
                 ))}
               </div>
