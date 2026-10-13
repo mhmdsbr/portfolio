@@ -1,19 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge, Heading, Typography } from "@/client/components/public/atoms";
-
-interface Project {
-  id: number;
-  slug: string;
-  title: string;
-  category: string;
-  category_slug: string;
-  description: string | null;
-  image: string | null;
-  link?: string | null;
-  github_url?: string | null;
-  tech?: string[] | null;
-}
+import type { Project } from "@/shared/types";
 
 interface ProjectCardProps {
   project: Project;
@@ -49,14 +37,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 View Project
             </Link>
             {project.github_url && project.github_url !== "#" && (
-              <a
+              <Link
                 href={project.github_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-black/80 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-black transition"
               >
                 GitHub
-              </a>
+              </Link>
             )}
           </div>
         </div>

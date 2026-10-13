@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 import {
   faBehance,
   faDribbble,
@@ -93,13 +94,13 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                     {method.title}
                   </Typography>
                   {method.kind === 'email' ? (
-                    <a href={`mailto:${method.value.replace(/^mailto:/i, '')}`} className="text-sm text-white hover:underline">
+                    <Link href={`mailto:${method.value.replace(/^mailto:/i, '')}`} className="text-sm text-white hover:underline">
                       {method.value.replace(/^mailto:/i, '')}
-                    </a>
+                    </Link>
                   ) : method.kind === 'phone' ? (
-                    <a href={`tel:${method.value.replace(/^tel:/i, '')}`} className="text-sm text-white hover:underline">
+                    <Link href={`tel:${method.value.replace(/^tel:/i, '')}`} className="text-sm text-white hover:underline">
                       {method.value}
-                    </a>
+                    </Link>
                   ) : (
                     <Typography size="sm" color="white">
                       {method.value}
@@ -119,7 +120,7 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
               </Typography>
               <div className="flex gap-4 text-primary">
                 {contact.socialLinks.map(({ platform, url }) => (
-                  <a
+                  <Link
                     key={platform}
                     href={url}
                     className="text-white"
@@ -128,7 +129,7 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                     aria-label={platform}
                   >
                     <FontAwesomeIcon icon={socialIcons[platform]} aria-hidden="true" />
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>

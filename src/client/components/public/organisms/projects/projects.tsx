@@ -1,24 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import type { ProjectsResponse } from "@/shared/types";
+import type { Project, ProjectsResponse } from "@/shared/types";
 import { useProjectsAnimation } from "@/client/hooks/animations/useProjectsAnimation";
 import { Button, Heading, Typography } from "@/client/components/public/atoms";
 import SectionLayout from "@/client/components/public/molecules/SectionLayout";
-import ProjectCard from "./ProjectCard";
-
-interface Project {
-  id: number;
-  slug: string;
-  title: string;
-  category: string;
-  category_slug: string;
-  description: string | null;
-  image: string | null;
-  link?: string | null;
-  github_url?: string | null;
-  tech?: string[] | null;
-}
+import ProjectCard from "@/client/components/public/molecules/ProjectCard";
 
 export default function Projects({ projectsData }: { projectsData: ProjectsResponse }) {
   const [activeCategory, setActiveCategory] = useState("All");
