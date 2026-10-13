@@ -1,4 +1,5 @@
 import type { MouseEventHandler, ReactNode } from "react";
+import Link from "next/link";
 
 type ButtonVariant =
   | "primary"
@@ -9,16 +10,30 @@ type ButtonVariant =
 type ButtonSize = "small" | "medium" | "large";
 type ButtonType = "button" | "submit" | "reset";
 
-interface ButtonProps {
+interface ButtonBaseProps {
   children: ReactNode;
   variant: ButtonVariant;
   size?: ButtonSize;
-  type?: ButtonType;
   active?: boolean;
-  disabled?: boolean;
   ariaLabel?: string;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
+  className?: string;
 }
+
+type ButtonProps = ButtonBaseProps &
+  (
+    | {
+        href: string;
+        type?: never;
+        disabled?: never;
+        onClick?: never;
+      }
+    | {
+        href?: never;
+        type?: ButtonType;
+        disabled?: boolean;
+        onClick?: MouseEventHandler<HTMLButtonElement>;
+      }
+  );
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
@@ -52,6 +67,8 @@ export default function Button({
   disabled = false,
   ariaLabel,
   onClick,
+  href,
+  className: additionalClassName,
 }: ButtonProps) {
   const className = [
     variantClasses[variant],
@@ -59,9 +76,18 @@ export default function Button({
     variant === "filter"
       ? filterStateClasses[active ? "active" : "inactive"]
       : "",
+    additionalClassName,
   ]
     .filter(Boolean)
     .join(" ");
+
+  if (href) {
+    return (
+      <Link href={href} aria-label={ariaLabel} className={className}>
+        {children}
+      </Link>
+    );
+  }
 
   return (
     <button

@@ -58,15 +58,6 @@ export default function Header({ singleTitle, headerData }: HeaderProps) {
     isReady,
   });
 
-  if (!isReady) {
-    return (
-      <header className="flex justify-center w-full z-50">
-        <div className="flex justify-center w-full py-5 text-2xl fixed lg:text-3xl font-semibold px-10 top-0 z-50">
-          <span className="flex items-baseline text-gray-500">Loading...</span>
-        </div>
-      </header>
-    );
-  }
 
   return (
     <header
@@ -75,7 +66,7 @@ export default function Header({ singleTitle, headerData }: HeaderProps) {
     >
       <div
         ref={headerRef}
-        className="flex justify-center w-full py-5 text-2xl fixed lg:text-3xl font-semibold px-10 cursor-pointer top-0 z-50"
+        className="flex justify-center w-full py-4 text-xl fixed lg:text-2xl font-semibold px-10 cursor-pointer top-0 z-50"
       >
         <span className="flex items-baseline">
           &lt;

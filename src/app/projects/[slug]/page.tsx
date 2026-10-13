@@ -1,11 +1,11 @@
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/server/repos/projects";
 import Header from "@/client/components/public/organisms/header";
-import { Badge, Heading, Typography } from "@/client/components/public/atoms";
+import { Badge, Button, Heading, Typography } from "@/client/components/public/atoms";
 import { getPublicAll } from "@/server/services/public-content";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
+import PublicPageLayout from "@/client/components/public/layouts/PublicPageLayout";
 
 export const dynamic = "force-dynamic";
 
@@ -26,19 +26,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const { header } = await getPublicAll();
 
   return (
-      <main className="relative min-h-screen overflow-x-hidden px-6 py-16 text-white">
+      <PublicPageLayout id="project-page" className="px-6 py-22">
         <BackgroundGradient />
         <Header singleTitle={project.title} headerData={header} />
         <article className="relative z-10 mx-auto max-w-7xl">
-          <Link
+          <Button
+            variant="subtle"
             href="/#projects"
-            className="mb-10 inline-flex text-sm text-cyan-400 transition hover:text-cyan-300"
+            className="mb-4 block text-cyan-400 transition hover:text-cyan-300"
           >
-            ← Back to projects
-          </Link>
+            ← Back
+          </Button>
 
         <div className="grid gap-12 lg:grid-cols-[1.35fr_1fr] lg:gap-16 lg:items-start">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-white/10 bg-gray-900/80 shadow-2xl shadow-cyan-950/20">
+          <div className="relative aspect-16/10 overflow-hidden rounded-3xl border border-white/10 bg-gray-900/80 shadow-2xl shadow-cyan-950/20">
             {project.image ? (
               <Image
                 src={project.image}
@@ -140,6 +141,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </div>
         </div>
         </article>
-      </main>
+      </PublicPageLayout>
   );
 }

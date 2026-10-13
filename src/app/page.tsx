@@ -8,6 +8,7 @@ import Services from "@/client/components/public/organisms/services";
 import Projects from "@/client/components/public/organisms/projects";
 import Contact from "@/client/components/public/organisms/contact";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
+import PublicPageLayout from "@/client/components/public/layouts/PublicPageLayout";
 import Testimonials from "@/client/components/public/organisms/testimonials";
 import { getPublicAll } from "@/server/services/public-content";
 import type { SectionKind } from "@/shared/types";
@@ -30,7 +31,7 @@ export default async function Home() {
   const sections = data.header.sections.filter((section) => section.isEnabled);
 
   return (
-    <main id="main" className="relative text-white overflow-x-hidden">
+    <PublicPageLayout id="main">
       <BackgroundGradient />
       <Header headerData={data.header} />
       {sections.map((section) => {
@@ -38,6 +39,6 @@ export default async function Home() {
         return render ? <Fragment key={section.kind}>{render(data)}</Fragment> : null;
       })}
       <Footer footerData={data.footer} />
-    </main>
+    </PublicPageLayout>
   );
 }
