@@ -1,14 +1,15 @@
 import { Fragment, type ReactNode } from "react";
-import Header from "@/client/components/public/header";
-import Footer from "@/client/components/public/footer/footer";
-import Hero from "@/client/components/public/hero/hero";
-import About from "@/client/components/public/about";
-import Experience from "@/client/components/public/experience";
-import Services from "@/client/components/public/services";
-import Projects from "@/client/components/public/projects/projects";
-import Contact from "@/client/components/public/contact";
+import Header from "@/client/components/public/organisms/header";
+import Footer from "@/client/components/public/organisms/footer";
+import Hero from "@/client/components/public/organisms/hero";
+import About from "@/client/components/public/organisms/about";
+import Experience from "@/client/components/public/organisms/experience";
+import Services from "@/client/components/public/organisms/services";
+import Projects from "@/client/components/public/organisms/projects";
+import Contact from "@/client/components/public/organisms/contact";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
-import Testimonials from "@/client/components/public/testimonials/testimonials";
+import PublicPageLayout from "@/client/components/public/layouts/PublicPageLayout";
+import Testimonials from "@/client/components/public/organisms/testimonials";
 import { getPublicAll } from "@/server/services/public-content";
 import type { SectionKind } from "@/shared/types";
 import type { AllDataResponse } from "@/shared/types/public-content";
@@ -30,7 +31,7 @@ export default async function Home() {
   const sections = data.header.sections.filter((section) => section.isEnabled);
 
   return (
-    <main id="main" className="relative text-white overflow-x-hidden">
+    <PublicPageLayout id="main">
       <BackgroundGradient />
       <Header headerData={data.header} />
       {sections.map((section) => {
@@ -38,6 +39,6 @@ export default async function Home() {
         return render ? <Fragment key={section.kind}>{render(data)}</Fragment> : null;
       })}
       <Footer footerData={data.footer} />
-    </main>
+    </PublicPageLayout>
   );
 }
