@@ -22,6 +22,7 @@ import useTitleScrollAnimation from '@/client/hooks/animations/useTitleScrollAni
 import type { ContactResponse } from '@/shared/types';
 import { Button, Heading, Typography } from "@/client/components/public/atoms";
 import SectionLayout from "@/client/components/public/molecules/SectionLayout";
+import { submitContactMessage } from "@/server/actions/public/contact";
 
 type ContactSocialPlatform = ContactResponse["socialLinks"][number]["platform"];
 
@@ -52,13 +53,35 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
     subject: '',
     message: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((current) => ({ ...current, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setFormError('');
+    setFormSuccess(false);
+
+    try {
+      const result = await submitContactMessage(formData);
+      if (!result.success) {
+        setFormError(result.error);
+        return;
+      }
+
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setFormSuccess(true);
+    } catch (error) {
+      console.error('Public contact form submission failed:', error);
+      setFormError('Unable to send your message right now. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const titleWords = contact?.title?.split(' ') || [];
@@ -143,6 +166,7 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                 name="name"
                 id="name"
                 required
+                maxLength={100}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={formData.name}
                 onChange={handleChange}
@@ -155,6 +179,7 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                 name="email"
                 id="email"
                 required
+                maxLength={254}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={formData.email}
                 onChange={handleChange}
@@ -166,6 +191,7 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                 type="text"
                 name="subject"
                 id="subject"
+                maxLength={200}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={formData.subject}
                 onChange={handleChange}
@@ -178,16 +204,28 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                 id="message"
                 rows={4}
                 required
+                maxLength={10000}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={formData.message}
                 onChange={handleChange}
               />
             </div>
+            {formError && (
+              <p role="alert" className="text-sm text-red-400">
+                {formError}
+              </p>
+            )}
+            {formSuccess && (
+              <p role="status" className="text-sm text-green-400">
+                Your message has been sent. Thank you for reaching out.
+              </p>
+            )}
             <Button
               variant="primary"
               type="submit"
+              disabled={isSubmitting}
             >
-              {contact?.button.text}
+              {isSubmitting ? 'Sending...' : contact?.button.text || 'Send message'}
             </Button>
           </form>
         </div>
