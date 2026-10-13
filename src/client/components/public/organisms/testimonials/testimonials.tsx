@@ -1,25 +1,24 @@
 "use client";
 
-import React from "react";
 import "swiper/css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import Image from "next/image";
 import type { TestimonialsResponse } from "@/shared/types";
 
 import styles from "./testimonials.module.css";
-import Link from "next/link";
-import { Heading, Typography } from "@/client/components/public/atoms";
+import { Heading } from "@/client/components/public/atoms";
 import SectionLayout from "@/client/components/public/molecules/SectionLayout";
+import TestimonialCard from "@/client/components/public/molecules/TestimonialCard";
 
-const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
+const colors = ["#337BFF", "#FF5733", "#33FF57", "#FF33A1", "#8A33FF"];
+
+export default function Testimonials({
   testimonialsData,
-}) => {
+}: {
+  testimonialsData: TestimonialsResponse;
+}) {
   const sectionId = "testimonials";
 
-  const colors = ["#337BFF", "#FF5733", "#33FF57", "#FF33A1", "#8A33FF"];
-
-  // Return early if no testimonials data
   if (
     !testimonialsData ||
     !testimonialsData.items ||
@@ -74,81 +73,17 @@ const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
       >
         {items.map((item, index) => (
           <SwiperSlide
-            key={index}
+            key={`${item.title}-${index}`}
             className={styles["testimonial-slider__slide"]}
           >
-            <div
-              className={styles["testimonial-item"]}
-              style={{
-                borderLeft: `4px solid ${colors[index % colors.length]}`,
-              }}
-            >
-              <div className={styles["testimonial-content"]}>
-                {item.body && (
-                  <>
-                    <p
-                      className={`${styles["testimonial-quote"]} line-clamp-4`}
-                    >
-                      {item.body}
-                    </p>
-                    <Link
-                      href="https://www.linkedin.com/in/mohammad-saber-20b9551a3/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mb-3 inline-block text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300"
-                    >
-                      Read more
-                    </Link>
-                  </>
-                )}
-
-                <div className={styles["testimonial-author"]}>
-                  <div className={styles["author-info"]}>
-                    {item.title && (
-                      <Heading
-                        as="h4"
-                        size="inherit"
-                        color="inherit"
-                        weight="inherit"
-                      >
-                        {item.title}
-                      </Heading>
-                    )}
-                    {item.subtitle && (
-                      <Typography size="inherit" color="inherit">
-                        {item.subtitle}
-                      </Typography>
-                    )}
-                    {item.rating && (
-                      <div className={styles["author-rating"]}>
-                        {"⭐".repeat(
-                          Math.max(
-                            0,
-                            Math.min(5, Math.round(item.rating || 0)),
-                          ),
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {item.image && (
-                    <div className={styles["author-avatar"]}>
-                      <Image
-                        src={item.image}
-                        alt={item.title || "Testimonial"}
-                        fill
-                        sizes="50px"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <TestimonialCard
+              testimonial={item}
+              accentColor={colors[index % colors.length]}
+            />
           </SwiperSlide>
         ))}
       </Swiper>
       </SectionLayout>
     </section>
   );
-};
-
-export default Testimonials;
+}

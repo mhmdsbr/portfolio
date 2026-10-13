@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import type { FooterResponse } from '@/shared/types'
-import Modal from '@/client/components/public/molecules/modal/Modal'
+import Modal from '@/client/components/public/molecules/Modal'
 import SectionLayout from '@/client/components/public/molecules/SectionLayout'
 import { Button, Typography } from "@/client/components/public/atoms";
 

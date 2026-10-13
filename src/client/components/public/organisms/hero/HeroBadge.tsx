@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { RefObject } from "react";
 import { Typography } from "@/client/components/public/atoms";
 
@@ -47,7 +46,9 @@ export default function HeroBadge({
         ref={descriptionRef}
         className="z-0 flex h-full min-w-0 max-w-[30vw] items-center rounded-r-md border-r-6 border-primary-cyan bg-white px-2 text-black opacity-100 sm:max-w-none sm:px-3 lg:opacity-0"
       >
-        <Link href="/cv.pdf" className="truncate">{subtitleTwo}</Link>
+        <Typography size="inherit" color="inherit" overflow="truncate">
+          {subtitleTwo}
+        </Typography>
       </div>
     </div>
   );
