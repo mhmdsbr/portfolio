@@ -2,9 +2,8 @@ export function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
 }
 
-export function validateAdminIdentity(email: string, displayName: string) {
+export function validateAdminEmail(email: string) {
   const normalizedEmail = normalizeEmail(email)
-  const normalizedName = displayName.trim()
 
   if (
     normalizedEmail.length > 254 ||
@@ -12,6 +11,15 @@ export function validateAdminIdentity(email: string, displayName: string) {
   ) {
     return { success: false as const, error: 'Enter a valid email address.' }
   }
+
+  return { success: true as const, email: normalizedEmail }
+}
+
+export function validateAdminIdentity(email: string, displayName: string) {
+  const validatedEmail = validateAdminEmail(email)
+  const normalizedName = displayName.trim()
+
+  if (!validatedEmail.success) return validatedEmail
   if (!normalizedName || normalizedName.length > 100) {
     return {
       success: false as const,
@@ -20,7 +28,7 @@ export function validateAdminIdentity(email: string, displayName: string) {
   }
   return {
     success: true as const,
-    email: normalizedEmail,
+    email: validatedEmail.email,
     displayName: normalizedName,
   }
 }

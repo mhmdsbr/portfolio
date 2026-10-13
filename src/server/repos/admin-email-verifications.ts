@@ -14,11 +14,19 @@ export const adminEmailVerificationsRepo = {
 
   /** Creation time of an unconsumed challenge that expires after `expiresAfter`. */
   async findPendingCreatedAt(
-    filter: { purpose: Purpose; email?: string; expiresAfter: Date },
+    filter: {
+      purpose: Purpose
+      email?: string
+      expiresAfter: Date
+      createdByUserId?: number | null
+    },
     executor: DbExecutor = defaultExecutor,
   ) {
     const [challenge] = await executor
-      .select({ createdAt: schema.adminEmailVerifications.createdAt })
+      .select({
+        id: schema.adminEmailVerifications.id,
+        createdAt: schema.adminEmailVerifications.createdAt,
+      })
       .from(schema.adminEmailVerifications)
       .where(
         and(
@@ -27,6 +35,14 @@ export const adminEmailVerificationsRepo = {
             ? undefined
             : eq(schema.adminEmailVerifications.email, filter.email),
           eq(schema.adminEmailVerifications.purpose, filter.purpose),
+          filter.createdByUserId === undefined
+            ? undefined
+            : filter.createdByUserId === null
+              ? isNull(schema.adminEmailVerifications.createdByUserId)
+              : eq(
+                  schema.adminEmailVerifications.createdByUserId,
+                  filter.createdByUserId,
+                ),
           gt(schema.adminEmailVerifications.expiresAt, filter.expiresAfter),
         ),
       )
@@ -64,7 +80,7 @@ export const adminEmailVerificationsRepo = {
     filter: {
       id: string
       purpose: Purpose
-      createdByUserId?: number
+      createdByUserId?: number | null
       maxAttempts: number
     },
     executor: DbExecutor = defaultExecutor,
@@ -79,10 +95,12 @@ export const adminEmailVerificationsRepo = {
           eq(schema.adminEmailVerifications.purpose, filter.purpose),
           filter.createdByUserId === undefined
             ? undefined
-            : eq(
-                schema.adminEmailVerifications.createdByUserId,
-                filter.createdByUserId,
-              ),
+            : filter.createdByUserId === null
+              ? isNull(schema.adminEmailVerifications.createdByUserId)
+              : eq(
+                  schema.adminEmailVerifications.createdByUserId,
+                  filter.createdByUserId,
+                ),
           gt(schema.adminEmailVerifications.expiresAt, new Date()),
           sql`${schema.adminEmailVerifications.attempts} < ${filter.maxAttempts}`,
         ),
