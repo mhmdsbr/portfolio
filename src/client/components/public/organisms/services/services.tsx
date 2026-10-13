@@ -55,10 +55,16 @@ export default function Services({ services }: { services: ServicesResponse }) {
     return (
       <section id={sectionId} className="px-6 py-16 text-white">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
+          <Heading
+            as="h2"
+            size="sectionLarge"
+            color="inherit"
+            font="mono"
+            spacing="topSmall"
+          >
             {title}
-          </h2>
-          <Typography className="mt-8 text-gray-400">
+          </Heading>
+          <Typography size="base" color="muted" spacing="topLarge">
             No services available yet.
           </Typography>
         </div>
@@ -72,7 +78,13 @@ export default function Services({ services }: { services: ServicesResponse }) {
       className="block w-full overflow-hidden mx-auto my-10 text-center"
     >
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto">
-        <Heading className="relative z-10 flex justify-center md:text-6xl">
+        <Heading
+          as="h2"
+          size="sectionCompact"
+          color="inherit"
+          font="mono"
+          align="center"
+        >
           {title}
         </Heading>
         <div className="services-container container mx-auto grid w-full grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:w-10/12 md:gap-8 lg:w-10/12 xl:grid-cols-3">
@@ -84,11 +96,17 @@ export default function Services({ services }: { services: ServicesResponse }) {
               <div className="mb-4 flex h-10 shrink-0 items-center justify-center md:h-12">
                 {item.icon && getIcon(item.icon)}
               </div>
-              <h3 className="mb-4 shrink-0 text-lg font-bold text-white md:text-2xl">
+              <Heading
+                as="h3"
+                size="service"
+                color="white"
+                weight="bold"
+                spacing="bottomMedium"
+              >
                 {item.title}
-              </h3>
-              <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto md:items-start md:justify-start">
-                <Typography className="text-gray-400">
+              </Heading>
+              <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto md:items-start">
+                <Typography size="inherit" color="muted" align="center">
                   {item.description}
                 </Typography>
               </div>

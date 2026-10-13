@@ -32,7 +32,14 @@ const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
   return (
     <section id={sectionId} className={styles["testimonial-slider"]}>
       {title && (
-        <Heading className="mb-12 md:text-6xl">
+        <Heading
+          as="h2"
+          size="sectionCompact"
+          color="inherit"
+          font="mono"
+          align="center"
+          spacing="bottomLarge"
+        >
           {title}
         </Heading>
       )}
@@ -96,10 +103,17 @@ const Testimonials: React.FC<{ testimonialsData: TestimonialsResponse }> = ({
                 <div className={styles["testimonial-author"]}>
                   <div className={styles["author-info"]}>
                     {item.title && (
-                      <h4 className={styles["author-name"]}>{item.title}</h4>
+                      <Heading
+                        as="h4"
+                        size="inherit"
+                        color="inherit"
+                        weight="inherit"
+                      >
+                        {item.title}
+                      </Heading>
                     )}
                     {item.subtitle && (
-                      <Typography className={styles["author-role"]}>
+                      <Typography size="inherit" color="inherit">
                         {item.subtitle}
                       </Typography>
                     )}

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import type { ProjectsResponse } from "@/shared/types";
 import { useProjectsAnimation } from "@/client/hooks/animations/useProjectsAnimation";
-import { Heading, Typography } from "@/client/components/public/atoms";
+import { Button, Heading, Typography } from "@/client/components/public/atoms";
 import ProjectCard from "./ProjectCard";
 
 interface Project {
@@ -59,9 +59,16 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
         <div className="max-w-6xl mx-auto text-center">
           <span className="text-sm uppercase tracking-wider text-gray-400">
           </span>
-          <h2 className="text-5xl md:text-7xl font-bold font-mono mt-2">
-          </h2>
-          <Typography className="mt-8 text-gray-400">
+          <Heading
+            as="h2"
+            size="sectionLarge"
+            color="inherit"
+            font="mono"
+            spacing="topSmall"
+          >
+            {projectsData.title}
+          </Heading>
+          <Typography size="base" color="muted" spacing="topLarge">
             No projects available yet.
           </Typography>
         </div>
@@ -73,7 +80,13 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
     <section id={sectionId} className="px-6 py-16 text-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <Heading className="mt-2 md:text-6xl">
+          <Heading
+            as="h2"
+            size="sectionCompact"
+            color="inherit"
+            font="mono"
+            spacing="topSmall"
+          >
             {projectsData.title}
           </Heading>
         </div>
@@ -81,18 +94,15 @@ export default function Projects({ projectsData }: { projectsData: ProjectsRespo
         {/* Tabs */}
         <div className="flex justify-center gap-3 mb-10 flex-wrap">
           {categories.map((cat) => (
-            <button
+            <Button
               key={cat}
+              variant="filter"
+              active={activeCategory === cat}
               onClick={() => handleTabClick(cat)}
               disabled={animating}
-              className={`px-6 py-2.5 cursor-pointer rounded-full text-sm font-semibold transition-all duration-300 ${
-                activeCategory === cat
-                  ? "bg-white text-black shadow-lg shadow-white/20 scale-105"
-                  : "bg-gray-800 hover:bg-gray-700 hover:scale-105"
-              }`}
             >
                 {cat}
-            </button>
+            </Button>
           ))}
         </div>
 

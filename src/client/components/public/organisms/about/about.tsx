@@ -45,8 +45,12 @@ export default function About({ about }: { about: AboutResponse }) {
         className="mx-auto my-12 flex h-full flex-col justify-center gap-6"
       >
         <Heading
+          as="h2"
+          size="section"
+          color="inherit"
+          font="mono"
+          align="center"
           ref={titleRef}
-          className="flex justify-center sm:text-5xl lg:text-6xl"
         >
           {titleWords.map((word, i) => (
             <span key={i} className="word mx-2 inline-block sm:mx-3">
@@ -59,7 +63,9 @@ export default function About({ about }: { about: AboutResponse }) {
             ref={textRef}
             className="mx-auto flex w-full max-w-4xl flex-col justify-start gap-4 text-base leading-7 text-justify sm:text-xl sm:leading-8"
           >
-            <Typography>{description}</Typography>
+            <Typography size="inherit" color="inherit">
+              {description}
+            </Typography>
           </div>
         </div>
       </div>

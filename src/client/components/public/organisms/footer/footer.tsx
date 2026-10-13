@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import type { FooterResponse } from '@/shared/types'
 import Modal from '@/client/components/public/molecules/modal/Modal'
-import { Typography } from "@/client/components/public/atoms";
+import { Button, Typography } from "@/client/components/public/atoms";
 
 const Footer = ({ footerData }: { footerData: FooterResponse }) => {
 
@@ -17,25 +17,25 @@ const Footer = ({ footerData }: { footerData: FooterResponse }) => {
     <>
       <footer className="bg-gray-900 text-white py-8">
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <Typography className="text-sm text-center md:text-left">
+          <Typography size="sm" color="inherit" align="footer">
             © {new Date().getFullYear()} {footerData?.companyName || 'Your Company'}. {footerData?.copyrightText || 'All rights reserved.'}
           </Typography>
           <div className="flex gap-4">
             {footerData?.privacyPolicy && (
-              <button
+              <Button
+                variant="subtle"
                 onClick={() => setShowPrivacy(true)}
-                className="text-sm hover:underline cursor-pointer"
               >
                 Privacy Policy
-              </button>
+              </Button>
             )}
             {footerData?.termsOfService && (
-              <button
+              <Button
+                variant="subtle"
                 onClick={() => setShowTerms(true)}
-                className="text-sm hover:underline cursor-pointer"
               >
                 Terms of Service
-              </button>
+              </Button>
             )}
           </div>
         </div>

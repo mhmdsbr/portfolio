@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/client/components/public/organisms/header";
-import { Badge, Typography } from "@/client/components/public/atoms";
+import { Badge, Heading, Typography } from "@/client/components/public/atoms";
 import { getPublicAll } from "@/server/services/public-content";
 import { getProjectsByCategory } from "@/server/repos/projects";
 
@@ -39,11 +39,25 @@ export default async function ProjectCategoryPage({
           </Link>
 
           <header className="mb-12">
-            <Typography className="mb-3 text-sm font-semibold uppercase tracking-wider text-cyan-400">
+            <Typography
+              size="sm"
+              color="accent"
+              weight="semibold"
+              transform="uppercase"
+              tracking="wide"
+              spacing="bottomMedium"
+            >
               Project category
             </Typography>
-            <h1 className="text-4xl font-bold md:text-6xl">{categoryName}</h1>
-            <Typography className="mt-4 max-w-2xl text-lg text-gray-400">
+            <Heading as="h1" size="sectionCompact" color="inherit">
+              {categoryName}
+            </Heading>
+            <Typography
+              size="lg"
+              color="muted"
+              spacing="topMedium"
+              width="medium"
+            >
               {projects.length} {projects.length === 1 ? "project" : "projects"}{" "}
               in this category.
             </Typography>
@@ -74,8 +88,15 @@ export default async function ProjectCategoryPage({
                 </div>
 
                 <div className="p-6">
-                  <h2 className="text-2xl font-bold">{project.title}</h2>
-                  <Typography className="mt-3 leading-7 text-gray-300">
+                  <Heading as="h2" size="2xl" color="inherit">
+                    {project.title}
+                  </Heading>
+                  <Typography
+                    size="inherit"
+                    color="body"
+                    spacing="topSmall"
+                    leading="7"
+                  >
                     {project.description || "Project details coming soon."}
                   </Typography>
 

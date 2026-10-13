@@ -34,10 +34,14 @@ export default function HeroBadge({
         ) : null}
       </div>
       <div className="z-20 flex h-full min-w-0 max-w-[22vw] items-center border-r border-white bg-primary-orange px-2 sm:max-w-none sm:px-3">
-        <Typography className="truncate">{location}</Typography>
+        <Typography size="inherit" color="inherit" overflow="truncate">
+          {location}
+        </Typography>
       </div>
       <div className="z-20 flex h-full min-w-0 max-w-[24vw] items-center border-white bg-primary-purple px-2 sm:max-w-none sm:px-3">
-        <Typography className="truncate">{subtitleOne}</Typography>
+        <Typography size="inherit" color="inherit" overflow="truncate">
+          {subtitleOne}
+        </Typography>
       </div>
       <div
         ref={descriptionRef}

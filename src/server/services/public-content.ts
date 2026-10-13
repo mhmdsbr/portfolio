@@ -6,6 +6,7 @@ import { listHeroTitles } from '@/server/repos/hero-titles'
 import { listSections, getSection } from '@/server/repos/page-sections'
 import { getProjects } from '@/server/repos/projects'
 import { profileRepo, siteConfigRepo } from '@/server/repos/singletons'
+import { listSocialLinks } from '@/server/repos/social-links'
 import type {
   AboutResponse,
   AllDataResponse,
@@ -129,9 +130,10 @@ export async function getPublicProjects(): Promise<ProjectsResponse> {
 }
 
 export async function getPublicContact(): Promise<ContactResponse> {
-  const [section, methods] = await Promise.all([
+  const [section, methods, socialLinks] = await Promise.all([
     getSection('contact'),
     getContactMethodsForSection('contact'),
+    listSocialLinks(),
   ])
 
   return {
@@ -142,6 +144,7 @@ export async function getPublicContact(): Promise<ContactResponse> {
       url: section?.config.buttonUrl ?? null,
     },
     methods: methods.map(({ id, kind, title, value }) => ({ id, kind, title, value })),
+    socialLinks,
   }
 }
 

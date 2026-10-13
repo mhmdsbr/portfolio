@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Badge, Typography } from "@/client/components/public/atoms";
+import { Badge, Heading, Typography } from "@/client/components/public/atoms";
 
 interface Project {
   id: number;
@@ -83,12 +83,21 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               </div>
             )}
           </div>
-          <Link href={detailHref}>
-            <h3 className="text-xl font-bold mb-2 group-hover:text-cyan-400 transition-colors">
+          <Link
+            href={detailHref}
+            className="transition-colors group-hover:text-cyan-400"
+          >
+            <Heading
+              as="h3"
+              size="xl"
+              color="inherit"
+              weight="bold"
+              spacing="bottomSmall"
+            >
               {project.title}
-            </h3>
+            </Heading>
           </Link>
-          <Typography className="text-sm text-gray-400 line-clamp-2">
+          <Typography size="sm" color="muted" overflow="clamp2">
             {project.description}
           </Typography>
         </div>

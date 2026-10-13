@@ -2,10 +2,18 @@
 
 import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import useTitleScrollAnimation from '@/client/hooks/animations/useTitleScrollAnimation';
 import type { ContactResponse } from '@/shared/types';
-import { Heading, Typography } from "@/client/components/public/atoms";
+import { Button, Heading, Typography } from "@/client/components/public/atoms";
+
+type ContactSocialPlatform = ContactResponse["socialLinks"][number]["platform"];
+
+const socialIcons: Partial<Record<ContactSocialPlatform, IconDefinition>> = {
+  linkedin: faLinkedin,
+  github: faGithub
+};
 
 export default function Contact({ contact }: { contact: ContactResponse }) {
   const titleRef = useRef<HTMLHeadingElement | null>(null);
@@ -33,7 +41,15 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
   return (
     <section id={sectionId} className="block w-full overflow-hidden mx-auto text-center">
       <div className="flex flex-col gap-6 h-full my-12 justify-center mx-auto max-w-5xl px-4">
-        <Heading ref={titleRef} className="mb-12 md:text-6xl">
+        <Heading
+          as="h2"
+          size="sectionCompact"
+          color="inherit"
+          font="mono"
+          align="center"
+          spacing="bottomLarge"
+          ref={titleRef}
+        >
           {titleWords.map((word, i) => (
             <span key={i} className="word inline-block mx-2">
               {word}
@@ -46,7 +62,9 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
             {contact?.methods.map((method) => (
               <div key={method.id} className="flex items-start gap-3">
                 <div>
-                  <Typography className="font-semibold">{method.title}</Typography>
+                  <Typography size="inherit" color="inherit" weight="semibold">
+                    {method.title}
+                  </Typography>
                   {method.kind === 'email' ? (
                     <a href={`mailto:${method.value.replace(/^mailto:/i, '')}`} className="text-sm text-white hover:underline">
                       {method.value.replace(/^mailto:/i, '')}
@@ -56,7 +74,7 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                       {method.value}
                     </a>
                   ) : (
-                    <Typography className="text-sm text-white">
+                    <Typography size="sm" color="white">
                       {method.value}
                     </Typography>
                   )}
@@ -64,16 +82,31 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
               </div>
             ))}
             <div className="pt-4">
-              <Typography className="font-semibold mb-2">
+              <Typography
+                size="inherit"
+                color="inherit"
+                weight="semibold"
+                spacing="bottomSmall"
+              >
                 Follow me
               </Typography>
               <div className="flex gap-4 text-primary">
-                <a href="https://www.linkedin.com/in/mohammad-saber-20b9551a3/" className="text-white" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                  <FontAwesomeIcon icon={faLinkedin} />
-                </a>
-                <a href="https://github.com/mhmdsbr" className="text-white"  target="_blank" rel="noopener noreferrer" aria-label="Github">
-                  <FontAwesomeIcon icon={faGithub} />
-                </a>
+                {contact.socialLinks.map(({ platform, url }) => (
+                  <a
+                    key={platform}
+                    href={url}
+                    className="text-white"
+                    target={url.startsWith("http") ? "_blank" : undefined}
+                    rel={url.startsWith("http") ? "noopener noreferrer" : undefined}
+                    aria-label={platform}
+                  >
+                    {socialIcons[platform] ? (
+                      <FontAwesomeIcon icon={socialIcons[platform]} />
+                    ) : (
+                      platform
+                    )}
+                  </a>
+                ))}
               </div>
             </div>
           </div>
@@ -126,12 +159,12 @@ export default function Contact({ contact }: { contact: ContactResponse }) {
                 onChange={handleChange}
               />
             </div>
-            <button
+            <Button
+              variant="primary"
               type="submit"
-              className="w-5/12 cursor-pointer py-2 px-4 bg-primary text-white text-left border rounded-md hover:bg-primary-dark transition"
             >
               {contact?.button.text}
-            </button>
+            </Button>
           </form>
         </div>
       </div>

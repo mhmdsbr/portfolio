@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/server/repos/projects";
 import Header from "@/client/components/public/organisms/header";
-import { Badge, Typography } from "@/client/components/public/atoms";
+import { Badge, Heading, Typography } from "@/client/components/public/atoms";
 import { getPublicAll } from "@/server/services/public-content";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
 
@@ -57,19 +57,39 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-gray-950/60 p-7 backdrop-blur-sm md:p-10">
-            <Typography className="mb-3 text-sm font-semibold uppercase tracking-wider text-cyan-400">
+            <Typography
+              size="sm"
+              color="accent"
+              weight="semibold"
+              transform="uppercase"
+              tracking="wide"
+              spacing="bottomMedium"
+            >
               {project.category}
             </Typography>
-            <h1 className="mb-6 text-4xl font-bold md:text-6xl">
+            <Heading
+              as="h1"
+              size="sectionCompact"
+              color="inherit"
+              spacing="bottomLarge"
+            >
               {project.title}
-            </h1>
-            <Typography className="text-lg leading-8 text-gray-300">
+            </Heading>
+            <Typography size="lg" color="body" leading="8">
               {project.description || "Project details coming soon."}
             </Typography>
 
             {project.roles && project.roles.length > 0 && (
               <div className="mt-10 border-t border-white/10 pt-8">
-                <h2 className="mb-4 text-xl font-semibold">My role</h2>
+                <Heading
+                  as="h2"
+                  size="xl"
+                  color="inherit"
+                  weight="semibold"
+                  spacing="bottomMedium"
+                >
+                  My role
+                </Heading>
                 <ul className="space-y-3 text-gray-300">
                   {project.roles.map((role) => (
                     <li key={role} className="flex gap-3 leading-7">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useLenis } from 'lenis/react'
+import { Button, Heading } from '@/client/components/public/atoms'
 
 interface ModalProps {
   isOpen: boolean
@@ -82,11 +83,14 @@ const Modal = ({ isOpen, onClose, title, htmlContent }: ModalProps) => {
         }`}
       >
         <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-white/95 backdrop-blur px-6 py-4 rounded-t-2xl">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          <button
+          <Heading as="h3" size="lg" color="gray-900" weight="semibold">
+            {title}
+          </Heading>
+          <Button
+            variant="icon"
+            size="small"
             onClick={onClose}
-            aria-label={`Close ${title}`}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 cursor-pointer"
+            ariaLabel={`Close ${title}`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +102,7 @@ const Modal = ({ isOpen, onClose, title, htmlContent }: ModalProps) => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <div

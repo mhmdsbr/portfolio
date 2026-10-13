@@ -53,14 +53,14 @@
     flex: 1;
 }
 
-.author-name {
+.author-info > h4 {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 0.25rem;
     color: #222;
 }
 
-.author-role {
+.author-info > p {
     font-size: 0.9rem;
     color: #666;
     overflow-wrap: anywhere;

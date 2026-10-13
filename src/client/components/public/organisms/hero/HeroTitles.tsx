@@ -1,6 +1,7 @@
 "use client";
 
 import { RefObject } from "react";
+import { Heading } from "@/client/components/public/atoms";
 
 interface HeroTitlesProps {
   titles: string[];
@@ -12,12 +13,26 @@ interface HeroTitlesProps {
 export default function HeroTitles({ titles, line1Ref, line2Ref, line3Ref }: HeroTitlesProps) {
   return (
     <div>
-      <h1 className="px-10" ref={line1Ref}>
+      <div className="px-10">
+      <Heading
+        as="h1"
+        size="inherit"
+        color="inherit"
+        weight="inherit"
+        ref={line1Ref}
+      >
         <span className="block text-lg sm:text-xl md:text-3xl lg:text-4xl xl:text-5xl pink-gradient-text font-extrabold">
           {titles[0]}
         </span>
-      </h1>
-      <h2 className="flex justify-center gap-5">
+      </Heading>
+      </div>
+      <Heading
+        as="h2"
+        size="inherit"
+        color="inherit"
+        weight="inherit"
+      >
+      <div className="flex justify-center gap-5">
         <span
           className="block md:text-2xl lg:text-3xl font-roboto font-semibold uppercase mt-8 opacity-0"
           ref={line2Ref}
@@ -30,7 +45,8 @@ export default function HeroTitles({ titles, line1Ref, line2Ref, line3Ref }: Her
         >
           {titles[2]}
         </span>
-      </h2>
+      </div>
+      </Heading>
     </div>
   );
 }

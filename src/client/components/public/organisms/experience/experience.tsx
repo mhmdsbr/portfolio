@@ -41,7 +41,14 @@ export default function Experience({ experience }: { experience: ExperienceRespo
         </div>
       ) : (
         <>
-          <Heading className="mb-12 md:text-6xl">
+          <Heading
+            as="h2"
+            size="sectionCompact"
+            color="inherit"
+            font="mono"
+            align="center"
+            spacing="bottomLarge"
+          >
             {title}
           </Heading>
           <div className="space-y-10 max-w-3xl mx-auto">
@@ -50,13 +57,24 @@ export default function Experience({ experience }: { experience: ExperienceRespo
                 key={i}
                 className="experience-item p-6 border border-gray-700 rounded-2xl bg-linear-to-br from-gray-900 to-gray-800 shadow-lg"
               >
-                <h3 className="text-xl font-semibold">
+                <Heading
+                  as="h3"
+                  size="xl"
+                  color="inherit"
+                  weight="semibold"
+                >
                   {exp.title} @ {exp.company}
-                </h3>
-                <Typography className="text-sm text-gray-400 mb-2">
+                </Heading>
+                <Typography
+                  size="sm"
+                  color="muted"
+                  spacing="bottomSmall"
+                >
                   {exp.from} - {exp.to ?? "Present"}
                 </Typography>
-                <Typography className="text-base">{exp.description}</Typography>
+                <Typography size="base" color="inherit">
+                  {exp.description}
+                </Typography>
               </div>
             ))}
           </div>

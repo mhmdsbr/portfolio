@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useLenis } from 'lenis/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Typography } from "@/client/components/public/atoms";
+import { Button, Heading, Typography } from "@/client/components/public/atoms";
 
 const INTRO_VIDEO_URL = 'https://video.sabermohamad.de/intro.mp4'
 
@@ -49,17 +49,28 @@ export default function Intro() {
           <span aria-hidden="true">←</span>
           Back to home
         </Link>
-        <Typography className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-400">
+        <Typography
+          size="sm"
+          color="accent"
+          weight="semibold"
+          transform="uppercase"
+          tracking="widest"
+          spacing="bottomLarge"
+        >
           Video introduction
         </Typography>
-        <h1 className="text-xl font-bold sm:text-2xl md:text-4xl">
+        <Heading
+          as="h1"
+          size="intro"
+          color="inherit"
+          weight="bold"
+        >
           Tomorrow University of Applied Sciences
-        </h1>
-        <button
-          type="button"
+        </Heading>
+        <Button
+          variant="media"
           onClick={() => setIsVideoOpen(true)}
-          aria-label="Play video introduction"
-          className="group relative mt-9 block w-full cursor-pointer overflow-hidden rounded-2xl border border-white/15 bg-gray-900 text-left shadow-2xl shadow-cyan-950/30 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300"
+          ariaLabel="Play video introduction"
         >
           <Image
             src="/intro-thumbnail.svg"
@@ -79,7 +90,7 @@ export default function Intro() {
               </svg>
             </span>
           </span>
-        </button>
+        </Button>
       </section>
 
       {isVideoOpen && (
@@ -95,17 +106,23 @@ export default function Intro() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
-              <h2 id="intro-video-title" className="font-semibold text-white">
+              <Heading
+                as="h2"
+                size="inherit"
+                color="white"
+                weight="semibold"
+                id="intro-video-title"
+              >
                 Introduction
-              </h2>
-              <button
-                type="button"
+              </Heading>
+              <Button
+                variant="icon"
+                size="large"
                 onClick={() => setIsVideoOpen(false)}
-                aria-label="Close introduction video"
-                className="flex h-10 w-10 items-center justify-center rounded-full text-2xl text-gray-300 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-cyan-300"
+                ariaLabel="Close introduction video"
               >
                 &times;
-              </button>
+              </Button>
             </div>
             <video
               autoPlay
