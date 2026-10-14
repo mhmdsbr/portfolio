@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import {
+  beginInitialAdminSignup,
+  completeInitialAdminSignup,
+} from "@/server/actions/admin/auth";
 
 export default function AdminSignupForm() {
   const [displayName, setDisplayName] = useState("");
@@ -18,28 +22,19 @@ export default function AdminSignupForm() {
     setError("");
 
     try {
-      const response = await fetch(
-        verificationSent ? "/api/admin/signup/verify" : "/api/admin/signup",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(
-            verificationSent
-              ? { challengeId, code }
-              : { displayName, email, password },
-          ),
-        },
-      );
-      const result = await response.json();
-
-      if (!response.ok) {
-        setError(result.error || "Sign-up failed.");
-        return;
-      }
-
       if (verificationSent) {
+        const result = await completeInitialAdminSignup(challengeId, code);
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
         window.location.assign("/admin");
       } else {
+        const result = await beginInitialAdminSignup(displayName, email, password);
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
         setChallengeId(result.challengeId);
         setVerificationSent(true);
         setPassword("");

@@ -518,7 +518,7 @@ flowchart LR
     OLD[("database from the previous schema")] -->|"npm run db:upgrade<br/>scripts/sql/upgrade-section-config.sql<br/>one transaction"| NEW2[("current schema,<br/>data preserved")]
 
     SEED["npm run db:seed"] --> LOCAL[("local DB")]
-    CLEAR["npm run db:clear --confirm<br/>TRUNCATE content tables,<br/>keeps admin_* tables"] --> LOCAL
+    CLEAR["npm run db:clear --confirm<br/>TRUNCATE content and admin_* tables"] --> LOCAL
     LOCAL -->|"npm run db:sync:prod --confirm<br/>replace content, reset sequences"| PROD[("production DB")]
 ```
 
@@ -527,7 +527,7 @@ flowchart LR
 | `npm run db:push` | create or sync the schema from `schema.ts` (new databases) |
 | `npm run db:reset:prod` | back up production with `pg_dump`, then drop all its objects and data and recreate the schema from `drizzle/0000_baseline.sql` with `psql` in one transaction |
 | `npm run db:seed` | insert sample portfolio content, sections with config and links |
-| `npm run db:clear` | truncate content tables and reset identity sequences; admin accounts are kept |
+| `npm run db:clear` | truncate content and admin tables (accounts, sessions, verifications) and reset identity sequences |
 | `npm run db:sync:prod` | copy local content tables to production in one transaction; admin tables are never copied |
 
 ## 12. Cascade and delete behaviour
