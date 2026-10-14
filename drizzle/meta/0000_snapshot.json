@@ -900,7 +900,7 @@
           "name": "number",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "title": {
           "name": "title",

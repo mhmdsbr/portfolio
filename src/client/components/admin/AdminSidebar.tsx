@@ -77,12 +77,16 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="w-64 shrink-0 bg-gray-800/50 border-r border-gray-700 flex flex-col">
+    <aside className="sticky top-0 h-screen self-start w-64 shrink-0 bg-gray-800/50 border-r border-gray-700 flex flex-col">
       <div className="p-4 border-b border-gray-700">
         <h1 className="text-xl font-bold text-cyan-400">Portfolio CMS</h1>
       </div>
 
-      <nav aria-label="Admin navigation" className="min-h-0 flex-1 overflow-y-auto p-4">
+      <nav
+        aria-label="Admin navigation"
+        className="min-h-0 flex-1 overflow-y-auto p-4"
+        data-lenis-prevent
+      >
         {navGroups.map(({ label: groupLabel, items }) => (
           <section key={groupLabel} className="mb-5 last:mb-0">
             <h2 className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">

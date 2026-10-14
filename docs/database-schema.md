@@ -255,7 +255,8 @@ configuration) are independent of the section tables.
 
 ## Migrations
 
-`drizzle/0000_baseline.sql` creates the whole schema for new databases. For
-databases created from the previous schema, `npm run db:upgrade` runs
-`scripts/sql/upgrade-section-config.sql`, which converts the data in place and
-fails without changes if anything does not fit the new constraints.
+`drizzle/0000_baseline.sql` creates the whole schema for new databases.
+`npm run db:reset:prod` rebuilds production from this file: after a `pg_dump`
+backup it drops every object in the `public` schema (and the `drizzle`
+migrations schema) and applies the baseline with `psql` in a single
+transaction, so production ends up with the current schema and no data.

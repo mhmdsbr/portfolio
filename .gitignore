@@ -15,3 +15,6 @@ build
 !.env.vars.*
 
 node_modules
+
+# Database backups
+backups/
