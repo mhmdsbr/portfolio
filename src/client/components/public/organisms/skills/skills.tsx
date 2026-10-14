@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { Badge, Heading, Typography } from "@/client/components/public/atoms";
 
 export default function Skills({
   skills,
@@ -103,22 +104,30 @@ export default function Skills({
       className="px-6 py-16 text-white"
     >
       <div className="mx-auto max-w-5xl">
-        <h2 className="mb-8 text-center font-mono text-4xl font-bold md:text-6xl">
+        <Heading
+          as="h2"
+          size="sectionCompact"
+          color="inherit"
+          font="mono"
+          align="center"
+          spacing="bottomLarge"
+        >
           Skills
-        </h2>
+        </Heading>
         {skills.length > 0 ? (
           <ul className="flex flex-wrap justify-center gap-3">
             {skills.map(({ skill }, index) => (
-              <li
-                key={`${skill}-${index}`}
-                className="skill-badge rounded-full border border-cyan-400/40 bg-gray-800/60 px-5 py-2 text-sm font-medium text-cyan-100 shadow-sm shadow-cyan-500/10 transition-colors hover:border-cyan-300 hover:bg-cyan-400/10 sm:text-base"
-              >
-                {skill}
+              <li key={`${skill}-${index}`}>
+                <Badge size="xlarge" tone="outline" className="skill-badge">
+                  {skill}
+                </Badge>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-center text-gray-400">No skills added yet.</p>
+          <Typography size="base" color="muted" align="center">
+            No skills added yet.
+          </Typography>
         )}
       </div>
     </section>

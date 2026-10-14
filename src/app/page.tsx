@@ -7,7 +7,7 @@ import Experience from "@/client/components/public/organisms/experience";
 import Services from "@/client/components/public/organisms/services";
 import Projects from "@/client/components/public/organisms/projects";
 import Contact from "@/client/components/public/organisms/contact";
-import Skills from "@/client/components/public/skills";
+import Skills from "@/client/components/public/organisms/skills";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
 import PublicPageLayout from "@/client/components/public/layouts/PublicPageLayout";
 import Testimonials from "@/client/components/public/organisms/testimonials";
