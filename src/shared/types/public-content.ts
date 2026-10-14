@@ -2,7 +2,7 @@
 // Public content payload types
 // =============================================
 
-import type { ContactMethodKind, SectionKind, ServiceIcon } from './enums';
+import type { ContactMethodKind, SectionKind, ServiceIcon, SocialPlatform } from './enums';
 
 export interface Button {
   text: string | null;
@@ -100,6 +100,10 @@ export interface ContactResponse {
     kind: ContactMethodKind;
     title: string;
     value: string;
+  }>;
+  socialLinks: Array<{
+    platform: SocialPlatform;
+    url: string;
   }>;
 }
 

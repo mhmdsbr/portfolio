@@ -1,4 +1,5 @@
-import type { ContactMethodInput } from '@/server/schemas/contact'
+import type { ContactMethodInput, SocialLinkInput } from '@/server/schemas/contact'
+import { socialLinkRepo } from '@/server/repos/collections'
 import {
   deleteContactMethodRow,
   getContactMethodsWithSections,
@@ -14,11 +15,12 @@ import { assertFound, NotFoundError, ValidationError } from './shared'
 
 
 export async function getContact() {
-  const [{ section, config }, contactMethods] = await Promise.all([
+  const [{ section, config }, contactMethods, socialLinks] = await Promise.all([
     requireSection('contact'),
     getContactMethodsWithSections(),
+    socialLinkRepo.list(),
   ])
-  return { section, config, contactMethods }
+  return { section, config, contactMethods, socialLinks }
 }
 
 export async function updateContactSettings(input: {
@@ -68,4 +70,20 @@ export async function reorderContactMethods(ids: number[]) {
     }
     await setContactMethodOrder(transaction, order)
   })
+}
+
+export async function createSocialLink(input: SocialLinkInput) {
+  return socialLinkRepo.append(input)
+}
+
+export async function updateSocialLink(id: number, input: SocialLinkInput) {
+  return assertFound(await socialLinkRepo.update(id, input), 'Social link')
+}
+
+export async function deleteSocialLink(id: number) {
+  if (!(await socialLinkRepo.remove(id))) throw new NotFoundError('Social link')
+}
+
+export async function reorderSocialLinks(ids: number[]) {
+  await socialLinkRepo.reorder(ids)
 }

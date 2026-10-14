@@ -1,7 +1,7 @@
 'use client'
 
 import { createServiceItem, updateServiceItem, deleteServiceItem, reorderServiceItems } from '@/server/actions/admin/services'
-import { useCrudList } from '@/client/hooks/useCrudList'
+import { useCrudList } from '@/client/hooks/crudList'
 import SortableCrudList, { CrudField, inputClass, editInputClass } from '@/client/components/admin/crud/SortableCrudList'
 import { 
   FiMonitor, 

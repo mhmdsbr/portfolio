@@ -6,7 +6,7 @@ import {
   deleteSkill,
   reorderSkills,
 } from "@/server/actions/admin/experience";
-import { useCrudList } from "@/client/hooks/useCrudList";
+import { useCrudList } from "@/client/hooks/crudList";
 import SortableCrudList, { CrudField, inputClass } from "@/client/components/admin/crud/SortableCrudList";
 import type { SkillsFormProps } from "./types";
 

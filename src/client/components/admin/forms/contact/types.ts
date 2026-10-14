@@ -1,4 +1,4 @@
-import type { ContactConfig, ContactMethodKind, ContactMethodSectionKind } from '@/shared/types'
+import type { ContactConfig, ContactMethodKind, ContactMethodSectionKind, SocialPlatform } from '@/shared/types'
 
 export interface ContactFormProps {
   config: ContactConfig
@@ -15,4 +15,15 @@ export interface ContactMethod {
 
 export interface ContactMethodsFormProps {
   contactMethods: ContactMethod[]
+}
+
+export interface SocialLink {
+  id: number
+  platform: SocialPlatform
+  url: string
+  sortOrder: number
+}
+
+export interface SocialLinksFormProps {
+  socialLinks: SocialLink[]
 }

@@ -2,7 +2,7 @@
 
 import { createTestimonialItem, updateTestimonialItem, deleteTestimonialItem, reorderTestimonialItems } from '@/server/actions/admin/testimonials'
 import Image from 'next/image'
-import { useCrudList } from '@/client/hooks/useCrudList'
+import { useCrudList } from '@/client/hooks/crudList'
 import SortableCrudList, { CrudField, inputClass, editInputClass } from '@/client/components/admin/crud/SortableCrudList'
 import type { TestimonialItemsFormProps } from './types'
 

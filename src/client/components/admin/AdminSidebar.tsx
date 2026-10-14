@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { logoutAdmin } from '@/server/actions/admin/auth'
 import {
   FiHome,
   FiBriefcase,
@@ -66,13 +67,10 @@ export default function AdminSidebar() {
     setLogoutError('')
 
     try {
-      const response = await fetch('/api/admin/auth', { method: 'DELETE' })
-      if (!response.ok) {
-        throw new Error('Unable to log out. Please try again.')
-      }
-
+      await logoutAdmin()
       window.location.assign('/admin/login')
-    } catch {
+    } catch (error) {
+      console.error('Admin logout failed:', error)
       setLogoutError('Unable to log out. Please try again.')
       setIsLoggingOut(false)
     }

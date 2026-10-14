@@ -1,7 +1,7 @@
 'use client'
 
 import { createDetail, updateDetail, deleteDetail, reorderDetails } from '@/server/actions/admin/about'
-import { useCrudList } from '@/client/hooks/useCrudList'
+import { useCrudList } from '@/client/hooks/crudList'
 import SortableCrudList, { CrudField, inputClass } from '@/client/components/admin/crud/SortableCrudList'
 import type { AboutDetailsFormProps } from './types'
 
