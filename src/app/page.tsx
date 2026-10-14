@@ -4,6 +4,7 @@ import Footer from "@/client/components/public/footer/footer";
 import Hero from "@/client/components/public/hero/hero";
 import About from "@/client/components/public/about";
 import Experience from "@/client/components/public/experience";
+import Skills from "@/client/components/public/skills";
 import Services from "@/client/components/public/services";
 import Projects from "@/client/components/public/projects/projects";
 import Contact from "@/client/components/public/contact";
@@ -18,7 +19,12 @@ export const dynamic = "force-dynamic";
 const sectionRenderers: Record<SectionKind, (data: AllDataResponse) => ReactNode> = {
   hero: (data) => <Hero hero={data.hero} />,
   about: (data) => <About about={data.about} />,
-  experience: (data) => <Experience experience={data.experience} />,
+  experience: (data) => (
+    <>
+      <Experience experience={data.experience} />
+      <Skills skills={data.experience.skills} />
+    </>
+  ),
   services: (data) => <Services services={data.services} />,
   projects: (data) => <Projects projectsData={data.projects} />,
   testimonials: (data) => <Testimonials testimonialsData={data.testimonials} />,
