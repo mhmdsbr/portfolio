@@ -25,7 +25,9 @@ export default function HeroStats({ details, statsRef }: HeroStatsProps) {
             tone="cyan"
             className="items-center gap-2 border border-cyan-400/40 px-4 py-2 backdrop-blur-sm sm:text-base"
           >
-            <span className="font-bold text-cyan-400">{number}</span>
+            {number !== null && (
+              <span className="font-bold text-cyan-400">{number}</span>
+            )}
             {title}
           </Badge>
         </li>

@@ -8,7 +8,7 @@ export interface AboutFormProps {
 
 export interface Detail {
   id: number
-  number: number
+  number: number | null
   title: string
   sortOrder: number | null
 }
