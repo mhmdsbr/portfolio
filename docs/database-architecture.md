@@ -525,7 +525,7 @@ flowchart LR
 | Command | Effect |
 | --- | --- |
 | `npm run db:push` | create or sync the schema from `schema.ts` (new databases) |
-| `npm run db:upgrade` | migrate a pre-consolidation database in place; refuses to run twice |
+| `npm run db:reset:prod` | back up production with `pg_dump`, then drop all its objects and data and recreate the schema from `drizzle/0000_baseline.sql` with `psql` in one transaction |
 | `npm run db:seed` | insert sample portfolio content, sections with config and links |
 | `npm run db:clear` | truncate content tables and reset identity sequences; admin accounts are kept |
 | `npm run db:sync:prod` | copy local content tables to production in one transaction; admin tables are never copied |
