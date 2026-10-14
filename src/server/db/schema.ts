@@ -177,7 +177,7 @@ export type ContactMethodSection = typeof contactMethodSections.$inferSelect
 // =============================================
 export const profileFacts = pgTable('profile_facts', {
   id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
-  number: integer('number').notNull(),
+  number: integer('number'),
   title: text('title').notNull(),
   sortOrder: integer('sort_order').notNull().default(0),
   ...timestamps(),

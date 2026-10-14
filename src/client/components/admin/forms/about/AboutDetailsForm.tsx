@@ -30,13 +30,12 @@ export default function AboutDetailsForm({ details }: AboutDetailsFormProps) {
       editClassName="flex-1 flex items-center gap-3"
       createFields={
         <>
-          <CrudField label="Number">
+          <CrudField label="Number (optional)">
             <input
               type="number"
               name="number"
               placeholder="5"
               className={inputClass.replace('w-full', 'w-24')}
-              required
             />
           </CrudField>
           <CrudField label="Title" className="flex-1">
@@ -49,9 +48,9 @@ export default function AboutDetailsForm({ details }: AboutDetailsFormProps) {
           <input
             type="number"
             name="number"
-            defaultValue={item.number}
+            defaultValue={item.number ?? ''}
+            placeholder="—"
             className={`w-24 ${compactEditClass}`}
-            required
           />
           <input
             type="text"
@@ -65,7 +64,7 @@ export default function AboutDetailsForm({ details }: AboutDetailsFormProps) {
       )}
       renderItem={(item) => (
         <div className="flex items-center gap-3">
-          <span className="text-2xl font-bold text-cyan-400 w-16">{item.number}</span>
+          <span className="text-2xl font-bold text-cyan-400 w-16">{item.number ?? '—'}</span>
           <span className="flex-1 text-gray-300">{item.title}</span>
         </div>
       )}

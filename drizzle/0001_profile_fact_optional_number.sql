@@ -1,0 +1,1 @@
+ALTER TABLE "profile_facts" ALTER COLUMN "number" DROP NOT NULL;
