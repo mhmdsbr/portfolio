@@ -1,10 +1,11 @@
 import { getContact } from '@/server/actions/admin/contact'
 import ContactForm from '@/client/components/admin/forms/contact/ContactForm'
 import ContactMethodsForm from '@/client/components/admin/forms/contact/ContactMethodsForm'
+import SocialLinksForm from '@/client/components/admin/forms/contact/SocialLinksForm'
 import SectionSettingsForm from '@/client/components/admin/forms/sections/SectionSettingsForm'
 
 export default async function ContactPage() {
-  const { section, config, contactMethods } = await getContact()
+  const { section, config, contactMethods, socialLinks } = await getContact()
 
   return (
     <div className="space-y-8">
@@ -27,6 +28,14 @@ export default async function ContactPage() {
           should display each method; unticked methods are hidden. Drag to reorder.
         </p>
         <ContactMethodsForm contactMethods={contactMethods} />
+      </div>
+
+      <div className="bg-gray-800/50 rounded-lg p-6">
+        <h2 className="text-lg font-semibold mb-4">Social Links</h2>
+        <p className="text-sm text-gray-400 mb-4">
+          Manage the social links shown in the Contact section. Drag to reorder.
+        </p>
+        <SocialLinksForm socialLinks={socialLinks} />
       </div>
     </div>
   )

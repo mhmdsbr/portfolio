@@ -1,10 +1,11 @@
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/server/repos/projects";
-import Header from "@/client/components/public/header";
+import Header from "@/client/components/public/organisms/header";
+import { Badge, Button, Heading, Typography } from "@/client/components/public/atoms";
 import { getPublicAll } from "@/server/services/public-content";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
+import PublicPageLayout from "@/client/components/public/layouts/PublicPageLayout";
 
 export const dynamic = "force-dynamic";
 
@@ -25,19 +26,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const { header } = await getPublicAll();
 
   return (
-      <main className="relative min-h-screen overflow-x-hidden px-6 py-16 text-white">
+      <PublicPageLayout id="project-page" className="px-6 py-22">
         <BackgroundGradient />
         <Header singleTitle={project.title} headerData={header} />
         <article className="relative z-10 mx-auto max-w-7xl">
-          <Link
+          <Button
+            variant="subtle"
             href="/#projects"
-            className="mb-10 inline-flex text-sm text-cyan-400 transition hover:text-cyan-300"
+            className="mb-4 block text-cyan-400 transition hover:text-cyan-300"
           >
-            ← Back to projects
-          </Link>
+            ← Back
+          </Button>
 
         <div className="grid gap-12 lg:grid-cols-[1.35fr_1fr] lg:gap-16 lg:items-start">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-white/10 bg-gray-900/80 shadow-2xl shadow-cyan-950/20">
+          <div className="relative aspect-16/10 overflow-hidden rounded-3xl border border-white/10 bg-gray-900/80 shadow-2xl shadow-cyan-950/20">
             {project.image ? (
               <Image
                 src={project.image}
@@ -56,19 +58,39 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-gray-950/60 p-7 backdrop-blur-sm md:p-10">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-cyan-400">
+            <Typography
+              size="sm"
+              color="accent"
+              weight="semibold"
+              transform="uppercase"
+              tracking="wide"
+              spacing="bottomMedium"
+            >
               {project.category}
-            </p>
-            <h1 className="mb-6 text-4xl font-bold md:text-6xl">
+            </Typography>
+            <Heading
+              as="h1"
+              size="sectionCompact"
+              color="inherit"
+              spacing="bottomLarge"
+            >
               {project.title}
-            </h1>
-            <p className="text-lg leading-8 text-gray-300">
+            </Heading>
+            <Typography size="lg" color="body" leading="8">
               {project.description || "Project details coming soon."}
-            </p>
+            </Typography>
 
             {project.roles && project.roles.length > 0 && (
               <div className="mt-10 border-t border-white/10 pt-8">
-                <h2 className="mb-4 text-xl font-semibold">My role</h2>
+                <Heading
+                  as="h2"
+                  size="xl"
+                  color="inherit"
+                  weight="semibold"
+                  spacing="bottomMedium"
+                >
+                  My role
+                </Heading>
                 <ul className="space-y-3 text-gray-300">
                   {project.roles.map((role) => (
                     <li key={role} className="flex gap-3 leading-7">
@@ -83,12 +105,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             {project.tech && project.tech.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">
                 {project.tech.map((technology) => (
-                  <span
+                  <Badge
                     key={technology}
-                    className="rounded-full bg-gray-800 px-3 py-1 text-sm text-gray-300"
+                    size="large"
+                    tone="dark"
                   >
                     {technology}
-                  </span>
+                  </Badge>
                 ))}
               </div>
             )}
@@ -118,6 +141,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </div>
         </div>
         </article>
-      </main>
+      </PublicPageLayout>
   );
 }

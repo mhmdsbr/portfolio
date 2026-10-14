@@ -6,7 +6,7 @@ import {
   deleteContactMethod,
   reorderContactMethods,
 } from '@/server/actions/admin/contact'
-import { useCrudList } from '@/client/hooks/useCrudList'
+import { useCrudList } from '@/client/hooks/crudList'
 import SortableCrudList, { CrudField, inputClass } from '@/client/components/admin/crud/SortableCrudList'
 import { CONTACT_METHOD_SECTION_KINDS } from '@/shared/constants'
 import type { ContactMethodKind, ContactMethodSectionKind } from '@/shared/types'

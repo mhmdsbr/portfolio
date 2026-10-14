@@ -25,6 +25,20 @@ export const adminUsersRepo = {
     return user
   },
 
+  async findActiveIdByEmail(email: string, executor: DbExecutor = defaultExecutor) {
+    const [user] = await executor
+      .select({ id: schema.adminUsers.id })
+      .from(schema.adminUsers)
+      .where(
+        and(
+          eq(schema.adminUsers.email, email),
+          eq(schema.adminUsers.isActive, true),
+        ),
+      )
+      .limit(1)
+    return user
+  },
+
   async findPasswordHashById(id: number, executor: DbExecutor = defaultExecutor) {
     const [user] = await executor
       .select({ passwordHash: schema.adminUsers.passwordHash })

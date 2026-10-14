@@ -10,10 +10,11 @@ import {
 import {
   contactMethodSchema,
   contactSettingsSchema,
+  socialLinkSchema,
 } from "@/server/schemas/contact";
 import { revalidateContent } from "@/server/revalidate";
 import * as service from "@/server/services/contact";
-function revalidateContactMethods() {
+function revalidateContactContent() {
   revalidateContent(
     "/admin/contact",
     "/admin/about",
@@ -38,7 +39,7 @@ export async function createContactMethod(formData: FormData) {
     const method = await service.createContactMethod(
       parseForm(contactMethodSchema, formData),
     );
-    revalidateContactMethods();
+    revalidateContactContent();
     return method;
   })();
 }
@@ -48,19 +49,50 @@ export async function updateContactMethod(id: number, formData: FormData) {
       parseInput(positiveId, id),
       parseForm(contactMethodSchema, formData),
     );
-    revalidateContactMethods();
+    revalidateContactContent();
     return method;
   })();
 }
 export async function deleteContactMethod(id: number) {
   return withAuthAction(async () => {
     await service.deleteContactMethod(parseInput(positiveId, id));
-    revalidateContactMethods();
+    revalidateContactContent();
   })();
 }
 export async function reorderContactMethods(ids: number[]) {
   return withAuthAction(async () => {
     await service.reorderContactMethods(parseInput(idListSchema, ids));
-    revalidateContactMethods();
+    revalidateContactContent();
+  })();
+}
+export async function createSocialLink(formData: FormData) {
+  return withAuthAction(async () => {
+    const socialLink = await service.createSocialLink(
+      parseForm(socialLinkSchema, formData),
+    );
+    revalidateContactContent();
+    return socialLink;
+  })();
+}
+export async function updateSocialLink(id: number, formData: FormData) {
+  return withAuthAction(async () => {
+    const socialLink = await service.updateSocialLink(
+      parseInput(positiveId, id),
+      parseForm(socialLinkSchema, formData),
+    );
+    revalidateContactContent();
+    return socialLink;
+  })();
+}
+export async function deleteSocialLink(id: number) {
+  return withAuthAction(async () => {
+    await service.deleteSocialLink(parseInput(positiveId, id));
+    revalidateContactContent();
+  })();
+}
+export async function reorderSocialLinks(ids: number[]) {
+  return withAuthAction(async () => {
+    await service.reorderSocialLinks(parseInput(idListSchema, ids));
+    revalidateContactContent();
   })();
 }
