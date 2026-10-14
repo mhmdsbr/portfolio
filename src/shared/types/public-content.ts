@@ -32,7 +32,7 @@ export interface AboutResponse {
     value: string;
   }>;
   details: Array<{
-    number: number;
+    number: number | null;
     title: string;
   }>;
 }

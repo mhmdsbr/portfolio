@@ -37,13 +37,13 @@ export async function saveProfile(input: {
 }
 
 
-export async function createDetail(input: { number: number; title: string }) {
+export async function createDetail(input: { number: number | null; title: string }) {
   return profileFactRepo.append(input)
 }
 
 export async function updateDetail(
   id: number,
-  input: { number: number; title: string },
+  input: { number: number | null; title: string },
 ) {
   return assertFound(
     await profileFactRepo.update(id, input),
