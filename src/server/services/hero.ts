@@ -1,7 +1,7 @@
 import { runInTransaction } from '@/server/repos/executor'
 import { listHeroTitles, replaceHeroTitles } from '@/server/repos/hero-titles'
 import { findSectionId } from '@/server/repos/page-sections'
-import { requireSection, updateSectionConfig } from './page-sections'
+import { ensureSections, requireSection, updateSectionConfig } from './page-sections'
 import { assertFound } from './shared'
 
 export async function getHero() {
@@ -24,6 +24,7 @@ export async function replaceTitles(titles: string[]) {
   const cleanTitles = titles
 
   await runInTransaction(async (transaction) => {
+    await ensureSections(transaction)
     const sectionId = assertFound(
       await findSectionId('hero', transaction),
       'Page section "hero"',

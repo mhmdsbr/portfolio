@@ -1,5 +1,10 @@
 import { asc, eq } from 'drizzle-orm'
 import * as schema from '@/server/db/schema'
+import {
+  SECTION_CONFIG_DEFAULTS,
+  SECTION_DEFAULT_NAVIGATION_TITLES,
+  SECTION_KINDS,
+} from '@/shared/constants'
 import type { SectionKind } from '@/shared/types'
 import { readSectionConfig } from '@/server/helpers/section-config'
 import { defaultExecutor, type DbExecutor } from './executor'
@@ -50,6 +55,30 @@ export function listSectionStates(executor: DbExecutor = defaultExecutor) {
       isEnabled: schema.pageSections.isEnabled,
     })
     .from(schema.pageSections)
+}
+
+/**
+ * Inserts a default row for every section kind that has none, so the admin
+ * works on an empty database. Idempotent and safe under concurrent calls.
+ */
+export async function insertMissingSections(executor: DbExecutor = defaultExecutor) {
+  const existing = new Set(
+    (await listSectionStates(executor)).map(({ kind }) => kind),
+  )
+  const missing = SECTION_KINDS.filter((kind) => !existing.has(kind))
+  if (missing.length === 0) return
+
+  await executor
+    .insert(schema.pageSections)
+    .values(
+      missing.map((kind) => ({
+        kind,
+        navigationTitle: SECTION_DEFAULT_NAVIGATION_TITLES[kind],
+        sortOrder: SECTION_KINDS.indexOf(kind),
+        config: SECTION_CONFIG_DEFAULTS[kind],
+      })),
+    )
+    .onConflictDoNothing({ target: schema.pageSections.kind })
 }
 
 /** Stores an already-validated config; returns the updated row or undefined. */
