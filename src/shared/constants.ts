@@ -77,3 +77,14 @@ export const SECTION_CONFIG_DEFAULTS: SectionConfigMap = {
   testimonials: {},
   contact: { formTitle: null, buttonText: null, buttonUrl: null },
 }
+
+// Navigation titles for page_sections rows created automatically when missing.
+export const SECTION_DEFAULT_NAVIGATION_TITLES: Record<keyof SectionConfigMap, string> = {
+  hero: 'Home',
+  about: 'About',
+  experience: 'Experience',
+  services: 'Services',
+  projects: 'Projects',
+  testimonials: 'Testimonials',
+  contact: 'Contact',
+}

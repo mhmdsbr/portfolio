@@ -13,17 +13,22 @@ function assertSectionKind(kind: unknown): asserts kind is SectionKind {
   if (!isSectionKind(kind)) throw new ValidationError('Invalid portfolio section')
 }
 
+/** Creates default rows for any missing section kinds (admin paths only). */
+export function ensureSections(executor?: DbExecutor) {
+  return sections.insertMissingSections(executor)
+}
+
 /** Admin-facing section data: shared metadata plus the typed config. */
 export async function requireSection<K extends SectionKind>(
   kind: K,
   executor?: DbExecutor,
 ) {
-  const section = await sections.getSection(kind, executor)
+  let section = await sections.getSection(kind, executor)
   if (!section) {
-    throw new Error(
-      `Page section "${kind}" not found. Seed the database or restore the page_sections row.`,
-    )
+    await ensureSections(executor)
+    section = await sections.getSection(kind, executor)
   }
+  if (!section) throw new Error(`Page section "${kind}" could not be created.`)
   const meta: SectionMeta = {
     id: section.id,
     kind,
@@ -39,6 +44,7 @@ export async function updateSectionConfig<K extends SectionKind>(
   kind: K,
   config: SectionConfigMap[K],
 ): Promise<SectionWithConfig<K>> {
+  await ensureSections()
   const section = assertFound(
     await sections.saveSectionConfig(kind, config),
     `Page section "${kind}"`,
@@ -47,6 +53,7 @@ export async function updateSectionConfig<K extends SectionKind>(
 }
 
 export async function listSections() {
+  await ensureSections()
   return { sections: await sections.listSections() }
 }
 
@@ -55,6 +62,7 @@ export async function updatePresentation(
   values: { navigationTitle: string; title: string | null },
 ) {
   assertSectionKind(kind)
+  await ensureSections()
   return assertFound(
     await sections.savePresentation(kind, values),
     'Portfolio section',
@@ -68,6 +76,7 @@ export async function setSectionEnabled(kind: SectionKind, isEnabled: boolean) {
   }
 
   await runInTransaction(async (transaction) => {
+    await ensureSections(transaction)
     const states = await sections.listSectionStates(transaction)
     const current = assertFound(
       states.find((state) => state.kind === kind),
@@ -92,6 +101,7 @@ export async function reorderPageLayoutSections(kinds: SectionKind[]) {
   }
 
   await runInTransaction(async (transaction) => {
+    await ensureSections(transaction)
     const existing = new Set<string>(
       (await sections.listSectionStates(transaction)).map(({ kind }) => kind),
     )

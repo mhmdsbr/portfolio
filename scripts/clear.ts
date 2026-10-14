@@ -11,13 +11,16 @@ if (!connectionString) {
 
 if (!process.argv.includes("--confirm")) {
   throw new Error(
-    "❌ This operation deletes all portfolio data. Re-run with --confirm to continue.",
+    "❌ This operation deletes all portfolio and admin data. Re-run with --confirm to continue.",
   );
 }
 
-// Keep authentication data intact when clearing portfolio content.
 // RESTART IDENTITY also resets the generated identity sequences.
-const portfolioTables = [
+const tables = [
+  "admin_sessions",
+  "admin_email_verifications",
+  "admin_profiles",
+  "admin_users",
   "social_links",
   "hero_titles",
   "contact_method_sections",
@@ -44,16 +47,16 @@ const client = postgres(connectionString, {
 });
 
 async function clearDatabase() {
-  console.log("⚠️ Clearing all portfolio data...");
+  console.log("⚠️ Clearing all portfolio and admin data...");
 
   try {
     await client.unsafe(
-      `TRUNCATE TABLE ${portfolioTables
+      `TRUNCATE TABLE ${tables
         .map((table) => `"${table}"`)
         .join(", ")} RESTART IDENTITY CASCADE`,
     );
     console.log(
-      `✅ Cleared ${portfolioTables.length} portfolio tables and reset identity sequences.`,
+      `✅ Cleared ${tables.length} tables, including admin accounts, and reset identity sequences.`,
     );
   } catch (error) {
     console.error("❌ Error clearing database:", error);

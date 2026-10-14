@@ -47,11 +47,12 @@ Navigate and interact with the portfolio seamlessly, experiencing the blend of R
 ### Admin account setup
 
 Apply the database schema before opening the admin area with `npm run db:push`
-using the database environment you intend to use. Databases created before the
-section-settings consolidation (with `hero_section`, `about_section`,
-`experience_section` and `contact_section` tables) must instead run
-`npm run db:upgrade` once; it migrates the existing data in a single
-transaction. Back up the database first. The first visit to
+using the database environment you intend to use. To rebuild the production
+database from `drizzle/0000_baseline.sql`, run `npm run db:reset:prod` from an
+interactive terminal. It requires `psql` and `pg_dump`, saves a backup to
+`backups/`, then deletes every table and all data (including admin accounts)
+and recreates the schema in one transaction. Follow it with
+`npm run db:sync:prod` to copy local content. The first visit to
 `/admin/login` redirects to the one-time `/admin/signup` page while no admin
 accounts exist. Configure SMTP on the server before signing up by setting
 `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, and `SMTP_PASSWORD` in the local

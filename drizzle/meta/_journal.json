@@ -8,13 +8,6 @@
       "when": 1791547689142,
       "tag": "0000_baseline",
       "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1791989438964,
-      "tag": "0001_profile_fact_optional_number",
-      "breakpoints": true
     }
   ]
 }

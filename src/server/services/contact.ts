@@ -10,7 +10,7 @@ import {
   updateContactMethodRow,
 } from '@/server/repos/contact-methods'
 import { runInTransaction } from '@/server/repos/executor'
-import { requireSection, updateSectionConfig } from './page-sections'
+import { ensureSections, requireSection, updateSectionConfig } from './page-sections'
 import { assertFound, NotFoundError, ValidationError } from './shared'
 
 
@@ -36,6 +36,7 @@ export async function createContactMethod(input: ContactMethodInput) {
   const { kind, title, value, sections } = input
   const fields = { kind, title, value }
   const method = await runInTransaction(async (transaction) => {
+    await ensureSections(transaction)
     const created = await insertContactMethodAtEnd(transaction, fields)
     await setContactMethodSections(transaction, created.id, sections)
     return created
@@ -47,6 +48,7 @@ export async function updateContactMethod(id: number, input: ContactMethodInput)
   const { kind, title, value, sections } = input
   const fields = { kind, title, value }
   const method = await runInTransaction(async (transaction) => {
+    await ensureSections(transaction)
     const updated = assertFound(
       await updateContactMethodRow(transaction, id, fields),
       'Contact method',
