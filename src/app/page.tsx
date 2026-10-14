@@ -7,6 +7,7 @@ import Experience from "@/client/components/public/organisms/experience";
 import Services from "@/client/components/public/organisms/services";
 import Projects from "@/client/components/public/organisms/projects";
 import Contact from "@/client/components/public/organisms/contact";
+import Skills from "@/client/components/public/organisms/skills";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
 import PublicPageLayout from "@/client/components/public/layouts/PublicPageLayout";
 import Testimonials from "@/client/components/public/organisms/testimonials";
@@ -19,7 +20,12 @@ export const dynamic = "force-dynamic";
 const sectionRenderers: Record<SectionKind, (data: AllDataResponse) => ReactNode> = {
   hero: (data) => <Hero hero={data.hero} details={data.about.details} />,
   about: (data) => <About about={data.about} />,
-  experience: (data) => <Experience experience={data.experience} />,
+  experience: (data) => (
+    <>
+      <Experience experience={data.experience} />
+      <Skills skills={data.experience.skills} />
+    </>
+  ),
   services: (data) => <Services services={data.services} />,
   projects: (data) => <Projects projectsData={data.projects} />,
   testimonials: (data) => <Testimonials testimonialsData={data.testimonials} />,

@@ -32,6 +32,7 @@ export default function SkillsForm({ skills }: SkillsFormProps) {
       createLabel="Add Skill"
       createClassName="flex gap-3 items-end"
       rowClassName="p-3"
+      listClassName="max-h-96 overflow-y-auto pr-2"
       editClassName="flex-1 flex items-center gap-3"
       createFields={
         <>
