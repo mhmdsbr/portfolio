@@ -2,17 +2,27 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { HeroResponse } from "@/shared/types";
+import type { AboutResponse } from "@/shared/types/public-content";
 import useHeroAnimations from "@/client/hooks/animations/useHeroAnimations";
 import HeroTitles from "./HeroTitles";
 import HeroBadge from "./HeroBadge";
+import HeroStats from "./HeroStats";
 import useBadgeScrollAnimation from "@/client/hooks/animations/useBadgeScrollAnimation";
 import SectionLayout from "@/client/components/public/molecules/SectionLayout";
 
-export default function Hero({ hero }: { hero: HeroResponse }) {
+export default function Hero({
+  hero,
+  details = [],
+}: {
+  hero: HeroResponse;
+  details?: AboutResponse["details"];
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const line1Ref = useRef<HTMLHeadingElement>(null);
   const line2Ref = useRef<HTMLSpanElement>(null);
   const line3Ref = useRef<HTMLSpanElement>(null);
+  const statsRef = useRef<HTMLUListElement>(null);
+  const heroBadgeRef = useRef<HTMLDivElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
   const sectionId = "hero";
@@ -37,6 +47,8 @@ export default function Hero({ hero }: { hero: HeroResponse }) {
       line1Ref,
       line2Ref,
       line3Ref,
+      statsRef,
+      heroBadgeRef,
     },
     animationReady,
   );
@@ -61,12 +73,16 @@ export default function Hero({ hero }: { hero: HeroResponse }) {
         width="full"
         className="relative flex h-full flex-col items-center justify-evenly gap-4 text-center"
       >
-        <HeroTitles
-          titles={hero.titles}
-          line1Ref={line1Ref}
-          line2Ref={line2Ref}
-          line3Ref={line3Ref}
-        />
+        <div className="flex flex-col items-center gap-4">
+          <HeroTitles
+            titles={hero.titles}
+            line1Ref={line1Ref}
+            line2Ref={line2Ref}
+            line3Ref={line3Ref}
+          />
+
+          <HeroStats details={details} statsRef={statsRef} />
+        </div>
 
         <HeroBadge
           logo={hero.logo}
@@ -74,6 +90,7 @@ export default function Hero({ hero }: { hero: HeroResponse }) {
           subtitleOne={hero.subtitle_one}
           subtitleTwo={hero.subtitle_two}
           descriptionRef={descriptionRef}
+          badgeRef={heroBadgeRef}
         />
       </SectionLayout>
     </section>

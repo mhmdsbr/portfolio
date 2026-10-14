@@ -18,7 +18,7 @@ import type { AllDataResponse } from "@/shared/types/public-content";
 export const dynamic = "force-dynamic";
 
 const sectionRenderers: Record<SectionKind, (data: AllDataResponse) => ReactNode> = {
-  hero: (data) => <Hero hero={data.hero} />,
+  hero: (data) => <Hero hero={data.hero} details={data.about.details} />,
   about: (data) => <About about={data.about} />,
   experience: (data) => (
     <>
