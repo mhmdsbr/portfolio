@@ -35,6 +35,7 @@ export default function SortableCrudList<T extends { id: number }>({
   editClassName = 'flex-1 grid grid-cols-1 md:grid-cols-3 gap-3',
   renderItem,
   rowClassName = 'p-4',
+  listClassName = '',
   align = 'center',
   emptyState,
 }: SortableCrudListProps<T>) {
@@ -70,7 +71,8 @@ export default function SortableCrudList<T extends { id: number }>({
             <div
               {...droppable.droppableProps}
               ref={droppable.innerRef}
-              className="space-y-2"
+              data-lenis-prevent={listClassName ? true : undefined}
+              className={`space-y-2 ${listClassName}`}
             >
               {items.map((item, index) => (
                 <Draggable key={item.id} draggableId={String(item.id)} index={index}>
