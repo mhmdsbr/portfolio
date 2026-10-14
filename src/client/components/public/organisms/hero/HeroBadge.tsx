@@ -10,6 +10,7 @@ interface HeroBadgeProps {
   subtitleOne: string | null;
   subtitleTwo: string | null;
   descriptionRef: RefObject<HTMLParagraphElement | null>;
+  badgeRef?: RefObject<HTMLDivElement | null>;
 }
 
 export default function HeroBadge({
@@ -18,9 +19,13 @@ export default function HeroBadge({
   subtitleOne,
   subtitleTwo,
   descriptionRef,
+  badgeRef,
 }: HeroBadgeProps) {
   return (
-    <div className="absolute bottom-8 left-0 z-10 flex h-14 w-full max-w-full items-center justify-start overflow-hidden text-[10px] font-medium uppercase text-white sm:bottom-20 sm:h-16 sm:w-fit sm:text-xs md:text-sm lg:left-4">
+    <div
+      ref={badgeRef}
+      className="absolute bottom-8 left-0 z-10 flex h-14 w-full max-w-full items-center justify-start overflow-hidden text-[10px] font-medium uppercase text-white opacity-0 sm:bottom-20 sm:h-16 sm:w-fit sm:text-xs md:text-sm lg:left-4"
+    >
       <div className="z-20 flex h-full shrink-0 items-center rounded-l-xs border-r border-white bg-primary-cyan p-2 sm:p-3">
         {logo ? (
           <Image

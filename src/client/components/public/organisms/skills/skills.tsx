@@ -2,8 +2,11 @@
 
 import { useRef } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { Badge, Heading, Typography } from "@/client/components/public/atoms";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Skills({
   skills,
@@ -11,6 +14,63 @@ export default function Skills({
   skills: Array<{ skill: string; level: number | null }>;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
+
+  // Rain: each badge falls from above the viewport into its slot as the page scrolls toward this section.
+  useGSAP(
+    () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      if (reducedMotion) return;
+
+      const drops = gsap.utils.toArray<HTMLElement>(".skill-drop", section);
+
+      drops.forEach((drop) => {
+        // How many viewports before the section arrives this drop starts falling (varies speed per drop).
+        const leadViewports = gsap.utils.random(0.9, 1.6);
+        const startX = gsap.utils.random(0, 1);
+        const startLift = gsap.utils.random(40, 260);
+        const endPercent = Math.round(gsap.utils.random(10, 35));
+        const setVisibility = (progress: number) =>
+          gsap.set(drop, { visibility: progress > 0 ? "visible" : "hidden" });
+
+        gsap.set(drop, { visibility: "hidden" });
+
+        gsap.fromTo(
+          drop,
+          {
+            // offsetTop/offsetLeft ignore transforms, so these stay correct on refresh.
+            x: () =>
+              startX * (window.innerWidth - drop.offsetWidth) -
+              (section.getBoundingClientRect().left + drop.offsetLeft),
+            y: () =>
+              -(drop.offsetHeight + startLift) -
+              (drop.offsetTop + window.innerHeight * (1 + leadViewports)),
+            rotation: gsap.utils.random(-35, 35),
+          },
+          {
+            x: 0,
+            y: 0,
+            rotation: 0,
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: () => `top bottom+=${window.innerHeight * leadViewports}`,
+              end: `top ${endPercent}%`,
+              scrub: 1.5,
+              invalidateOnRefresh: true,
+              onUpdate: (self) => setVisibility(self.progress),
+              onRefresh: (self) => setVisibility(self.progress),
+            },
+          },
+        );
+      });
+    },
+    { scope: sectionRef },
+  );
 
   useGSAP(
     () => {
@@ -101,7 +161,7 @@ export default function Skills({
     <section
       id="skills"
       ref={sectionRef}
-      className="px-6 py-16 text-white"
+      className="relative z-20 px-6 py-16 text-white"
     >
       <div className="mx-auto max-w-5xl">
         <Heading
@@ -117,7 +177,7 @@ export default function Skills({
         {skills.length > 0 ? (
           <ul className="flex flex-wrap justify-center gap-3">
             {skills.map(({ skill }, index) => (
-              <li key={`${skill}-${index}`}>
+              <li key={`${skill}-${index}`} className="skill-drop">
                 <Badge size="xlarge" tone="outline" className="skill-badge">
                   {skill}
                 </Badge>

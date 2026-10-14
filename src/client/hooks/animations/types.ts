@@ -36,6 +36,8 @@ export interface HeroAnimationRefs {
   line1Ref: RefObject<HTMLSpanElement | null>
   line2Ref: RefObject<HTMLSpanElement | null>
   line3Ref: RefObject<HTMLSpanElement | null>
+  statsRef?: RefObject<HTMLUListElement | null>
+  heroBadgeRef?: RefObject<HTMLDivElement | null>
 }
 
 export interface BadgeAnimationRefs {
