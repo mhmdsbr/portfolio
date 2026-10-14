@@ -33,16 +33,13 @@ export interface HeaderAnimationRefs {
 }
 
 export interface HeroAnimationRefs {
+  containerRef: RefObject<HTMLElement | null>
   line1Ref: RefObject<HTMLSpanElement | null>
   line2Ref: RefObject<HTMLSpanElement | null>
   line3Ref: RefObject<HTMLSpanElement | null>
   statsRef?: RefObject<HTMLUListElement | null>
   heroBadgeRef?: RefObject<HTMLDivElement | null>
-}
-
-export interface BadgeAnimationRefs {
-  containerRef: RefObject<HTMLDivElement | null>
-  descriptionRef?: RefObject<HTMLParagraphElement | null>
+  descriptionRef?: RefObject<HTMLElement | null>
 }
 
 export interface UseProjectsAnimation<T> {

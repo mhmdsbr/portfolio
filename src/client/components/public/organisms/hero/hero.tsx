@@ -7,7 +7,6 @@ import useHeroAnimations from "@/client/hooks/animations/useHeroAnimations";
 import HeroTitles from "./HeroTitles";
 import HeroBadge from "./HeroBadge";
 import HeroStats from "./HeroStats";
-import useBadgeScrollAnimation from "@/client/hooks/animations/useBadgeScrollAnimation";
 import SectionLayout from "@/client/components/public/molecules/SectionLayout";
 
 export default function Hero({
@@ -44,22 +43,16 @@ export default function Hero({
 
   useHeroAnimations(
     {
+      containerRef,
       line1Ref,
       line2Ref,
       line3Ref,
       statsRef,
       heroBadgeRef,
-    },
-    animationReady,
-  );
-
-  useBadgeScrollAnimation(
-    {
-      containerRef,
       descriptionRef,
     },
     animationReady,
-  )
+  );
 
   if (!hero) return <div>No hero data found</div>;
 
