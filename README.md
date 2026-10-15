@@ -70,6 +70,9 @@ admins can add, deactivate, reactivate, or reset other admin accounts in
 Passwords are stored as scrypt hashes, and sessions use opaque HTTP-only cookies
 backed by the database.
 
+For detailed diagrams of login, signup, email verification, password resets and
+session handling, see [Admin authentication flows](./docs/authentication-flows.md).
+
 ## Contributing
 
 If you'd like to contribute to this project, please follow these steps:
