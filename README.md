@@ -73,6 +73,9 @@ backed by the database.
 For detailed diagrams of login, signup, email verification, password resets and
 session handling, see [Admin authentication flows](./docs/authentication-flows.md).
 
+For implementation recipes covering public components, animations, admin editors,
+inputs, repositories and schema changes, see the [Development guide](./docs/development.md).
+
 ## Contributing
 
 If you'd like to contribute to this project, please follow these steps:

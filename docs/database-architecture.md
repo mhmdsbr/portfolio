@@ -58,6 +58,11 @@ the auth layer; `services/admin-accounts.ts` and `services/admin-verification.ts
 hold the account and email-verification rules. Only the `admin-*` repositories
 query the tables.
 
+The verification service entry point re-exports focused modules in
+[admin-verification/](../src/server/services/admin-verification): signup,
+self-service password reset, admin-assisted reset and own password change.
+Shared challenge limits and attempt handling live alongside those modules.
+
 See [Admin authentication flows](./authentication-flows.md) for detailed login,
 signup, password-reset and session lifecycle diagrams.
 

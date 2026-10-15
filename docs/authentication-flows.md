@@ -424,9 +424,13 @@ flowchart TD
 |---|---|
 | Route guards | [Login page](../src/app/(auth)/admin/login/page.tsx), [signup page](../src/app/(auth)/admin/signup/page.tsx), [admin layout](../src/app/admin/layout.tsx) |
 | Public auth forms | [AdminLoginForm](../src/client/components/admin/forms/auth/AdminLoginForm.tsx), [AdminSignupForm](../src/client/components/admin/forms/auth/AdminSignupForm.tsx) |
-| Signed-in forms | [ProfileSettingsForm](../src/client/components/admin/forms/profile-settings/ProfileSettingsForm.tsx) |
+| Signed-in forms | [ProfileSettingsForm](../src/client/components/admin/forms/profile-settings/ProfileSettingsForm.tsx) composes [profile details](../src/client/components/admin/forms/profile-settings/ProfileDetailsForm.tsx), [password change](../src/client/components/admin/forms/profile-settings/PasswordChangeForm.tsx), [account activation](../src/client/components/admin/forms/profile-settings/AdminAccounts.tsx), [add admin](../src/client/components/admin/forms/profile-settings/AddAdminForm.tsx) and [admin password reset](../src/client/components/admin/forms/profile-settings/AdminPasswordResetForm.tsx) panels. Each panel owns its form state and action handling. |
 | Server Actions | [Auth actions](../src/server/actions/admin/auth.ts), [profile actions](../src/server/actions/admin/profile.ts) |
-| Verification and account rules | [admin-verification](../src/server/services/admin-verification.ts), [admin-accounts](../src/server/services/admin-accounts.ts) |
+| Verification entry point | [admin-verification](../src/server/services/admin-verification.ts) preserves the existing exports; implementations are split by flow below. |
+| Signup verification | [signup](../src/server/services/admin-verification/signup.ts): first-admin and additional-admin email verification. |
+| Password verification | [Self-service reset](../src/server/services/admin-verification/self-service-password-reset.ts), [admin-assisted reset](../src/server/services/admin-verification/admin-password-reset.ts), [own password change](../src/server/services/admin-verification/password-change.ts). |
+| Shared verification rules | [shared](../src/server/services/admin-verification/shared.ts): expiry/cooldown/attempt constants, challenge input checks and code-attempt handling. |
+| Account rules | [admin-accounts](../src/server/services/admin-accounts.ts): profile updates and activation/deactivation. |
 | Session, hashing and validation | [session](../src/server/auth/session.ts), [password](../src/server/auth/password.ts), [validation](../src/server/auth/validation.ts) |
 | Persistence and locks | [Users](../src/server/repos/admin-users.ts), [profiles](../src/server/repos/admin-profiles.ts), [sessions](../src/server/repos/admin-sessions.ts), [verifications](../src/server/repos/admin-email-verifications.ts), [advisory locks](../src/server/repos/advisory-locks.ts) |
 | Mail and schema | [SMTP delivery](../src/server/email.ts), [database schema](../src/server/db/schema.ts) |
