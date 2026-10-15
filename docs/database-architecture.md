@@ -58,6 +58,9 @@ the auth layer; `services/admin-accounts.ts` and `services/admin-verification.ts
 hold the account and email-verification rules. Only the `admin-*` repositories
 query the tables.
 
+See [Admin authentication flows](./authentication-flows.md) for detailed login,
+signup, password-reset and session lifecycle diagrams.
+
 ## 2. Entity relationships
 
 Tables are grouped by purpose. Only foreign keys are drawn; `page_sections`
