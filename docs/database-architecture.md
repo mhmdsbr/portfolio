@@ -18,6 +18,16 @@ public site is rendered on the server from a single `AllDataResponse` payload
 (`getPublicAll()`). The public pages are `force-dynamic`, so they read the
 database on every request and no data cache is used. There is no public JSON API.
 
+Within each `getPublicAll()` call, section metadata, contact methods with their
+section associations, and site settings are each loaded once. Independent content
+reads run in parallel; hero titles start loading as soon as the section lookup
+resolves. Pure mapping helpers assemble the public response. Project detail and
+category pages use `getPublicHeader()` to load only section metadata for navigation,
+alongside their project repository reads. The header mapper is shared with the
+homepage; unused standalone section loaders have been removed. This avoids
+duplicate shared reads without adding cross-request caching or changing the
+response contract.
+
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','secondaryColor':'#e0f2fe','tertiaryColor':'#f1f5f9','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','clusterBkg':'#f1f5f9','clusterBorder':'#94a3b8','titleColor':'#0f172a','edgeLabelBackground':'#e2e8f0'}}}%%
 flowchart LR
@@ -57,6 +67,11 @@ verification codes) and `session.ts` (cookie, session lookup, login/logout) are
 the auth layer; `services/admin-accounts.ts` and `services/admin-verification.ts`
 hold the account and email-verification rules. Only the `admin-*` repositories
 query the tables.
+
+The verification service entry point re-exports focused modules in
+[admin-verification/](../src/server/services/admin-verification): signup,
+self-service password reset, admin-assisted reset and own password change.
+Shared challenge limits and attempt handling live alongside those modules.
 
 See [Admin authentication flows](./authentication-flows.md) for detailed login,
 signup, password-reset and session lifecycle diagrams.
