@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/server/repos/projects";
 import Header from "@/client/components/public/organisms/header";
 import { Badge, Button, Heading, Typography } from "@/client/components/public/atoms";
-import { getPublicAll } from "@/server/services/public-content";
+import { getPublicHeader } from "@/server/services/public-content";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
 import PublicPageLayout from "@/client/components/public/layouts/PublicPageLayout";
 
@@ -23,7 +23,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound();
   }
 
-  const { header } = await getPublicAll();
+  const header = await getPublicHeader();
 
   return (
       <PublicPageLayout id="project-page" className="px-6 py-22">

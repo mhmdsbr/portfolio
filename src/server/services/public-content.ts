@@ -1,9 +1,9 @@
 import { readSectionConfig } from '@/server/helpers/section-config'
 import type { SectionKind } from '@/shared/types'
-import { getContactMethodsForSection, getContactMethodsWithSections } from '@/server/repos/contact-methods'
+import { getContactMethodsWithSections } from '@/server/repos/contact-methods'
 import { experienceRepo, profileFactRepo, serviceRepo, skillRepo, testimonialRepo } from '@/server/repos/collections'
 import { listHeroTitles } from '@/server/repos/hero-titles'
-import { listSections, getSection } from '@/server/repos/page-sections'
+import { listSections } from '@/server/repos/page-sections'
 import { getProjects } from '@/server/repos/projects'
 import { profileRepo, siteConfigRepo } from '@/server/repos/singletons'
 import { listSocialLinks } from '@/server/repos/social-links'
@@ -15,32 +15,54 @@ import type {
   ExperienceResponse,
   FooterResponse,
   HeroResponse,
+  HeaderResponse,
   ProjectsResponse,
   ServicesResponse,
   TestimonialsResponse,
 } from '@/shared/types'
 
-export async function getPublicHero(): Promise<HeroResponse> {
-  const section = await getSection('hero')
-  const titles = section ? await listHeroTitles(section.id) : []
+type Section = Awaited<ReturnType<typeof listSections>>[number]
+type ContactMethods = Awaited<ReturnType<typeof getContactMethodsWithSections>>
+type SiteConfig = Awaited<ReturnType<typeof siteConfigRepo.get>>
 
+export async function getPublicHeader(): Promise<HeaderResponse> {
+  return mapHeader(await listSections())
+}
+
+function mapHeader(sections: Section[]): HeaderResponse {
   return {
-    titles: titles.map(({ title }) => title),
-    location: section?.config.location ?? null,
-    subtitle_one: section?.config.subtitleOne ?? null,
-    subtitle_two: section?.config.subtitleTwo ?? null,
-    logo: section?.config.logoUrl ?? null,
+    sections: sections.map(({ id, kind, navigationTitle, title, sortOrder, isEnabled }) => ({
+      id,
+      kind,
+      navigationTitle,
+      title,
+      sortOrder,
+      isEnabled,
+    })),
+    defaultTitle: null,
   }
 }
 
-export async function getPublicAbout(): Promise<AboutResponse> {
-  const [section, profile, methods, details] = await Promise.all([
-    getSection('about'),
-    profileRepo.get(),
-    getContactMethodsForSection('about'),
-    profileFactRepo.list(),
-  ])
+function mapHero(
+  section: Section | null | undefined,
+  titles: Awaited<ReturnType<typeof listHeroTitles>>,
+): HeroResponse {
+  const config = readSectionConfig('hero', section?.config)
+  return {
+    titles: titles.map(({ title }) => title),
+    location: config.location,
+    subtitle_one: config.subtitleOne,
+    subtitle_two: config.subtitleTwo,
+    logo: config.logoUrl,
+  }
+}
 
+function mapAbout(
+  section: Section | null | undefined,
+  profile: Awaited<ReturnType<typeof profileRepo.get>>,
+  methods: ContactMethods,
+  details: Awaited<ReturnType<typeof profileFactRepo.list>>,
+): AboutResponse {
   return {
     title: section?.title ?? null,
     name: profile?.name ?? null,
@@ -51,13 +73,11 @@ export async function getPublicAbout(): Promise<AboutResponse> {
   }
 }
 
-export async function getPublicExperience(): Promise<ExperienceResponse> {
-  const [section, experiences, skills] = await Promise.all([
-    getSection('experience'),
-    experienceRepo.list(),
-    skillRepo.list(),
-  ])
-
+function mapExperience(
+  section: Section | null | undefined,
+  experiences: Awaited<ReturnType<typeof experienceRepo.list>>,
+  skills: Awaited<ReturnType<typeof skillRepo.list>>,
+): ExperienceResponse {
   return {
     title: section?.title ?? null,
     experiences: experiences.map((experience) => ({
@@ -71,12 +91,10 @@ export async function getPublicExperience(): Promise<ExperienceResponse> {
   }
 }
 
-export async function getPublicServices(): Promise<ServicesResponse> {
-  const [section, items] = await Promise.all([
-    getSection('services'),
-    serviceRepo.list(),
-  ])
-
+function mapServices(
+  section: Section | null | undefined,
+  items: Awaited<ReturnType<typeof serviceRepo.list>>,
+): ServicesResponse {
   return {
     title: section?.title ?? null,
     items: items.map(({ title, description, icon }) => ({
@@ -87,12 +105,10 @@ export async function getPublicServices(): Promise<ServicesResponse> {
   }
 }
 
-export async function getPublicTestimonials(): Promise<TestimonialsResponse> {
-  const [section, items] = await Promise.all([
-    getSection('testimonials'),
-    testimonialRepo.list(),
-  ])
-
+function mapTestimonials(
+  section: Section | null | undefined,
+  items: Awaited<ReturnType<typeof testimonialRepo.list>>,
+): TestimonialsResponse {
   return {
     title: section?.title ?? null,
     items: items.map(({ imageUrl, title, subtitle, rating, body }) => ({
@@ -105,12 +121,10 @@ export async function getPublicTestimonials(): Promise<TestimonialsResponse> {
   }
 }
 
-export async function getPublicProjects(): Promise<ProjectsResponse> {
-  const [section, projects] = await Promise.all([
-    getSection('projects'),
-    getProjects(),
-  ])
-
+function mapProjects(
+  section: Section | null | undefined,
+  projects: Awaited<ReturnType<typeof getProjects>>,
+): ProjectsResponse {
   return {
     title: section?.title ?? null,
     items: projects.map((project) => ({
@@ -129,27 +143,25 @@ export async function getPublicProjects(): Promise<ProjectsResponse> {
   }
 }
 
-export async function getPublicContact(): Promise<ContactResponse> {
-  const [section, methods, socialLinks] = await Promise.all([
-    getSection('contact'),
-    getContactMethodsForSection('contact'),
-    listSocialLinks(),
-  ])
-
+function mapContact(
+  section: Section | null | undefined,
+  methods: ContactMethods,
+  socialLinks: Awaited<ReturnType<typeof listSocialLinks>>,
+): ContactResponse {
+  const config = readSectionConfig('contact', section?.config)
   return {
     title: section?.title ?? null,
-    form_title: section?.config.formTitle ?? null,
+    form_title: config.formTitle,
     button: {
-      text: section?.config.buttonText ?? null,
-      url: section?.config.buttonUrl ?? null,
+      text: config.buttonText,
+      url: config.buttonUrl,
     },
     methods: methods.map(({ id, kind, title, value }) => ({ id, kind, title, value })),
     socialLinks,
   }
 }
 
-export async function getPublicFooter(): Promise<FooterResponse> {
-  const config = await siteConfigRepo.get()
+function mapFooter(config: SiteConfig): FooterResponse {
   return {
     companyName: config?.companyName ?? null,
     privacyPolicy: config?.privacyPolicy ?? null,
@@ -158,76 +170,56 @@ export async function getPublicFooter(): Promise<FooterResponse> {
   }
 }
 
-export async function getPublicConfig(): Promise<ConfigResponse> {
-  const config = await siteConfigRepo.get()
+function mapConfig(config: SiteConfig): ConfigResponse {
   return { recaptcha_site_key: config?.recaptchaSiteKey ?? null }
 }
 
 export async function getPublicAll(): Promise<AllDataResponse> {
-  const [hero, about, services, experience, testimonials, projects, contact, config, footer, sections] =
-    await Promise.all([
-      getPublicHero(),
-      getPublicAbout(),
-      getPublicServices(),
-      getPublicExperience(),
-      getPublicTestimonials(),
-      getPublicProjects(),
-      getPublicContact(),
-      getPublicConfig(),
-      getPublicFooter(),
-      listSections(),
-    ])
+  const sectionsPromise = listSections()
+  const titlesPromise = sectionsPromise.then((sections) => {
+    const hero = sections.find((section) => section.kind === 'hero')
+    return hero ? listHeroTitles(hero.id) : []
+  })
+  const [
+    sections, methods, settings, profile, details, experiences,
+    skills, services, testimonials, projects, socialLinks, titles,
+  ] = await Promise.all([
+    sectionsPromise,
+    getContactMethodsWithSections(),
+    siteConfigRepo.get(),
+    profileRepo.get(),
+    profileFactRepo.list(),
+    experienceRepo.list(),
+    skillRepo.list(),
+    serviceRepo.list(),
+    testimonialRepo.list(),
+    getProjects(),
+    listSocialLinks(),
+    titlesPromise,
+  ])
 
   const sectionsByKind = new Map<SectionKind, (typeof sections)[number]>(
     sections.map((section) => [section.kind, section]),
   )
-  const sectionConfig = <K extends SectionKind>(kind: K) =>
-    readSectionConfig(kind, sectionsByKind.get(kind)?.config)
-  const allContactMethods = await getContactMethodsWithSections()
+  const heroSection = sectionsByKind.get('hero')
   const contactMethodsFor = (kind: 'about' | 'contact') =>
-    allContactMethods.filter((method) => method.sections.includes(kind))
+    methods.filter((method) => method.sections.includes(kind))
+  const footer = mapFooter(settings)
 
   return {
-    hero,
-    about: {
-      ...about,
-      contact_information: contactMethodsFor('about').map(({ kind, title, value }) => ({
-        kind,
-        title,
-        value,
-      })),
-    },
-    services,
-    experience,
-    testimonials,
-    projects,
-    contact: {
-      ...contact,
-      title: sectionsByKind.get('contact')?.title ?? null,
-      form_title: sectionConfig('contact').formTitle,
-      button: {
-        text: sectionConfig('contact').buttonText,
-        url: sectionConfig('contact').buttonUrl,
-      },
-      methods: contactMethodsFor('contact').map(({ id, kind, title, value }) => ({
-        id,
-        kind,
-        title,
-        value,
-      })),
-    },
-    config,
-    header: {
-      sections: sections.map(({ id, kind, navigationTitle, title, sortOrder, isEnabled }) => ({
-        id,
-        kind,
-        navigationTitle,
-        title,
-        sortOrder,
-        isEnabled,
-      })),
-      defaultTitle: null,
-    },
+    hero: mapHero(heroSection, titles),
+    about: mapAbout(
+      sectionsByKind.get('about'), profile, contactMethodsFor('about'), details,
+    ),
+    services: mapServices(sectionsByKind.get('services'), services),
+    experience: mapExperience(sectionsByKind.get('experience'), experiences, skills),
+    testimonials: mapTestimonials(sectionsByKind.get('testimonials'), testimonials),
+    projects: mapProjects(sectionsByKind.get('projects'), projects),
+    contact: mapContact(
+      sectionsByKind.get('contact'), contactMethodsFor('contact'), socialLinks,
+    ),
+    config: mapConfig(settings),
+    header: mapHeader(sections),
     footer: {
       companyName: footer.companyName || 'Your Company',
       privacyPolicy: footer.privacyPolicy,

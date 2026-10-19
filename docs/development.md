@@ -109,12 +109,20 @@ Use existing typography, spacing and component conventions.
 Do not fetch admin endpoints from a public component or pass complete database
 rows when the component only needs a small public projection.
 
+`getPublicAll()` fetches shared section metadata, contact methods and site settings
+once per call, alongside independent content reads. Reuse its mapping helpers when
+extending a response rather than re-fetching shared data. Project detail and
+category pages use `getPublicHeader()` instead of fetching the whole homepage
+payload for navigation. Unused standalone section loaders have been removed.
+Keep new loaders focused, and do not introduce cross-request caching without
+defining an invalidation policy.
+
 ### C. Existing example: Skills
 
 Trace:
 
 1. `skillRepo.list()` reads ordered rows.
-2. `getPublicExperience()` maps them to `{ skill, level }`.
+2. `getPublicAll()` uses `mapExperience()` to map them to `{ skill, level }`.
 3. The home page renders `<Skills skills={data.experience.skills} />` inside the
    experience renderer.
 4. [Skills](../src/client/components/public/organisms/skills/skills.tsx) renders
