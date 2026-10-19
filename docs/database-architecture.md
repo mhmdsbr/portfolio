@@ -18,6 +18,16 @@ public site is rendered on the server from a single `AllDataResponse` payload
 (`getPublicAll()`). The public pages are `force-dynamic`, so they read the
 database on every request and no data cache is used. There is no public JSON API.
 
+Within each `getPublicAll()` call, section metadata, contact methods with their
+section associations, and site settings are each loaded once. Independent content
+reads run in parallel; hero titles start loading as soon as the section lookup
+resolves. Pure mapping helpers assemble the public response. Project detail and
+category pages use `getPublicHeader()` to load only section metadata for navigation,
+alongside their project repository reads. The header mapper is shared with the
+homepage; unused standalone section loaders have been removed. This avoids
+duplicate shared reads without adding cross-request caching or changing the
+response contract.
+
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#dbeafe','primaryTextColor':'#0f172a','primaryBorderColor':'#2563eb','secondaryColor':'#e0f2fe','tertiaryColor':'#f1f5f9','lineColor':'#64748b','textColor':'#0f172a','mainBkg':'#dbeafe','nodeBorder':'#2563eb','clusterBkg':'#f1f5f9','clusterBorder':'#94a3b8','titleColor':'#0f172a','edgeLabelBackground':'#e2e8f0'}}}%%
 flowchart LR

@@ -8,7 +8,7 @@ import {
   Heading,
   Typography,
 } from "@/client/components/public/atoms";
-import { getPublicAll } from "@/server/services/public-content";
+import { getPublicHeader } from "@/server/services/public-content";
 import { getProjectsByCategory } from "@/server/repos/projects";
 import PublicPageLayout from "@/client/components/public/layouts/PublicPageLayout";
 import BackgroundGradient from "@/client/components/common/backgroundGradient";
@@ -32,7 +32,7 @@ export default async function ProjectCategoryPage({
   }
 
   const categoryName = projects[0].category;
-  const { header } = await getPublicAll();
+  const header = await getPublicHeader();
 
   return (
     <PublicPageLayout className="px-6 py-22">
